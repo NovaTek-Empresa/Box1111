@@ -61,7 +61,7 @@ const chatData = {
             messages: [
                 { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
                 { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' },
-                { from: 'client', text: 'Quando posso visitar?', time: '09:19' },
+                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
                 { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:21' }
             ]
         },
@@ -82,7 +82,7 @@ const chatData = {
             last: 'Quando posso visitar?',
             messages: [
                 { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
-                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' }
+                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:15' }
             ]
         },
               {
