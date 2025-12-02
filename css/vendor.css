@@ -141,6 +141,41 @@ body {
     border-top: 1px solid #334155;
 }
 
+/* Collapse / Compact sidebar (desktop) */
+.vendor-sidebar.collapsed {
+    width: 72px;
+}
+
+.vendor-sidebar.collapsed .brand-text,
+.vendor-sidebar.collapsed .sidebar-footer a,
+.vendor-sidebar.collapsed .nav-item a span {
+    display: none;
+}
+
+.vendor-sidebar.collapsed .nav-item a {
+    justify-content: center;
+    padding: 12px 8px;
+}
+
+.vendor-sidebar .collapse-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--sidebar-text);
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.vendor-sidebar .collapse-btn:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.vendor-main.sidebar-compact {
+    margin-left: 72px;
+}
+
 /* Main Content */
 .vendor-main {
     flex: 1;

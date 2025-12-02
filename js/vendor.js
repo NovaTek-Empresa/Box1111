@@ -113,6 +113,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Botão para colapsar/expandir a sidebar (desktop)
+    const vendorCollapseBtn = document.getElementById('vendorSidebarCollapse');
+    const vendorMain = document.querySelector('.vendor-main');
+
+    if (vendorCollapseBtn && vendorSidebar && vendorMain) {
+        vendorCollapseBtn.addEventListener('click', () => {
+            const icon = vendorCollapseBtn.querySelector('i');
+            vendorSidebar.classList.toggle('collapsed');
+            vendorMain.classList.toggle('sidebar-compact');
+            if (vendorSidebar.classList.contains('collapsed')) {
+                if (icon) {
+                    icon.classList.remove('fa-angle-left');
+                    icon.classList.add('fa-angle-right');
+                }
+            } else {
+                if (icon) {
+                    icon.classList.remove('fa-angle-right');
+                    icon.classList.add('fa-angle-left');
+                }
+            }
+        });
+    }
+    
     // Navegação entre seções
     const navItems = document.querySelectorAll('.nav-item');
     
