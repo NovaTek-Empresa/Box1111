@@ -210,6 +210,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Botão para colapsar/expandir a sidebar (desktop)
+    const adminCollapseBtn = document.getElementById('adminSidebarCollapse');
+    const adminMain = document.querySelector('.admin-main');
+
+    if (adminCollapseBtn && adminSidebar && adminMain) {
+        adminCollapseBtn.addEventListener('click', () => {
+            const icon = adminCollapseBtn.querySelector('i');
+            adminSidebar.classList.toggle('collapsed');
+            adminMain.classList.toggle('sidebar-compact');
+            // Alternar ícone
+            if (adminSidebar.classList.contains('collapsed')) {
+                if (icon) {
+                    icon.classList.remove('fa-angle-left');
+                    icon.classList.add('fa-angle-right');
+                }
+            } else {
+                if (icon) {
+                    icon.classList.remove('fa-angle-right');
+                    icon.classList.add('fa-angle-left');
+                }
+            }
+        });
+    }
+    
     // Navegação entre seções
     setupNavigation();
     
