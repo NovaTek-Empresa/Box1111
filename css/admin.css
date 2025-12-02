@@ -167,6 +167,41 @@ body {
     background: rgba(255, 255, 255, 0.05);
 }
 
+/* Collapse / Compact sidebar (desktop) */
+.admin-sidebar.collapsed {
+    width: 72px;
+}
+
+.admin-sidebar.collapsed .brand-text,
+.admin-sidebar.collapsed .sidebar-footer a,
+.admin-sidebar.collapsed .nav-item a span {
+    display: none;
+}
+
+.admin-sidebar.collapsed .nav-item a {
+    justify-content: center;
+    padding: 12px 8px;
+}
+
+.admin-sidebar .collapse-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--sidebar-text);
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.admin-sidebar .collapse-btn:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.admin-main.sidebar-compact {
+    margin-left: 72px;
+}
+
 /* Main Content */
 .admin-main {
     flex: 1;
