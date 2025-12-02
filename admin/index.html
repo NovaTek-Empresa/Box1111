@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo — Imobiliária OLX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">BOX</div>
+                <div class="brand-text">
+                    <h2>11 11</h2>
+                    <p>Painel Administrativo</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-section="dashboard">
+                        <a href="#dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="properties">
+                        <a href="#properties">
+                            <i class="fas fa-home"></i>
+                            <span>Imóveis</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="users">
+                        <a href="#users">
+                            <i class="fas fa-users"></i>
+                            <span>Usuários</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="vendors">
+                        <a href="#vendors">
+                            <i class="fas fa-store"></i>
+                            <span>Vendedores</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="categories">
+                        <a href="#categories">
+                            <i class="fas fa-tags"></i>
+                            <span>Categorias</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="reports">
+                        <a href="#reports">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Relatórios</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="settings">
+                        <a href="#settings">
+                            <i class="fas fa-cog"></i>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="../index.html" class="btn btn-outline">
+                    <i class="fas fa-globe"></i>
+                    Ver Site
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="admin-search">
+                        <input type="text" placeholder="Pesquisar..." id="globalSearch">
+                        <button><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="admin-notifications">
+                        <button class="notification-btn" id="notificationBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <div class="notifications-dropdown" id="notificationsDropdown">
+                            <div class="notification-header">
+                                <h3>Notificações</h3>
+                                <button class="mark-all-read">Marcar todas como lidas</button>
+                            </div>
+                            <div class="notification-list">
+                                <!-- Notificações serão carregadas via JavaScript -->
+                            </div>
+                            <div class="notification-footer">
+                                <a href="#all-notifications">Ver todas as notificações</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admin-profile">
+                        <div class="profile-dropdown">
+                            <button class="profile-btn">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Admin">
+                                <span>Administrador</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="profile-menu">
+                                <a href="#profile" class="menu-item">
+                                    <i class="fas fa-user"></i>
+                                    Meu Perfil
+                                </a>
+                                <a href="#settings" class="menu-item">
+                                    <i class="fas fa-cog"></i>
+                                    Configurações
+                                </a>
+                                <div class="menu-divider"></div>
+                                <a href="../index.html" class="menu-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Sair
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="admin-content">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="content-section active">
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>1,254</h3>
+                                <p>Imóveis Ativos</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>12%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>3,842</h3>
+                                <p>Usuários Registrados</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>8%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>156</h3>
+                                <p>Vendedores Ativos</p>
+                            </div>
+                            <div class="stat-trend down">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>3%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>R$ 42.5M</h3>
+                                <p>Volume de Vendas</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>15%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="content-grid">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Atividade Recente</h3>
+                                <a href="#" class="view-all">Ver Tudo</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="activity-list" id="activityList">
+                                    <!-- Atividades serão carregadas via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Imóveis Recentes</h3>
+                                <a href="#" class="view-all">Ver Tudo</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="property-list" id="propertyList">
+                                    <!-- Imóveis serão carregados via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Properties Section -->
+                <section id="properties-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciar Imóveis</h2>
+                        <button class="btn btn-primary" id="addPropertyBtn">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Imóvel
+                        </button>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Todos os Imóveis</h3>
+                            <div class="table-actions">
+                                <div class="filter-dropdown">
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-filter"></i>
+                                        Filtrar
+                                    </button>
+                                </div>
+                                <div class="export-dropdown">
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="data-table" id="propertiesTable">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="selectAllProperties"></th>
+                                            <th>Imóvel</th>
+                                            <th>Preço</th>
+                                            <th>Localização</th>
+                                            <th>Status</th>
+                                            <th>Data</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dados dos imóveis serão carregados via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-footer">
+                                <div class="table-info">
+                                    Mostrando 1-10 de 1,254 imóveis
+                                </div>
+                                <div class="pagination">
+                                    <button class="pagination-btn" disabled>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button class="pagination-btn active">1</button>
+                                    <button class="pagination-btn">2</button>
+                                    <button class="pagination-btn">3</button>
+                                    <button class="pagination-btn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Users Section -->
+                <section id="users-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciar Usuários</h2>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Usuário
+                        </button>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Todos os Usuários</h3>
+                            <div class="table-actions">
+                                <div class="filter-dropdown">
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-filter"></i>
+                                        Filtrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="data-table" id="usersTable">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="selectAllUsers"></th>
+                                            <th>Usuário</th>
+                                            <th>Email</th>
+                                            <th>Tipo</th>
+                                            <th>Status</th>
+                                            <th>Registro</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dados dos usuários serão carregados via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-footer">
+                                <div class="table-info">
+                                    Mostrando 1-10 de 3,842 usuários
+                                </div>
+                                <div class="pagination">
+                                    <button class="pagination-btn" disabled>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button class="pagination-btn active">1</button>
+                                    <button class="pagination-btn">2</button>
+                                    <button class="pagination-btn">3</button>
+                                    <button class="pagination-btn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Outras seções (vendors, categories, reports, settings) -->
+                <!-- Estrutura similar às seções acima -->
+                
+                <!-- Vendors Section -->
+                <section id="vendors-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciar Vendedores</h2>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Vendedor
+                        </button>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-body">
+                            <p>Conteúdo da seção Vendedores será carregado aqui.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Categories Section -->
+                <section id="categories-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciar Categorias</h2>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Categoria
+                        </button>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-body">
+                            <p>Conteúdo da seção Categorias será carregado aqui.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section id="reports-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Relatórios e Análises</h2>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            Exportar Relatório
+                        </button>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-body">
+                            <p>Conteúdo da seção Relatórios será carregado aqui.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Configurações do Sistema</h2>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-body">
+                            <p>Conteúdo da seção Configurações será carregado aqui.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para adicionar/editar imóvel -->
+    <div class="modal" id="propertyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Adicionar Imóvel</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="propertyForm">
+                    <div class="form-group">
+                        <label for="propertyTitle">Título do Imóvel</label>
+                        <input type="text" id="propertyTitle" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="propertyPrice">Preço</label>
+                            <input type="text" id="propertyPrice" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="propertyType">Tipo</label>
+                            <select id="propertyType" required>
+                                <option value="">Selecione...</option>
+                                <option value="casa">Casa</option>
+                                <option value="apartamento">Apartamento</option>
+                                <option value="terreno">Terreno</option>
+                                <option value="comercial">Comercial</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyLocation">Localização</label>
+                        <input type="text" id="propertyLocation" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyDescription">Descrição</label>
+                        <textarea id="propertyDescription" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="modalCancel">Cancelar</button>
+                <button class="btn btn-primary" id="modalSave">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>
