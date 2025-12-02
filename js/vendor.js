@@ -98,6 +98,13 @@ const chatData = {
     ]
 };
 
+
+function countNotification(chatData){
+    
+    return chatData.conversations.length;
+}
+
+
 // Variável temporária de anexo na conversa atual
 let currentChatAttachment = null;
 

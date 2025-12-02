@@ -45,7 +45,7 @@ body {
 /* Sidebar */
 .vendor-sidebar {
     width: 280px;
-    background: var(--sidebar-bg);
+    background: linear-gradient(200deg, var(--primary), var(--accent));
     color: var(--sidebar-text);
     transition: var(--transition);
     display: flex;

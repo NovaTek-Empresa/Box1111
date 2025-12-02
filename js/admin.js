@@ -611,6 +611,8 @@ function updateNotificationBadge(count) {
     }
 }
 
+
+
 // Marcar notificação como lida
 function markNotificationAsRead(id) {
     const notification = adminData.notifications.find(n => n.id === id);
