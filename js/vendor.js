@@ -60,6 +60,38 @@ const chatData = {
             last: 'Quando posso visitar?',
             messages: [
                 { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
+                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' },
+                { from: 'client', text: 'Quando posso visitar?', time: '09:19' },
+                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:21' }
+            ]
+        },
+                {
+            id: 3,
+            name: 'Rafael Souza',
+            avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
+            last: 'Quando posso visitar?',
+            messages: [
+                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
+                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' }
+            ]
+        },
+              {
+            id: 4,
+            name: 'Rafael Souza',
+            avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
+            last: 'Quando posso visitar?',
+            messages: [
+                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
+                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' }
+            ]
+        },
+              {
+            id: 5,
+            name: 'Rafael Souza',
+            avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
+            last: 'Quando posso visitar?',
+            messages: [
+                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
                 { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' }
             ]
         }
