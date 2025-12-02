@@ -1558,25 +1558,34 @@ body {
 
 @media (max-width: 1024px) {
     .admin-main {
-        max-width: 625px;
+        max-width: 705px;
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 414px) {
     .admin-main {
-        max-width: 625px;
+        width: 10px;
+        padding-left: 71px;
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 868px) {
     .admin-main {
-        max-width: 625px;
+        max-width: 570px;
+        padding-left: px;
     }
 }
 
 @media (max-width: 768px) {
     .admin-main {
+        max-width: 645px;
+        padding-left: 71px;
+    }
+}
+
+@media (max-width: 598px) {
+    .admin-main {
         max-width: 545px;
-        padding-left: 2;
+        padding-left: 71px;
     }
 }
