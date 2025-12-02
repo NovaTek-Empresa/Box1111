@@ -673,6 +673,7 @@ body {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     overflow: hidden;
+    height: 830px;
 }
 
 .chat-sidebar {
