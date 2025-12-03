@@ -186,11 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Carregar dados do dashboard
-    loadDashboardData();
-    
     // Configurar busca
     setupVendorSearch();
+    
+    // Carregar dashboard por padrão na primeira carga
+    loadSectionContent('dashboard');
 });
 
 // Carregar dados do dashboard
@@ -229,6 +229,7 @@ function updateStats() {
 // Carregar imóveis recentes
 function loadRecentProperties() {
     const propertiesTable = document.querySelector('.properties-table tbody');
+    // Se não houver tabela de propriedades (página dashboard), apenas retornar
     if (!propertiesTable) return;
     
     propertiesTable.innerHTML = '';
@@ -373,94 +374,192 @@ function updatePropertiesTable(properties) {
 
 // Carregar conteúdo da seção
 function loadSectionContent(section) {
-    const contentArea = document.querySelector('.vendor-content');
+    // Primeiro, ocultar todas as seções
+    hideAllSections();
     
-    // Simulação de carregamento de conteúdo
+    // Lidar com cada seção
     switch(section) {
         case 'dashboard':
-            contentArea.innerHTML = `
-                <div class="stats-grid">
-                    <!-- Conteúdo do dashboard será carregado aqui -->
-                </div>
-                <div class="actions-grid">
-                    <!-- Ações rápidas -->
-                </div>
-                <div class="content-card">
-                    <!-- Imóveis recentes -->
-                </div>
-            `;
+            const dashboardDiv = document.querySelector('[data-section="dashboard"]');
+            if (dashboardDiv) {
+                dashboardDiv.style.display = 'block';
+            }
             loadDashboardData();
             break;
             
+        case 'add-property':
+            const addPropertySection = document.getElementById('add-property');
+            if (addPropertySection) {
+                addPropertySection.style.display = 'block';
+            }
+            setupPropertyForm();
+            break;
+            
         case 'properties':
-            contentArea.innerHTML = `
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3>Meus Imóveis</h3>
-                        <a href="#add-property" class="btn">Adicionar Imóvel</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="properties-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Imóvel</th>
-                                        <th>Preço</th>
-                                        <th>Status</th>
-                                        <th>Visualizações</th>
-                                        <th>Data</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Imóveis serão carregados aqui -->
-                                </tbody>
-                            </table>
+            // Buscar ou criar seção de propriedades
+            let propertiesSection = document.getElementById('my-properties');
+            if (!propertiesSection) {
+                propertiesSection = document.createElement('div');
+                propertiesSection.id = 'my-properties';
+                propertiesSection.className = 'content-section';
+                propertiesSection.innerHTML = `
+                    <div class="vendor-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Meus Imóveis</h3>
+                                <a href="#add-property" class="btn">Adicionar Imóvel</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="properties-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Imóvel</th>
+                                                <th>Preço</th>
+                                                <th>Status</th>
+                                                <th>Visualizações</th>
+                                                <th>Data</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Imóveis serão carregados aqui -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+                document.querySelector('.vendor-main').appendChild(propertiesSection);
+            }
+            propertiesSection.style.display = 'block';
             loadRecentProperties();
             break;
             
         case 'messages':
-            contentArea.innerHTML = `
-                <div class="content-card chat-card">
-                    <aside class="chat-sidebar">
-                        <div style="padding:16px;border-bottom:1px solid var(--border);font-weight:700;">Mensagens</div>
-                        <ul class="chat-list" id="chatList"></ul>
-                    </aside>
-                    <section class="chat-panel">
-                        <div class="chat-header" id="chatHeader">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="avatar" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
-                            <div>
-                                <div id="chatName" style="font-weight:700;">Selecione uma conversa</div>
-                                <div id="chatStatus" style="font-size:0.85rem;color:var(--text-light);">Online</div>
-                            </div>
+            // Buscar ou criar seção de mensagens
+            let messagesSection = document.getElementById('my-messages');
+            if (!messagesSection) {
+                messagesSection = document.createElement('div');
+                messagesSection.id = 'my-messages';
+                messagesSection.className = 'content-section';
+                messagesSection.innerHTML = `
+                    <div class="vendor-content">
+                        <div class="content-card chat-card">
+                            <aside class="chat-sidebar">
+                                <div style="padding:16px;border-bottom:1px solid var(--border);font-weight:700;">Mensagens</div>
+                                <ul class="chat-list" id="chatList"></ul>
+                            </aside>
+                            <section class="chat-panel">
+                                <div class="chat-header" id="chatHeader">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="avatar" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
+                                    <div>
+                                        <div id="chatName" style="font-weight:700;">Selecione uma conversa</div>
+                                        <div id="chatStatus" style="font-size:0.85rem;color:var(--text-light);">Online</div>
+                                    </div>
+                                </div>
+                                <div class="chat-messages" id="chatMessages">
+                                    <p style="color:var(--text-light);">Selecione uma conversa à esquerda para começar a conversar.</p>
+                                </div>
+                                <div class="chat-input-area">
+                                    <button id="chatAttach" class="btn btn-outline" title="Anexar arquivo" style="padding:8px 10px;height:40px;">📎</button>
+                                    <input id="chatFileInput" type="file" style="display:none;">
+                                    <input id="chatInput" class="chat-input" placeholder="Escreva uma mensagem...">
+                                    <button id="chatSend" class="chat-send">Enviar</button>
+                                </div>
+                                <div style="padding:0 16px 16px 16px;">
+                                    <div id="chatAttachmentPreview" style="font-size:0.9rem;color:var(--text-light);"></div>
+                                </div>
+                            </section>
                         </div>
-                        <div class="chat-messages" id="chatMessages">
-                            <p style="color:var(--text-light);">Selecione uma conversa à esquerda para começar a conversar.</p>
-                        </div>
-                        <div class="chat-input-area">
-                            <button id="chatAttach" class="btn btn-outline" title="Anexar arquivo" style="padding:8px 10px;height:40px;">📎</button>
-                            <input id="chatFileInput" type="file" style="display:none;">
-                            <input id="chatInput" class="chat-input" placeholder="Escreva uma mensagem...">
-                            <button id="chatSend" class="chat-send">Enviar</button>
-                        </div>
-                        <div style="padding:0 16px 16px 16px;">
-                            <div id="chatAttachmentPreview" style="font-size:0.9rem;color:var(--text-light);"></div>
-                        </div>
-                    </section>
-                </div>
-            `;
-            // Inicializar chat
+                    </div>
+                `;
+                document.querySelector('.vendor-main').appendChild(messagesSection);
+            }
+            messagesSection.style.display = 'block';
             initChat();
             break;
             
+        case 'statistics':
+            // Placeholder para estatísticas
+            let statisticsSection = document.getElementById('my-statistics');
+            if (!statisticsSection) {
+                statisticsSection = document.createElement('div');
+                statisticsSection.id = 'my-statistics';
+                statisticsSection.className = 'content-section';
+                statisticsSection.innerHTML = `
+                    <div class="vendor-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Estatísticas</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Página de estatísticas em desenvolvimento...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.querySelector('.vendor-main').appendChild(statisticsSection);
+            }
+            statisticsSection.style.display = 'block';
+            break;
+            
+        case 'profile':
+            // Placeholder para perfil
+            let profileSection = document.getElementById('my-profile');
+            if (!profileSection) {
+                profileSection = document.createElement('div');
+                profileSection.id = 'my-profile';
+                profileSection.className = 'content-section';
+                profileSection.innerHTML = `
+                    <div class="vendor-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Meu Perfil</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Página de perfil em desenvolvimento...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.querySelector('.vendor-main').appendChild(profileSection);
+            }
+            profileSection.style.display = 'block';
+            break;
+            
         default:
-            // Carregar dashboard por padrão
-            loadSectionContent('dashboard');
+            // Não fazer nada para seções desconhecidas
+            break;
     }
+}
+
+// Helper para ocultar todas as seções
+function hideAllSections() {
+    // Ocultar dashboard
+    const dashboardDiv = document.querySelector('[data-section="dashboard"]');
+    if (dashboardDiv) dashboardDiv.style.display = 'none';
+    
+    // Ocultar add-property
+    const addPropertySection = document.getElementById('add-property');
+    if (addPropertySection) addPropertySection.style.display = 'none';
+    
+    // Ocultar properties
+    const propertiesSection = document.getElementById('my-properties');
+    if (propertiesSection) propertiesSection.style.display = 'none';
+    
+    // Ocultar messages
+    const messagesSection = document.getElementById('my-messages');
+    if (messagesSection) messagesSection.style.display = 'none';
+    
+    // Ocultar statistics
+    const statisticsSection = document.getElementById('my-statistics');
+    if (statisticsSection) statisticsSection.style.display = 'none';
+    
+    // Ocultar profile
+    const profileSection = document.getElementById('my-profile');
+    if (profileSection) profileSection.style.display = 'none';
 }
 
 // Configurar formulário de adição de imóvel

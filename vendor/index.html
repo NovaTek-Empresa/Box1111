@@ -122,59 +122,81 @@
             </header>
 
             <!-- Content -->
-            <div class="vendor-content" id="dashboard">
+            <div class="vendor-content" id="dashboard" data-section="dashboard">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div>
+                        <h2>Bem-vindo de volta, Carlos!</h2>
+                        <p>Aqui está um resumo do desempenho dos seus imóveis.</p>
+                    </div>
+                    <div class="dashboard-actions">
+                        <button class="btn btn-accent">
+                            <i class="fas fa-calendar-alt"></i>
+                            Esta Semana
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-home"></i>
                         </div>
-                        <div class="stat-info">
-                            <h3>12</h3>
-                            <p>Imóveis Ativos</p>
-                        </div>
-                        <div class="stat-trend up">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>2</span>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <h3>12</h3>
+                                <p>Imóveis Ativos</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>2 novos</span>
+                            </div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-eye"></i>
                         </div>
-                        <div class="stat-info">
-                            <h3>1,254</h3>
-                            <p>Visualizações</p>
-                        </div>
-                        <div class="stat-trend up">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>12%</span>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <h3>1,254</h3>
+                                <p>Visualizações</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>12%</span>
+                            </div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-envelope"></i>
                         </div>
-                        <div class="stat-info">
-                            <h3>24</h3>
-                            <p>Mensagens</p>
-                        </div>
-                        <div class="stat-trend down">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>3</span>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <h3>24</h3>
+                                <p>Mensagens</p>
+                            </div>
+                            <div class="stat-trend down">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>3</span>
+                            </div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <div class="stat-info">
-                            <h3>R$ 2.5M</h3>
-                            <p>Vendas Totais</p>
-                        </div>
-                        <div class="stat-trend up">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>15%</span>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <h3>R$ 2.5M</h3>
+                                <p>Receita Total</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>15%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -207,124 +229,148 @@
                     </div>
                 </div>
 
-                <!-- Recent Properties -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3>Meus Imóveis Recentes</h3>
-                        <a href="#properties" class="view-all">Ver Todos</a>
+                <!-- Analytics Grid -->
+                <div class="analytics-grid">
+                    <!-- Chart Card -->
+                    <div class="content-card chart-card">
+                        <div class="card-header">
+                            <h3>Visualizações por Dia</h3>
+                            <div class="card-controls">
+                                <select class="filter-period">
+                                    <option>Últimos 7 dias</option>
+                                    <option>Últimos 30 dias</option>
+                                    <option>Últimos 90 dias</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-placeholder">
+                                <svg viewBox="0 0 400 200" class="chart-svg">
+                                    <!-- Gráfico simplificado com SVG -->
+                                    <polyline points="0,150 50,120 100,140 150,80 200,100 250,60 300,90 350,40 400,70" 
+                                              fill="none" stroke="#22c55e" stroke-width="3" vector-effect="non-scaling-stroke"/>
+                                    <circle cx="0" cy="150" r="4" fill="#22c55e"/>
+                                    <circle cx="50" cy="120" r="4" fill="#22c55e"/>
+                                    <circle cx="100" cy="140" r="4" fill="#22c55e"/>
+                                    <circle cx="150" cy="80" r="4" fill="#22c55e"/>
+                                    <circle cx="200" cy="100" r="4" fill="#22c55e"/>
+                                    <circle cx="250" cy="60" r="4" fill="#22c55e"/>
+                                    <circle cx="300" cy="90" r="4" fill="#22c55e"/>
+                                    <circle cx="350" cy="40" r="4" fill="#22c55e"/>
+                                    <circle cx="400" cy="70" r="4" fill="#22c55e"/>
+                                </svg>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background: #22c55e;"></span>
+                                    <span>Visualizações</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="properties-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Imóvel</th>
-                                        <th>Preço</th>
-                                        <th>Status</th>
-                                        <th>Visualizações</th>
-                                        <th>Data</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="property-cell">
-                                                <div class="property-image">
-                                                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100&q=80&auto=format&fit=crop" alt="Imóvel">
-                                                </div>
-                                                <div class="property-info">
-                                                    <h4>Casa Alto Padrão</h4>
-                                                    <span class="property-location">Jardins, SP</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="price-cell">R$ 1.250.000</td>
-                                        <td>
-                                            <span class="status-badge active">Ativo</span>
-                                        </td>
-                                        <td>245</td>
-                                        <td>15/10/2023</td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Promover">
-                                                    <i class="fas fa-bullhorn"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Desativar">
-                                                    <i class="fas fa-pause"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="property-cell">
-                                                <div class="property-image">
-                                                    <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=100&q=80&auto=format&fit=crop" alt="Imóvel">
-                                                </div>
-                                                <div class="property-info">
-                                                    <h4>Sobrado Moderno</h4>
-                                                    <span class="property-location">Vila Mariana, SP</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="price-cell">R$ 790.000</td>
-                                        <td>
-                                            <span class="status-badge active">Ativo</span>
-                                        </td>
-                                        <td>189</td>
-                                        <td>12/10/2023</td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Promover">
-                                                    <i class="fas fa-bullhorn"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Desativar">
-                                                    <i class="fas fa-pause"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="property-cell">
-                                                <div class="property-image">
-                                                    <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=100&q=80&auto=format&fit=crop" alt="Imóvel">
-                                                </div>
-                                                <div class="property-info">
-                                                    <h4>Apartamento Centro</h4>
-                                                    <span class="property-location">Centro, SP</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="price-cell">R$ 420.000</td>
-                                        <td>
-                                            <span class="status-badge inactive">Inativo</span>
-                                        </td>
-                                        <td>76</td>
-                                        <td>10/10/2023</td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Promover">
-                                                    <i class="fas fa-bullhorn"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Ativar">
-                                                    <i class="fas fa-play"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+
+                    <!-- Top Properties -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Imóveis Mais Vistos</h3>
+                            <a href="#properties" class="view-all">Ver Tudo</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="top-properties-list">
+                                <div class="property-rank-item">
+                                    <div class="rank-badge">1º</div>
+                                    <div class="rank-info">
+                                        <h4>Casa Alto Padrão</h4>
+                                        <p>Jardins, SP</p>
+                                    </div>
+                                    <div class="rank-stats">
+                                        <span class="views">
+                                            <i class="fas fa-eye"></i>
+                                            245
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="property-rank-item">
+                                    <div class="rank-badge">2º</div>
+                                    <div class="rank-info">
+                                        <h4>Sobrado Moderno</h4>
+                                        <p>Vila Mariana, SP</p>
+                                    </div>
+                                    <div class="rank-stats">
+                                        <span class="views">
+                                            <i class="fas fa-eye"></i>
+                                            189
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="property-rank-item">
+                                    <div class="rank-badge">3º</div>
+                                    <div class="rank-info">
+                                        <h4>Apartamento Centro</h4>
+                                        <p>Centro, SP</p>
+                                    </div>
+                                    <div class="rank-stats">
+                                        <span class="views">
+                                            <i class="fas fa-eye"></i>
+                                            156
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-section">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Atividade Recente</h3>
+                            <a href="#" class="view-all">Ver Todas</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Imóvel publicado com sucesso</h4>
+                                        <p>Casa Alto Padrão foi listado e está disponível para visualização</p>
+                                        <span class="activity-time">Há 2 horas</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon new-message">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Nova mensagem de cliente</h4>
+                                        <p>João Silva manifestou interesse no Sobrado Moderno</p>
+                                        <span class="activity-time">Há 4 horas</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon milestone">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>1000 visualizações alcançadas</h4>
+                                        <p>Seus anúncios atingiram um novo marco de engajamento</p>
+                                        <span class="activity-time">Há 1 dia</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Ranking melhorado</h4>
+                                        <p>Casa Alto Padrão subiu para a posição #1 em buscas</p>
+                                        <span class="activity-time">Há 2 dias</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
