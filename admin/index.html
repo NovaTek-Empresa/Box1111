@@ -415,54 +415,6 @@
         </main>
     </div>
 
-    <!-- Modal para adicionar/editar imóvel -->
-    <div class="modal" id="propertyModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Adicionar Imóvel</h3>
-                <button class="modal-close" id="modalClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="propertyForm">
-                    <div class="form-group">
-                        <label for="propertyTitle">Título do Imóvel</label>
-                        <input type="text" id="propertyTitle" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="propertyPrice">Preço</label>
-                            <input type="text" id="propertyPrice" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="propertyType">Tipo</label>
-                            <select id="propertyType" required>
-                                <option value="">Selecione...</option>
-                                <option value="casa">Casa</option>
-                                <option value="apartamento">Apartamento</option>
-                                <option value="terreno">Terreno</option>
-                                <option value="comercial">Comercial</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="propertyLocation">Localização</label>
-                        <input type="text" id="propertyLocation" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="propertyDescription">Descrição</label>
-                        <textarea id="propertyDescription" rows="4"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" id="modalCancel">Cancelar</button>
-                <button class="btn btn-primary" id="modalSave">Salvar</button>
-            </div>
-        </div>
-    </div>
-
     <script src="../js/admin.js"></script>
 </body>
 </html>

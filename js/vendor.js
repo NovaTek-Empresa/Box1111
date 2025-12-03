@@ -403,131 +403,6 @@ function loadSectionContent(section) {
             loadRecentProperties();
             break;
             
-        case 'add-property':
-            contentArea.innerHTML = `
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3>Adicionar Novo Imóvel</h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="addPropertyForm" class="property-form">
-                            <div class="form-section">
-                                <h4>Informações Básicas</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyTitle">Título do Anúncio</label>
-                                        <input type="text" id="propertyTitle" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyType">Tipo de Imóvel</label>
-                                        <select id="propertyType" class="form-control" required>
-                                            <option value="">Selecione...</option>
-                                            <option value="casa">Casa</option>
-                                            <option value="apartamento">Apartamento</option>
-                                            <option value="comercial">Comercial</option>
-                                            <option value="terreno">Terreno</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyTransaction">Tipo de Transação</label>
-                                        <select id="propertyTransaction" class="form-control" required>
-                                            <option value="">Selecione...</option>
-                                            <option value="venda">Venda</option>
-                                            <option value="aluguel">Aluguel</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyPrice">Preço</label>
-                                        <input type="text" id="propertyPrice" class="form-control" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyArea">Área (m²)</label>
-                                        <input type="number" id="propertyArea" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-section">
-                                <h4>Localização</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyAddress">Endereço</label>
-                                        <input type="text" id="propertyAddress" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyCity">Cidade</label>
-                                        <input type="text" id="propertyCity" class="form-control" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="propertyState">Estado</label>
-                                        <input type="text" id="propertyState" class="form-control" required>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-section">
-                                <h4>Descrição e Características</h4>
-                                <div class="form-group">
-                                    <label class="form-label" for="propertyDescription">Descrição</label>
-                                    <textarea id="propertyDescription" class="form-control" rows="4"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Características</label>
-                                    <div class="features-grid">
-                                        <label class="checkbox">
-                                            <input type="checkbox" name="features" value="quartos">
-                                            <span class="checkmark"></span>
-                                            Quartos
-                                        </label>
-                                        <label class="checkbox">
-                                            <input type="checkbox" name="features" value="banheiros">
-                                            <span class="checkmark"></span>
-                                            Banheiros
-                                        </label>
-                                        <label class="checkbox">
-                                            <input type="checkbox" name="features" value="garagem">
-                                            <span class="checkmark"></span>
-                                            Garagem
-                                        </label>
-                                        <label class="checkbox">
-                                            <input type="checkbox" name="features" value="piscina">
-                                            <span class="checkmark"></span>
-                                            Piscina
-                                        </label>
-                                        <!-- Mais características podem ser adicionadas -->
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-section">
-                                <h4>Imagens</h4>
-                                <div class="image-upload">
-                                    <div class="upload-area" id="uploadArea">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <p>Arraste imagens aqui ou clique para selecionar</p>
-                                        <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
-                                    </div>
-                                    <div class="image-preview" id="imagePreview"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="btn">Publicar Imóvel</button>
-                                <button type="button" class="btn btn-outline">Salvar como Rascunho</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            `;
-            setupPropertyForm();
-            break;
-            
         case 'messages':
             contentArea.innerHTML = `
                 <div class="content-card chat-card">
@@ -816,3 +691,253 @@ function formatTime(date) {
     const m = String(d.getMinutes()).padStart(2, '0');
     return `${h}:${m}`;
 }
+
+// ===== Add Property Form Functionality =====
+
+// Store selected tags
+let selectedPropertyTags = [];
+
+// Initialize Add Property Form
+function initAddPropertyForm() {
+    const form = document.getElementById('addPropertyForm');
+    if (!form) return;
+
+    // File upload handling
+    const fileInput = document.getElementById('propertyImages');
+    const uploadArea = document.querySelector('.file-upload-area');
+    
+    if (uploadArea) {
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = 'rgba(34, 197, 94, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.background = 'rgba(34, 197, 94, 0.02)';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = 'rgba(34, 197, 94, 0.02)';
+            if (e.dataTransfer.files) {
+                handleImageFiles(e.dataTransfer.files);
+            }
+        });
+    }
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            handleImageFiles(e.target.files);
+        });
+    }
+
+    // Character counter for description
+    const descriptionInput = document.getElementById('propertyDescription');
+    const charCount = document.getElementById('charCount');
+    
+    if (descriptionInput) {
+        descriptionInput.addEventListener('input', () => {
+            const count = descriptionInput.value.length;
+            if (charCount) {
+                charCount.textContent = `${count} / 2000 caracteres`;
+            }
+            if (count > 2000) {
+                descriptionInput.value = descriptionInput.value.substring(0, 2000);
+            }
+        });
+    }
+
+    // Tags functionality
+    const tagCheckboxes = document.querySelectorAll('.tag-checkbox input[type="checkbox"]');
+    
+    tagCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedTags);
+    });
+
+    // Form submission
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitAddPropertyForm();
+    });
+}
+
+function handleImageFiles(files) {
+    const preview = document.getElementById('imagePreview');
+    if (!preview) return;
+
+    let existingImages = preview.querySelectorAll('.preview-item').length;
+    
+    Array.from(files).forEach((file, index) => {
+        if (existingImages + index >= 20) return; // Max 20 images
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <button type="button" class="remove-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            const removeBtn = div.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', () => div.remove());
+            
+            preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function updateSelectedTags() {
+    const tagCheckboxes = document.querySelectorAll('.tag-checkbox input[type="checkbox"]:checked');
+    const tagsDisplay = document.getElementById('tagsDisplay');
+    
+    if (!tagsDisplay) return;
+    
+    selectedPropertyTags = Array.from(tagCheckboxes).map(checkbox => {
+        const label = checkbox.parentElement;
+        return label.querySelector('span').textContent.trim();
+    });
+    
+    tagsDisplay.innerHTML = '';
+    
+    selectedPropertyTags.forEach(tag => {
+        const badge = document.createElement('div');
+        badge.className = 'tag-badge';
+        badge.innerHTML = `
+            ${tag}
+            <button type="button" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        tagsDisplay.appendChild(badge);
+    });
+}
+
+function submitAddPropertyForm() {
+    const form = document.getElementById('addPropertyForm');
+    if (!form) return;
+
+    // Get form data
+    const formData = new FormData(form);
+    const propertyData = {
+        title: formData.get('title'),
+        type: formData.get('type'),
+        transaction: 'aluguel',
+        price: formData.get('price'),
+        location: formData.get('location'),
+        city: formData.get('city'),
+        state: formData.get('state'),
+        description: formData.get('description'),
+        bedrooms: formData.get('bedrooms'),
+        bathrooms: formData.get('bathrooms'),
+        garages: formData.get('garages'),
+        area: formData.get('area'),
+        access: formData.get('access'),
+        checkIn: formData.get('checkIn'),
+        checkOut: formData.get('checkOut'),
+        features: formData.getAll('features'),
+        tags: selectedPropertyTags,
+        images: document.getElementById('imagePreview').querySelectorAll('img').length
+    };
+
+    // Validate required fields
+    if (!propertyData.title || !propertyData.type || !propertyData.price ||
+        !propertyData.location || !propertyData.area || !propertyData.description) {
+        alert('Por favor, preencha todos os campos obrigatórios (marcados com *)');
+        return;
+    }
+
+    // Mock submit - in production, send to server
+    console.log('Imóvel para publicar:', propertyData);
+    
+    // Show success message
+    const successMsg = document.createElement('div');
+    successMsg.className = 'success-message';
+    successMsg.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #22c55e;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        ">
+            <i class="fas fa-check-circle"></i> Imóvel publicado com sucesso!
+        </div>
+    `;
+    document.body.appendChild(successMsg);
+    
+    // Clear form
+    form.reset();
+    selectedPropertyTags = [];
+    const tagsDisplay = document.getElementById('tagsDisplay');
+    if (tagsDisplay) tagsDisplay.innerHTML = '';
+    document.getElementById('imagePreview').innerHTML = '';
+    document.getElementById('charCount').textContent = '0 / 2000 caracteres';
+    
+    // Uncheck all checkboxes
+    document.querySelectorAll('.tag-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.feature-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
+    
+    // Remove success message after 4 seconds
+    setTimeout(() => successMsg.remove(), 4000);
+}
+
+// Navigation between sections
+function showSection(sectionId) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Show selected section
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Update navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    const navLink = document.querySelector(`.nav-item a[href="#${sectionId}"]`);
+    if (navLink) {
+        navLink.parentElement.classList.add('active');
+    }
+}
+
+// Handle navigation link clicks
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize add property form
+    initAddPropertyForm();
+    
+    // Navigation
+    document.querySelectorAll('.nav-item a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                const sectionId = href.substring(1);
+                showSection(sectionId);
+            }
+        });
+    });
+    
+    // Show dashboard by default
+    const dashboardSection = document.getElementById('dashboard');
+    if (dashboardSection) {
+        dashboardSection.style.display = 'block';
+    }
+});

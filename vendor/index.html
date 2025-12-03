@@ -119,7 +119,7 @@
             </header>
 
             <!-- Content -->
-            <div class="vendor-content">
+            <div class="vendor-content" id="dashboard">
                 <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -323,6 +323,303 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Property Section -->
+            <div id="add-property" class="content-section" style="display: none;">
+                <div class="vendor-content">
+                    <div class="section-header">
+                        <h2>Adicionar Novo Imóvel</h2>
+                        <p>Preencha as informações do seu imóvel para criar um novo anúncio</p>
+                    </div>
+
+                    <div class="content-card">
+                        <form id="addPropertyForm" class="property-form">
+                        <!-- Seção de Fotos -->
+                        <div class="form-section">
+                            <h3>Fotos do Imóvel</h3>
+                            <div class="form-group">
+                                <label>Carregar Imagens</label>
+                                <div class="file-upload-area">
+                                    <input type="file" id="propertyImages" multiple accept="image/*">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Arraste as fotos aqui ou clique para selecionar</p>
+                                        <small>Máximo 20 fotos</small>
+                                    </div>
+                                </div>
+                                <div id="imagePreview" class="image-preview-grid"></div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Informações Básicas -->
+                        <div class="form-section">
+                            <h3>Informações Básicas</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propertyTitle">Título do Anúncio *</label>
+                                    <input type="text" id="propertyTitle" name="title" required placeholder="Ex: Casa Alto Padrão com Piscina">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertyType">Tipo de Imóvel *</label>
+                                    <select id="propertyType" name="type" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="casa">Casa</option>
+                                        <option value="apartamento">Apartamento</option>
+                                        <option value="comercial">Comercial</option>
+                                        <option value="terreno">Terreno</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propertyPrice">Preço *</label>
+                                    <input type="text" id="propertyPrice" name="price" required placeholder="R$ 0,00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Localização -->
+                        <div class="form-section">
+                            <h3>Localização</h3>
+                            <div class="form-group">
+                                <label for="propertyLocation">Endereço Completo *</label>
+                                <input type="text" id="propertyLocation" name="location" required placeholder="Rua, número, bairro, cidade, estado">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propertyCidade">Cidade *</label>
+                                    <input type="text" id="propertyCidade" name="city" required placeholder="São Paulo">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertyEstado">Estado *</label>
+                                    <input type="text" id="propertyEstado" name="state" required placeholder="SP">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Descrição -->
+                        <div class="form-section">
+                            <h3>Sobre este Espaço</h3>
+                            <div class="form-group">
+                                <label for="propertyDescription">Descrição Detalhada *</label>
+                                <textarea id="propertyDescription" name="description" required placeholder="Descreva o imóvel em detalhes, características especiais, etc..." rows="6"></textarea>
+                                <small id="charCount">0 / 2000 caracteres</small>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Detalhes -->
+                        <div class="form-section">
+                            <h3>Detalhes do Imóvel</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propertyBedrooms">Dormitórios</label>
+                                    <input type="number" id="propertyBedrooms" name="bedrooms" min="0" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertyBathrooms">Banheiros</label>
+                                    <input type="number" id="propertyBathrooms" name="bathrooms" min="0" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertyGarages">Vagas de Garagem</label>
+                                    <input type="number" id="propertyGarages" name="garages" min="0" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertyArea">Área (m²) *</label>
+                                    <input type="number" id="propertyArea" name="area" required min="0" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Acesso do Hóspede -->
+                        <div class="form-section">
+                            <h3>Acesso do Hóspede</h3>
+                            <div class="form-group">
+                                <label for="propertyAccess">Informações de Acesso</label>
+                                <textarea id="propertyAccess" name="access" placeholder="Descreva como o hóspede pode acessar o imóvel (chaves, códigos, instruções especiais, etc...)" rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="propertyCheckIn">Horário de Check-in</label>
+                                <input type="time" id="propertyCheckIn" name="checkIn">
+                            </div>
+                            <div class="form-group">
+                                <label for="propertyCheckOut">Horário de Check-out</label>
+                                <input type="time" id="propertyCheckOut" name="checkOut">
+                            </div>
+                        </div>
+
+                        <!-- Seção de Características -->
+                        <div class="form-section">
+                            <h3>Características e Comodidades</h3>
+                            <div class="features-grid">
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="piscina">
+                                    <span>
+                                        <i class="fas fa-swimming-pool"></i>
+                                        Piscina
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="academia">
+                                    <span>
+                                        <i class="fas fa-dumbbell"></i>
+                                        Academia
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="quadra">
+                                    <span>
+                                        <i class="fas fa-volleyball-ball"></i>
+                                        Quadra
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="churrasqueira">
+                                    <span>
+                                        <i class="fas fa-fire"></i>
+                                        Churrasqueira
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="jardim">
+                                    <span>
+                                        <i class="fas fa-leaf"></i>
+                                        Jardim
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="garagem">
+                                    <span>
+                                        <i class="fas fa-warehouse"></i>
+                                        Garagem
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="varanda">
+                                    <span>
+                                        <i class="fas fa-sun"></i>
+                                        Varanda
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="ar-condicionado">
+                                    <span>
+                                        <i class="fas fa-wind"></i>
+                                        Ar Condicionado
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="elevador">
+                                    <span>
+                                        <i class="fas fa-elevator"></i>
+                                        Elevador
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="portaria-24h">
+                                    <span>
+                                        <i class="fas fa-shield-alt"></i>
+                                        Portaria 24h
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="seguranca">
+                                    <span>
+                                        <i class="fas fa-camera"></i>
+                                        Câmeras de Segurança
+                                    </span>
+                                </label>
+                                <label class="feature-checkbox">
+                                    <input type="checkbox" name="features" value="wi-fi">
+                                    <span>
+                                        <i class="fas fa-wifi"></i>
+                                        Wi-Fi
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Tags -->
+                        <div class="form-section">
+                            <h3>Tags e Categorias</h3>
+                            <div class="form-group">
+                                <label>Selecione as Tags do Imóvel</label>
+                                <div class="tags-container">
+                                    <div class="available-tags">
+                                        <div class="tag-group">
+                                            <h4>Tipo de Propriedade</h4>
+                                            <div class="tags-grid">
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="luxo">
+                                                    <span>Luxo</span>
+                                                </label>
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="moderno">
+                                                    <span>Moderno</span>
+                                                </label>
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="classico">
+                                                    <span>Clássico</span>
+                                                </label>
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="rustico">
+                                                    <span>Rústico</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="tag-group">
+                                            <h4>Situação</h4>
+                                            <div class="tags-grid">
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="reformado">
+                                                    <span>Reformado</span>
+                                                </label>
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="novo">
+                                                    <span>Novo</span>
+                                                </label>
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="precisa-reforma">
+                                                    <span>Precisa Reforma</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="tag-group">
+                                            <h4>Localização</h4>
+                                            <div class="tags-grid">
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="centre-próximo">
+                                                    <span>Centro Próximo</span>
+                                                </label>
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="tranquilo">
+                                                    <span>Tranquilo</span>
+                                                </label>
+                                                <label class="tag-checkbox">
+                                                    <input type="checkbox" name="tags" value="movimentado">
+                                                    <span>Movimentado</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="selected-tags" id="selectedTags">
+                                        <h4>Tags Selecionadas</h4>
+                                        <div id="tagsDisplay" class="tags-display"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-outline">Limpar Formulário</button>
+                            <button type="submit" class="btn btn-accent">Publicar Anúncio</button>
+                        </div>
+                    </form>
                     </div>
                 </div>
             </div>
