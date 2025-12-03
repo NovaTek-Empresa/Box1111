@@ -637,7 +637,7 @@ function loadSectionContent(section) {
             break;
             
         case 'profile':
-            // Placeholder para perfil
+            // Tela de Meu Perfil (mais completa)
             let profileSection = document.getElementById('my-profile');
             if (!profileSection) {
                 profileSection = document.createElement('div');
@@ -645,12 +645,178 @@ function loadSectionContent(section) {
                 profileSection.className = 'content-section';
                 profileSection.innerHTML = `
                     <div class="vendor-content">
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h3>Meu Perfil</h3>
+                        <div class="section-header">
+                            <h2>Meu Perfil</h2>
+                            <p>Gerencie suas informações, métodos de pagamento e segurança</p>
+                        </div>
+
+                        <div class="profile-grid">
+                            <div class="profile-left">
+                                <div class="content-card profile-summary">
+                                    <div class="card-header"><h3>Resumo</h3></div>
+                                    <div class="card-body center">
+                                        <div class="profile-avatar-wrap">
+                                            <img id="avatarPreview" class="profile-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar">
+                                            <label class="avatar-change">
+                                                <input id="profileAvatarInput" type="file" accept="image/*" style="display:none">
+                                                <button type="button" class="btn btn-outline">Alterar Foto</button>
+                                            </label>
+                                        </div>
+                                        <h3 id="profileName">Carlos Silva</h3>
+                                        <p class="muted">Vendedor • Conta verificada</p>
+                                        <div class="profile-actions">
+                                            <button id="btnEditProfile" class="btn">Editar Perfil</button>
+                                            <button id="btnViewPublic" class="btn btn-outline">Ver Perfil Público</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="content-card">
+                                    <div class="card-header"><h3>Documentos</h3></div>
+                                    <div class="card-body">
+                                        <p class="muted">Envie documentos para verificação (CPF/CNPJ, comprovante de endereço).</p>
+                                                                <div class="doc-list">
+                                                                    <div class="doc-item">
+                                                                        <div class="doc-main">
+                                                                            <strong>CPF/CNPJ:</strong>
+                                                                            <div class="doc-value">123.456.789-00</div>
+                                                                            <div class="doc-actions">
+                                                                                <span class="status ok">Verificado</span>
+                                                                                <button class="btn btn-outline small">Atualizar</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="doc-item">
+                                                                        <div class="doc-main">
+                                                                            <strong>Comprovante:</strong>
+                                                                            <div class="doc-value">Não enviado</div>
+                                                                            <div class="doc-actions">
+                                                                                <span class="status missing">Não enviado</span>
+                                                                                <button class="btn btn-outline small">Enviar</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <p>Página de perfil em desenvolvimento...</p>
+
+                            <div class="profile-right">
+                                <div class="content-card">
+                                    <div class="card-header"><h3>Informações de Contato</h3></div>
+                                    <div class="card-body">
+                                        <form id="profileForm" class="profile-form">
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label for="profileFullName">Nome completo</label>
+                                                    <input id="profileFullName" type="text" value="Carlos Silva">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="profileEmail">E-mail</label>
+                                                    <input id="profileEmail" type="email" value="carlos@example.com">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label for="profilePhone">Telefone</label>
+                                                    <input id="profilePhone" type="text" value="(11) 99999-9999">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="profileCompany">Empresa / CPF</label>
+                                                    <input id="profileCompany" type="text" value="Autônomo">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group" style="flex:1">
+                                                    <label for="profileAddress">Endereço</label>
+                                                    <input id="profileAddress" type="text" value="Rua das Flores, 123">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label for="profileCity">Cidade</label>
+                                                    <input id="profileCity" type="text" value="São Paulo">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="profileState">Estado</label>
+                                                    <input id="profileState" type="text" value="SP">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="profileAbout">Sobre você</label>
+                                                <textarea id="profileAbout" rows="4">Anfitrião experiente, respondo rapidamente às mensagens.</textarea>
+                                            </div>
+
+                                            <div class="form-actions">
+                                                <button type="submit" class="btn btn-accent">Salvar Alterações</button>
+                                                <button type="button" id="btnCancelProfile" class="btn btn-outline">Cancelar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="content-card">
+                                    <div class="card-header"><h3>Métodos de Pagamento</h3></div>
+                                    <div class="card-body">
+                                        <p class="muted">Adicione cartões ou contas para receber pagamentos.</p>
+                                        <div id="paymentsList" class="payments-list" style="margin-top:10px"></div>
+
+                                        <form id="addPaymentForm" class="small-form" style="margin-top:12px">
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label for="paymentType">Tipo</label>
+                                                    <select id="paymentType">
+                                                        <option value="credit">Cartão de Crédito</option>
+                                                        <option value="debit">Cartão de Débito</option>
+                                                        <option value="pix">PIX</option>
+                                                        <option value="boleto">Boleto</option>
+                                                        <option value="cash">Pago na Entrada (Dinheiro)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="paymentLabel">Apelido</label>
+                                                    <input id="paymentLabel" type="text" placeholder="Ex: Conta PJ / Visa Corporativo">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="paymentValue">Número / Chave</label>
+                                                <input id="paymentValue" type="text" placeholder="Número do cartão (xxxx xxxx xxxx xxxx) ou chave PIX">
+                                            </div>
+                                            <div class="form-actions">
+                                                <button type="submit" class="btn btn-accent">Adicionar Método</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="content-card">
+                                    <div class="card-header"><h3>Segurança</h3></div>
+                                    <div class="card-body">
+                                        <form id="changePasswordForm" class="small-form">
+                                            <div class="form-group">
+                                                <label for="currentPassword">Senha atual</label>
+                                                <input id="currentPassword" type="password">
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label for="newPassword">Nova senha</label>
+                                                    <input id="newPassword" type="password">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="confirmPassword">Confirmar senha</label>
+                                                    <input id="confirmPassword" type="password">
+                                                </div>
+                                            </div>
+                                            <div class="form-actions">
+                                                <button type="submit" class="btn btn-accent">Atualizar Senha</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -658,6 +824,8 @@ function loadSectionContent(section) {
                 document.querySelector('.vendor-main').appendChild(profileSection);
             }
             profileSection.style.display = 'block';
+            // Inicializar interações do perfil
+            setupProfileInteractions();
             break;
             
         default:
@@ -760,6 +928,163 @@ function handleImageFiles(files) {
             reader.readAsDataURL(file);
         }
     }
+}
+
+// Setup interactions for profile screen (avatar preview, form submits)
+function setupProfileInteractions() {
+    const avatarInput = document.getElementById('profileAvatarInput');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const profileForm = document.getElementById('profileForm');
+    const btnCancel = document.getElementById('btnCancelProfile');
+    const btnEdit = document.getElementById('btnEditProfile');
+
+    if (avatarInput && avatarPreview) {
+        // catch clicks on the visible button to trigger file input
+        const avatarChangeBtn = avatarInput.closest('label');
+        if (avatarChangeBtn) avatarChangeBtn.addEventListener('click', () => avatarInput.click());
+
+        avatarInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => { avatarPreview.src = ev.target.result; };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (profileForm) {
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Perfil salvo com sucesso!');
+        });
+    }
+
+    if (btnCancel && profileForm) {
+        btnCancel.addEventListener('click', () => profileForm.reset());
+    }
+
+    if (btnEdit) {
+        btnEdit.addEventListener('click', () => {
+            const el = document.getElementById('profileFullName');
+            if (el) el.focus();
+        });
+    }
+
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        function showFieldError(el, msg) {
+            if (!el) return;
+            el.classList.add('input-error');
+            let next = el.nextElementSibling;
+            if (!next || !next.classList || !next.classList.contains('error-text')) {
+                next = document.createElement('div');
+                next.className = 'error-text';
+                el.parentNode.insertBefore(next, el.nextSibling);
+            }
+            next.textContent = msg;
+        }
+
+        function clearFieldError(el) {
+            if (!el) return;
+            el.classList.remove('input-error');
+            const next = el.nextElementSibling;
+            if (next && next.classList && next.classList.contains('error-text')) next.remove();
+        }
+
+        changePasswordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nw = document.getElementById('newPassword');
+            const conf = document.getElementById('confirmPassword');
+            let ok = true;
+            clearFieldError(nw);
+            clearFieldError(conf);
+            if (!nw.value || nw.value.length < 8) {
+                showFieldError(nw, 'Senha precisa ter ao menos 8 caracteres.');
+                ok = false;
+            }
+            if (nw.value !== conf.value) {
+                showFieldError(conf, 'As senhas não coincidem.');
+                ok = false;
+            }
+            if (!ok) return;
+            alert('Senha atualizada com sucesso!');
+            changePasswordForm.reset();
+        });
+    }
+
+    // Payment methods management (localStorage)
+    (function(){
+        const paymentsKey = 'vendor_profile_payments';
+        let payments = [];
+
+        function loadPayments() {
+            try { payments = JSON.parse(localStorage.getItem(paymentsKey) || '[]'); } catch(e){ payments = []; }
+        }
+        function savePayments() { localStorage.setItem(paymentsKey, JSON.stringify(payments)); }
+
+        function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+        function renderPayments(){
+            const list = document.getElementById('paymentsList');
+            if (!list) return;
+            list.innerHTML = '';
+            if (payments.length === 0) { list.innerHTML = '<div class="muted">Nenhum método cadastrado.</div>'; return; }
+        payments.forEach((p, idx) => {
+            const item = document.createElement('div');
+            item.className = 'payment-item';
+            // format value per type
+            let displayValue = '';
+            if (p.type === 'credit' || p.type === 'debit') {
+                // mask card number, show last 4
+                const digits = String(p.value).replace(/\D/g, '');
+                const last4 = digits.slice(-4);
+                displayValue = digits ? `•••• •••• •••• ${last4}` : p.value;
+            } else if (p.type === 'pix') {
+                const v = String(p.value);
+                displayValue = v.length > 12 ? v.slice(0,6) + '…' + v.slice(-4) : v;
+            } else if (p.type === 'boleto') {
+                const v = String(p.value).replace(/\s+/g,'');
+                displayValue = v.length > 8 ? '...'+v.slice(-8) : v;
+            } else if (p.type === 'cash') {
+                displayValue = 'Pago na entrada (dinheiro)';
+            } else {
+                displayValue = p.value;
+            }
+
+            const typeLabel = (p.type === 'credit' && 'Crédito') || (p.type === 'debit' && 'Débito') || (p.type === 'pix' && 'PIX') || (p.type === 'boleto' && 'Boleto') || (p.type === 'cash' && 'Dinheiro') || p.type;
+
+            item.innerHTML = `
+                <div class="payment-main">
+                    <div class="payment-type-badge ${p.type}">${escapeHtml(typeLabel)}</div>
+                    <div class="payment-label">${escapeHtml(p.label)}</div>
+                    <div class="payment-value">${escapeHtml(displayValue)}</div>
+                </div>
+                <div class="payment-actions">
+                    <button class="btn btn-outline btn-sm" data-idx="${idx}">Remover</button>
+                </div>`;
+            list.appendChild(item);
+        });
+            list.querySelectorAll('button[data-idx]').forEach(btn=>btn.addEventListener('click', ()=>{
+                const i = Number(btn.getAttribute('data-idx'));
+                payments.splice(i,1); savePayments(); renderPayments();
+            }));
+        }
+
+        loadPayments(); renderPayments();
+
+        const addPaymentForm = document.getElementById('addPaymentForm');
+        if (addPaymentForm) {
+            addPaymentForm.addEventListener('submit', (e)=>{
+                e.preventDefault();
+                const type = document.getElementById('paymentType').value || 'card';
+                const label = document.getElementById('paymentLabel').value.trim();
+                const value = document.getElementById('paymentValue').value.trim();
+                if (!label || !value) { alert('Preencha apelido e número/chave do método.'); return; }
+                payments.push({ type, label, value }); savePayments(); renderPayments(); addPaymentForm.reset();
+            });
+        }
+    })();
 }
 
 // Funções de ação

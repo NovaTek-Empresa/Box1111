@@ -932,6 +932,28 @@ body {
     box-shadow: var(--shadow);
 }
 
+/* Small/compact buttons */
+.btn.small, .btn-sm {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    border-radius: 999px;
+    min-width: auto;
+    box-shadow: none;
+}
+.btn.small i, .btn-sm i { font-size: 0.9rem; }
+.btn-outline.small, .btn-outline.btn-sm { border-width: 1px; padding: 6px 10px; }
+
+/* Ensure buttons inside doc items are compact and aligned */
+.doc-list .doc-item .btn {
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    height: auto;
+    align-self: center;
+}
+.doc-list .doc-item .btn.btn-outline { border-width:1px; }
+.doc-list .doc-item .btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(34,197,94,0.06); }
+
 .btn-primary {
     background-color: var(--primary);
     color: white;
@@ -2590,5 +2612,101 @@ body {
 @media (max-width: 900px) {
     .statistics-grid { grid-template-columns: 1fr; }
     .analytics-grid { grid-template-columns: 1fr; }
+}
+
+/* Profile screen styles — polished to match site visual language */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 22px;
+    align-items: start;
+    margin-top: 16px;
+}
+
+/* shared card look */
+.profile-left .content-card,
+.profile-right .content-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.profile-summary .card-body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 2px solid rgba(0,0,0,0.04);
+}
+
+.avatar-change { display:block; text-align:center; }
+.avatar-change .btn { margin-top:8px; padding:7px 12px; font-size:0.9rem; }
+
+.profile-summary h3 { margin: 6px 0 0 0; font-size: 1.05rem; color:var(--text); }
+.profile-summary .muted { color: var(--text-light); font-size: 0.9rem; }
+
+.profile-actions { display:flex; gap:8px; margin-top:8px; }
+.profile-actions .btn { padding:7px 12px; font-size:0.9rem; }
+
+.doc-list { padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+.doc-list .doc-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border-radius:12px; border:1px solid var(--border); background: var(--card); }
+.doc-list .doc-item { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:12px; border-radius:12px; border:1px solid var(--border); background: var(--card); }
+.doc-list .doc-item .status { font-size:0.825rem; padding:6px 10px; border-radius:999px; }
+.doc-list .doc-item .status.ok { background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04)); color:var(--accent); font-weight:700; border:1px solid rgba(34,197,94,0.08); }
+.doc-list .doc-item .status.missing { color:var(--text-light); background:transparent; border:1px dashed rgba(0,0,0,0.04); }
+
+/* New layout: put actions under the document value */
+.doc-list .doc-item .doc-main { display:flex; flex-direction:column; gap:8px; }
+.doc-list .doc-item .doc-actions { display:flex; gap:8px; justify-content:flex-end; align-items:center; }
+.doc-list .doc-item .doc-actions .btn { margin-left:8px; }
+.doc-list .doc-item strong { color:var(--text); margin-right:10px; }
+
+/* Right column: forms */
+.profile-right .card-body { padding: 18px; }
+.profile-right .profile-form .form-row { display:flex; gap:12px; }
+.profile-right .profile-form .form-group { flex:1; display:flex; flex-direction:column; gap:8px; }
+.profile-right .profile-form label { font-size:0.86rem; color:var(--text-light); }
+.profile-right .profile-form input, .profile-right .profile-form textarea { padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:transparent; color:var(--text); box-shadow:none; }
+.profile-right .profile-form input:focus, .profile-right .profile-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(34,197,94,0.06); }
+.profile-right .profile-form textarea { resize:vertical; min-height:96px; }
+.profile-right .small-form .form-group input { padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+
+.content-card .form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:14px; }
+
+.content-card.profile-summary { text-align:center; padding-bottom:8px; }
+
+/* subtle micro-typography */
+.profile-right .card-header h3, .profile-left .card-header h3 { font-size:1rem; margin:0; }
+
+@media (max-width:1000px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-left { order: 2; }
+}
+
+/* Validation and payments styles */
+.input-error { border-color: var(--danger) !important; box-shadow: 0 0 0 4px rgba(239,68,68,0.06) !important; }
+.error-text { color: var(--danger); font-size: 0.85rem; margin-top:6px; }
+
+.payments-list { display:flex; flex-direction:column; gap:8px; }
+.payment-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card); }
+.payment-main { display:flex; flex-direction:column; gap:4px; }
+.payment-type { font-weight:700; color:var(--accent); font-size:0.85rem; }
+.payment-label { font-weight:600; color:var(--text); }
+.payment-value { color:var(--text-light); font-size:0.9rem; }
+.payment-actions .btn-sm { padding:6px 8px; font-size:0.8rem; }
+
+@media (max-width:1000px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-left { order: 2; }
 }
 
