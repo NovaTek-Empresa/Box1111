@@ -1495,12 +1495,10 @@ function renderRevenueChart(series, containerId) {
         return;
     }
 
-    // Update existing chart if present
+    // If an existing chart instance exists, destroy it and recreate on the new canvas
     if (revenueChartInstance) {
-        revenueChartInstance.data.labels = labels;
-        revenueChartInstance.data.datasets[0].data = series;
-        revenueChartInstance.update();
-        return;
+        try { revenueChartInstance.destroy(); } catch(e){}
+        revenueChartInstance = null;
     }
 
     // Create new Chart.js line chart
