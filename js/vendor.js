@@ -6,6 +6,7 @@ const vendorData = {
         messages: 24,
         revenue: 2500000
     },
+    // Dados das propriedades recentes
     recentProperties: [
         {
             id: 1,
@@ -14,6 +15,8 @@ const vendorData = {
             price: "R$ 1.250.000",
             status: "active",
             views: 245,
+            requests: 18,
+            rentals: 6,
             date: "15/10/2023",
             image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100&q=80&auto=format&fit=crop"
         },
@@ -24,6 +27,8 @@ const vendorData = {
             price: "R$ 790.000",
             status: "active",
             views: 189,
+            requests: 12,
+            rentals: 4,
             date: "12/10/2023",
             image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=100&q=80&auto=format&fit=crop"
         },
@@ -34,10 +39,61 @@ const vendorData = {
             price: "R$ 420.000",
             status: "inactive",
             views: 76,
+            requests: 6,
+            rentals: 1,
             date: "10/10/2023",
             image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=100&q=80&auto=format&fit=crop"
         }
-    ]
+    ],
+    // Estatísticas detalhadas para a tela de statistics
+    statistics: {
+        revenueMonth: 35840,
+        revenueYear: 412000,
+        // séries simples para gráfico (últimos 12 meses)
+        revenueSeries: [28000, 30000, 32000, 29000, 35000, 36000, 37000, 34000, 38000, 40000, 42000, 35840],
+        // desempenho por anúncio
+        adsPerformance: [
+            { id: 1, title: 'Casa Alto Padrão', views: 245, requests: 18, rentals: 6 },
+            { id: 2, title: 'Sobrado Moderno', views: 189, requests: 12, rentals: 4 },
+            { id: 3, title: 'Apartamento Centro', views: 76, requests: 6, rentals: 1 },
+            { id: 4, title: 'Loja Centro', views: 52, requests: 5, rentals: 2 },
+            { id: 5, title: 'Chácara Verde', views: 34, requests: 3, rentals: 1 }
+        ],
+        // top produtos (top 5)
+        topProducts: [
+            { id: 1, title: 'Casa Alto Padrão', rentals: 6, revenue: 1250000 },
+            { id: 2, title: 'Sobrado Moderno', rentals: 4, revenue: 790000 },
+            { id: 4, title: 'Loja Centro', rentals: 2, revenue: 32000 },
+            { id: 3, title: 'Apartamento Centro', rentals: 1, revenue: 420000 },
+            { id: 5, title: 'Chácara Verde', rentals: 1, revenue: 5000 }
+        ],
+        // ocupação
+        occupancy: [
+            { id: 1, title: 'Casa Alto Padrão', bookings: [5,6,7,15,16,17] },
+            { id: 2, title: 'Sobrado Moderno', bookings: [1,2,3,20,21] },
+            { id: 3, title: 'Apartamento Centro', bookings: [10,11,12] }
+        ],
+        // avaliações
+        reviews: {
+            average: 4.7,
+            count: 128,
+            recent: [
+                { user: 'Ana', comment: 'Ótima hospedagem, recomendo!', rating: 5 },
+                { user: 'Pedro', comment: 'Local limpo e bem localizado.', rating: 4 }
+            ]
+        },
+        // pendências
+        pending: {
+            requests: [ { id: 101, name: 'João', property: 'Sobrado Moderno', date: '04/12/2025' } ],
+            upcomingReturns: [ { id: 1, property: 'Casa Alto Padrão', due: '06/12/2025' } ],
+            overdue: [ { id: 2, property: 'Sobrado Moderno', due: '28/11/2025', daysLate: 5 } ]
+        },
+        insights: [
+            'Alta demanda às sextas-feiras entre 18h e 21h',
+            'Considere aumentar preço em 10% para Casa Alto Padrão em feriados',
+            'Itens com baixa taxa de conversão: revisar fotos/descrição'
+        ]
+    }
 };
 
 // Dados de chat (simulação)
@@ -98,11 +154,16 @@ const chatData = {
     ]
 };
 
+// Chart instances
+let revenueChartInstance = null;
+
 
 function countNotification(chatData){
-    
     return chatData.conversations.length;
 }
+
+// preencher o badge
+document.querySelector(".badge-on").textContent = countNotification(chatData);
 
 
 // Variável temporária de anexo na conversa atual
@@ -482,7 +543,7 @@ function loadSectionContent(section) {
             break;
             
         case 'statistics':
-            // Placeholder para estatísticas
+            // Criar/mostrar seção de estatísticas completa
             let statisticsSection = document.getElementById('my-statistics');
             if (!statisticsSection) {
                 statisticsSection = document.createElement('div');
@@ -490,19 +551,89 @@ function loadSectionContent(section) {
                 statisticsSection.className = 'content-section';
                 statisticsSection.innerHTML = `
                     <div class="vendor-content">
+                        <div class="section-header">
+                            <h2>Estatísticas de Desempenho</h2>
+                            <p>Visão rápida para maximizar receita e ocupação</p>
+                        </div>
+
+                        <div class="statistics-grid">
+                            <div class="revenue-card content-card">
+                                <div class="card-header"><h3>Faturamento</h3></div>
+                                <div class="card-body">
+                                    <div class="revenue-cards">
+                                        <div class="rev-item">
+                                            <div class="rev-label">Total alugado no mês</div>
+                                            <div class="rev-value" id="revenueTotalMonth">R$ 0</div>
+                                        </div>
+                                        <div class="rev-item">
+                                            <div class="rev-label">Total acumulado no ano</div>
+                                            <div class="rev-value" id="revenueTotalYear">R$ 0</div>
+                                        </div>
+                                    </div>
+                                    <div class="small-chart" id="revenueChart"></div>
+                                </div>
+                            </div>
+
+                            <div class="ads-performance content-card">
+                                <div class="card-header"><h3>Desempenho dos Anúncios</h3></div>
+                                <div class="card-body">
+                                    <div class="table-container">
+                                        <table class="data-table" id="adsPerformanceTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Anúncio</th>
+                                                    <th>Visualizações</th>
+                                                    <th>Solicitações</th>
+                                                    <th>Aluguéis</th>
+                                                    <th>Conversão</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-grid">
+                            <div class="content-card">
+                                <div class="card-header"><h3>Produtos com Melhor Desempenho</h3></div>
+                                <div class="card-body">
+                                    <div id="topProductsList" class="top-products-list"></div>
+                                </div>
+                            </div>
+
+                            <div class="content-card">
+                                <div class="card-header"><h3>Calendário de Ocupação</h3></div>
+                                <div class="card-body">
+                                    <div id="occupancyCalendar" class="occupancy-calendar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="statistics-grid">
+                            <div class="metrics-card content-card">
+                                <div class="card-header"><h3>Métricas do Usuário</h3></div>
+                                <div class="card-body" id="userMetrics"></div>
+                            </div>
+
+                            <div class="pending-card content-card">
+                                <div class="card-header"><h3>Situações Pendentes</h3></div>
+                                <div class="card-body" id="pendingList"></div>
+                            </div>
+                        </div>
+
                         <div class="content-card">
-                            <div class="card-header">
-                                <h3>Estatísticas</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Página de estatísticas em desenvolvimento...</p>
-                            </div>
+                            <div class="card-header"><h3>Insights Importantes</h3></div>
+                            <div class="card-body" id="insightsList"></div>
                         </div>
                     </div>
                 `;
                 document.querySelector('.vendor-main').appendChild(statisticsSection);
             }
             statisticsSection.style.display = 'block';
+            // Renderizar conteúdo dinâmico
+            renderStatistics();
             break;
             
         case 'profile':
@@ -1010,6 +1141,222 @@ function submitAddPropertyForm() {
     
     // Remove success message after 4 seconds
     setTimeout(() => successMsg.remove(), 4000);
+}
+
+// Renderers para tela de estatísticas
+function formatCurrency(value) {
+    return 'R$ ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function renderRevenueChart(series, containerId) {
+    const container = document.getElementById(containerId.replace('#','')) || document.getElementById(containerId);
+    if (!container) return;
+    // Use Chart.js if available (creates/upserts a canvas-based line chart)
+    // Ensure the container has a canvas to render into
+    container.innerHTML = `<canvas id="revenueChartCanvas"></canvas>`;
+    const canvas = container.querySelector('canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const labels = series.map((_, i) => `M${i+1}`);
+
+    // If Chart is not loaded, fallback to a simple SVG line chart
+    if (typeof Chart === 'undefined') {
+        const width = 600;
+        const height = 180;
+        const max = Math.max(...series);
+        const stepX = width / (series.length - 1);
+        let points = series.map((v,i) => `${i*stepX},${height - (v / max) * (height - 20)}`).join(' ');
+        container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%;height:180px"><polyline points="${points}" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        return;
+    }
+
+    // Update existing chart if present
+    if (revenueChartInstance) {
+        revenueChartInstance.data.labels = labels;
+        revenueChartInstance.data.datasets[0].data = series;
+        revenueChartInstance.update();
+        return;
+    }
+
+    // Create new Chart.js line chart
+    revenueChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Faturamento',
+                data: series,
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34,197,94,0.08)',
+                tension: 0.35,
+                pointRadius: 3,
+                pointBackgroundColor: '#16a34a'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return formatCurrency(context.raw);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    ticks: { callback: function(value) { return formatCurrency(value); } },
+                    grid: { color: 'rgba(0,0,0,0.04)' }
+                }
+            }
+        }
+    });
+}
+
+function renderAdsPerformanceTable(list) {
+    const tbody = document.querySelector('#adsPerformanceTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(ad => {
+        const conv = ad.requests > 0 ? ((ad.rentals / ad.requests) * 100).toFixed(1) + '%' : (ad.views > 0 ? ((ad.rentals / ad.views) * 100).toFixed(1) + '%' : '0%');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${ad.title}</td><td>${ad.views}</td><td>${ad.requests}</td><td>${ad.rentals}</td><td>${conv}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderTopProducts(list) {
+    const container = document.getElementById('topProductsList');
+    if (!container) return;
+    container.innerHTML = '';
+    list.slice(0,5).forEach((p, idx) => {
+        const item = document.createElement('div');
+        item.className = 'top-product-item';
+        item.innerHTML = `<div class="rank">${idx+1}</div><div class="info"><h4>${p.title}</h4><div class="meta">${p.rentals} alugueis</div></div><div class="rev">${formatCurrency(p.revenue)}</div>`;
+        container.appendChild(item);
+    });
+}
+
+function renderOccupancyCalendar(occupancy) {
+    const container = document.getElementById('occupancyCalendar');
+    if (!container) return;
+    // Use days 1..30 for simplicity
+    const days = Array.from({length:30}, (_,i) => i+1);
+    container.innerHTML = '';
+    occupancy.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'occupancy-row';
+        const title = document.createElement('div');
+        title.className = 'occ-title';
+        title.textContent = item.title;
+        const strip = document.createElement('div');
+        strip.className = 'occ-strip';
+        days.forEach(d => {
+            const cell = document.createElement('span');
+            cell.className = item.bookings.includes(d) ? 'occ-day booked' : 'occ-day free';
+            cell.textContent = d;
+            strip.appendChild(cell);
+        });
+        row.appendChild(title);
+        row.appendChild(strip);
+        container.appendChild(row);
+    });
+}
+
+function renderUserMetrics(reviews) {
+    const container = document.getElementById('userMetrics');
+    if (!container) return;
+    container.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'user-metrics-header';
+    header.innerHTML = `<div class="rating">${reviews.average} <small>★</small></div><div class="count">${reviews.count} avaliações</div>`;
+    container.appendChild(header);
+    const list = document.createElement('div');
+    list.className = 'recent-comments';
+    reviews.recent.forEach(r => {
+        const c = document.createElement('div');
+        c.className = 'comment-item';
+        c.innerHTML = `<strong>${r.user}</strong><div class="comment-text">${r.comment}</div><div class="comment-rating">${r.rating}★</div>`;
+        list.appendChild(c);
+    });
+    container.appendChild(list);
+}
+
+function renderPending(pending) {
+    const container = document.getElementById('pendingList');
+    if (!container) return;
+    container.innerHTML = '';
+    const reqs = document.createElement('div');
+    reqs.innerHTML = `<h4>Solicitações pendentes (${pending.requests.length})</h4>`;
+    pending.requests.forEach(r => {
+        const it = document.createElement('div');
+        it.className = 'pending-item';
+        it.innerHTML = `<strong>${r.name}</strong> - ${r.property} <span class="muted">(${r.date})</span>`;
+        reqs.appendChild(it);
+    });
+    container.appendChild(reqs);
+
+    const upcoming = document.createElement('div');
+    upcoming.innerHTML = `<h4>Próximas devoluções (${pending.upcomingReturns.length})</h4>`;
+    pending.upcomingReturns.forEach(u => {
+        const it = document.createElement('div');
+        it.className = 'pending-item';
+        it.innerHTML = `${u.property} — ${u.due}`;
+        upcoming.appendChild(it);
+    });
+    container.appendChild(upcoming);
+
+    const overdue = document.createElement('div');
+    overdue.innerHTML = `<h4>Atrasos (${pending.overdue.length})</h4>`;
+    pending.overdue.forEach(o => {
+        const it = document.createElement('div');
+        it.className = 'pending-item overdue';
+        it.innerHTML = `${o.property} — ${o.due} <strong>${o.daysLate} dias</strong>`;
+        overdue.appendChild(it);
+    });
+    container.appendChild(overdue);
+}
+
+function renderInsights(list) {
+    const container = document.getElementById('insightsList');
+    if (!container) return;
+    container.innerHTML = '';
+    list.forEach(i => {
+        const it = document.createElement('div');
+        it.className = 'insight-item';
+        it.innerHTML = `<i class="fas fa-lightbulb"></i> ${i}`;
+        container.appendChild(it);
+    });
+}
+
+// Função principal que prepara a tela de statistics usando vendorData
+function renderStatistics() {
+    const s = vendorData.statistics;
+    if (!s) return;
+    // Faturamento
+    const monthEl = document.getElementById('revenueTotalMonth');
+    const yearEl = document.getElementById('revenueTotalYear');
+    if (monthEl) monthEl.textContent = formatCurrency(s.revenueMonth);
+    if (yearEl) yearEl.textContent = formatCurrency(s.revenueYear);
+    renderRevenueChart(s.revenueSeries, '#revenueChart');
+    // Ads
+    renderAdsPerformanceTable(s.adsPerformance);
+    // Top products
+    renderTopProducts(s.topProducts);
+    // Occupancy
+    renderOccupancyCalendar(s.occupancy);
+    // User metrics
+    renderUserMetrics(s.reviews);
+    // Pending
+    renderPending(s.pending);
+    // Insights
+    renderInsights(s.insights);
 }
 
 // Navigation between sections

@@ -2414,3 +2414,181 @@ body {
     }
 }
 
+/* Styles para Statistics - refinados para combinar com o estilo do site */
+.statistics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 3vw, 24px);
+    margin-bottom: clamp(16px, 3vh, 24px);
+}
+
+.statistics-grid .content-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+}
+
+.revenue-cards {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.rev-item {
+    background: var(--card);
+    padding: 14px;
+    border-radius: 10px;
+    flex: 1;
+    text-align: left;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-sm);
+}
+
+.rev-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.rev-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.small-chart {
+    margin-top: 12px;
+}
+
+.ads-performance .data-table th,
+.ads-performance .data-table td {
+    padding: 12px 14px;
+}
+
+.top-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.top-product-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.top-product-item .rank {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.top-product-item .info h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.top-product-item .rev {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.occupancy-calendar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow: auto;
+}
+
+.occupancy-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.occ-title {
+    width: 180px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.occ-strip {
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.occ-day {
+    min-width: 28px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-light);
+    border: 1px solid var(--border);
+}
+
+.occ-day.booked {
+    background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04));
+    color: var(--primary);
+    font-weight: 700;
+    border-color: rgba(34,197,94,0.25);
+}
+
+.user-metrics-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-metrics-header .rating {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.recent-comments .comment-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.pending-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+}
+
+.pending-item.overdue {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+.insight-item {
+    padding: 10px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    color: var(--text);
+}
+
+.insight-item i { color: var(--accent); }
+
+@media (max-width: 900px) {
+    .statistics-grid { grid-template-columns: 1fr; }
+    .analytics-grid { grid-template-columns: 1fr; }
+}
+
