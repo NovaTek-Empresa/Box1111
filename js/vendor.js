@@ -113,10 +113,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Toggle da sidebar em dispositivos móveis
     const sidebarToggle = document.getElementById('sidebarToggle');
     const vendorSidebar = document.querySelector('.vendor-sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
     
-    if (sidebarToggle && vendorSidebar) {
+    if (sidebarToggle && vendorSidebar && sidebarBackdrop) {
+        // Abrir/fechar sidebar
         sidebarToggle.addEventListener('click', () => {
             vendorSidebar.classList.toggle('active');
+            sidebarBackdrop.classList.toggle('active');
+        });
+        
+        // Fechar sidebar ao clicar no backdrop
+        sidebarBackdrop.addEventListener('click', () => {
+            vendorSidebar.classList.remove('active');
+            sidebarBackdrop.classList.remove('active');
+        });
+        
+        // Fechar sidebar ao clicar em um link de navegação
+        const navLinks = vendorSidebar.querySelectorAll('.nav-item a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    vendorSidebar.classList.remove('active');
+                    sidebarBackdrop.classList.remove('active');
+                }
+            });
         });
     }
     

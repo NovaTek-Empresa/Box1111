@@ -203,10 +203,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Toggle da sidebar em dispositivos móveis
     const sidebarToggle = document.getElementById('sidebarToggle');
     const adminSidebar = document.querySelector('.admin-sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
     
-    if (sidebarToggle && adminSidebar) {
+    if (sidebarToggle && adminSidebar && sidebarBackdrop) {
+        // Abrir/fechar sidebar
         sidebarToggle.addEventListener('click', () => {
             adminSidebar.classList.toggle('active');
+            sidebarBackdrop.classList.toggle('active');
+        });
+        
+        // Fechar sidebar ao clicar no backdrop
+        sidebarBackdrop.addEventListener('click', () => {
+            adminSidebar.classList.remove('active');
+            sidebarBackdrop.classList.remove('active');
+        });
+        
+        // Fechar sidebar ao clicar em um link de navegação
+        const navLinks = adminSidebar.querySelectorAll('.nav-item a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    adminSidebar.classList.remove('active');
+                    sidebarBackdrop.classList.remove('active');
+                }
+            });
         });
     }
     

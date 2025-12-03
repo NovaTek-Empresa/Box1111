@@ -167,7 +167,10 @@ body {
     text-decoration: none;
     transition: var(--transition);
     border-left: 3px solid transparent;
-    font-size: clamp(0.85rem, 1vw, 0.95rem);
+    font-size: clamp(0.75rem, 1vw, 0.95rem);
+    word-break: break-word;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
 .nav-item a:hover {
@@ -1500,18 +1503,43 @@ body {
         font-size: 15px;
     }
     
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .sidebar-backdrop.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
     .admin-sidebar {
         position: fixed;
         left: 0;
         top: 0;
         transform: translateX(-100%);
         width: 280px;
+        max-width: 85vw;
         height: 100vh;
-        z-index: 1000;
+        z-index: 1050;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     
     .admin-sidebar.active {
         transform: translateX(0);
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
     }
     
     .admin-main {
@@ -1529,7 +1557,25 @@ body {
     .admin-header {
         padding: 12px 16px;
         position: relative;
-        z-index: 101;
+        z-index: 1040;
+    }
+    
+    .sidebar-header {
+        padding: 12px 16px;
+    }
+    
+    .sidebar-nav {
+        padding: 8px 0;
+    }
+    
+    .nav-item a {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        white-space: normal;
+    }
+    
+    .sidebar-footer {
+        padding: 12px;
     }
     
     .admin-header h1 {
@@ -1624,12 +1670,55 @@ body {
         font-size: 14px;
     }
     
-    .admin-header {
-        padding: 10px 12px;
+    .admin-sidebar {
+        width: 260px;
+        max-width: 80vw;
     }
     
-    .admin-content {
-        padding: 12px;
+    .sidebar-header {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    
+    .sidebar-header .logo {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    .sidebar-header .brand-text h2 {
+        font-size: 0.95rem;
+    }
+    
+    .sidebar-header .brand-text p {
+        font-size: 0.65rem;
+    }
+    
+    .sidebar-nav {
+        padding: 6px 0;
+    }
+    
+    .nav-item {
+        margin-bottom: 2px;
+    }
+    
+    .nav-item a {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        gap: 8px;
+    }
+    
+    .nav-item i {
+        font-size: 1rem;
+    }
+    
+    .sidebar-footer {
+        padding: 10px;
+    }
+    
+    .sidebar-footer .btn {
+        padding: 6px 8px;
+        font-size: 0.8rem;
     }
     
     .header-left {
