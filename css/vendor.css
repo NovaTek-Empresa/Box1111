@@ -926,10 +926,22 @@ body {
 }
 
 .btn-outline:hover {
-    background-color: var(--primary);
+    /* Use same visual as sidebar hover: gradient matching site accent */
+    background: linear-gradient(200deg, var(--primary), var(--accent));
     color: white;
     transform: translateY(-2px);
     box-shadow: var(--shadow);
+    border-color: transparent;
+}
+
+/* Keep the Cancel button on the profile screen black on hover */
+#my-profile #btnCancelProfile.btn-outline:hover,
+#btnCancelProfile.btn-outline:hover {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
+    transform: translateY(0) !important;
+    box-shadow: var(--shadow) !important;
 }
 
 /* Small/compact buttons */
