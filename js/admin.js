@@ -155,6 +155,88 @@ const adminData = {
             avatar: "https://randomuser.me/api/portraits/men/22.jpg"
         }
     ],
+    vendors: [
+        {
+            id: 1,
+            name: "Mariana Oliveira",
+            email: "mariana.oliveira@email.com",
+            phone: "(11) 98765-4321",
+            creci: "123456",
+            status: "active",
+            registration: "12/10/2023",
+            avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+        },
+        {
+            id: 2,
+            name: "Ana Costa",
+            email: "ana.costa@email.com",
+            phone: "(11) 99876-5432",
+            creci: "654321",
+            status: "active",
+            registration: "08/10/2023",
+            avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+        },
+        {
+            id: 3,
+            name: "Fernando Lima",
+            email: "fernando.lima@email.com",
+            phone: "(11) 97654-3210",
+            creci: "789456",
+            status: "pending",
+            registration: "05/10/2023",
+            avatar: "https://randomuser.me/api/portraits/men/22.jpg"
+        },
+        {
+            id: 4,
+            name: "Lucas Martins",
+            email: "lucas.martins@email.com",
+            phone: "(11) 96543-2109",
+            creci: "321654",
+            status: "active",
+            registration: "28/09/2023",
+            avatar: "https://randomuser.me/api/portraits/men/45.jpg"
+        },
+        {
+            id: 5,
+            name: "Juliana Rocha",
+            email: "juliana.rocha@email.com",
+            phone: "(11) 95432-1098",
+            creci: "456789",
+            status: "inactive",
+            registration: "25/09/2023",
+            avatar: "https://randomuser.me/api/portraits/women/56.jpg"
+        },
+        {
+            id: 6,
+            name: "Paulo Gomes",
+            email: "paulo.gomes@email.com",
+            phone: "(11) 94321-0987",
+            creci: "987654",
+            status: "active",
+            registration: "20/09/2023",
+            avatar: "https://randomuser.me/api/portraits/men/12.jpg"
+        },
+        {
+            id: 7,
+            name: "Camila Santos",
+            email: "camila.santos@email.com",
+            phone: "(11) 93210-9876",
+            creci: "654987",
+            status: "active",
+            registration: "18/09/2023",
+            avatar: "https://randomuser.me/api/portraits/women/32.jpg"
+        },
+        {
+            id: 8,
+            name: "Ricardo Pereira",
+            email: "ricardo.pereira@email.com",
+            phone: "(11) 92109-8765",
+            creci: "147258",
+            status: "pending",
+            registration: "15/09/2023",
+            avatar: "https://randomuser.me/api/portraits/men/55.jpg"
+        }
+    ],
     notifications: [
         {
             id: 1,
@@ -272,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Carregar dados das tabelas
     loadPropertiesTable();
     loadUsersTable();
+    loadVendorsTable();
 });
 
 // Configurar navegação
@@ -328,7 +411,7 @@ function loadSectionData(section) {
             loadUsersTable();
             break;
         case 'vendors':
-            // Carregar dados de vendedores
+            loadVendorsTable();
             break;
         case 'categories':
             // Carregar dados de categorias
@@ -459,6 +542,9 @@ function setupAdminSearch() {
                 break;
             case 'users':
                 filterUsersTable(query);
+                break;
+            case 'vendors':
+                filterVendorsTable(query);
                 break;
             // Adicionar outros casos conforme necessário
         }
@@ -991,6 +1077,11 @@ function filterUsersTable(query) {
     loadUsersTable();
 }
 
+// Filtrar tabela de vendedores
+function filterVendorsTable(query) {
+    loadVendorsTable();
+}
+
 // Obter texto do status
 function getStatusText(status) {
     const statusMap = {
@@ -1035,6 +1126,96 @@ function deleteUser(id) {
             adminData.users.splice(userIndex, 1);
             showMessage('Usuário excluído com sucesso!', 'success');
             loadUsersTable();
+        }
+    }
+}
+
+// Carregar tabela de vendedores
+function loadVendorsTable() {
+    const tableBody = document.querySelector('#vendorsTable tbody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    let vendorsToShow = adminData.vendors;
+    
+    // Aplicar filtro de busca se existir
+    if (appState.searchQuery) {
+        vendorsToShow = vendorsToShow.filter(vendor => 
+            vendor.name.toLowerCase().includes(appState.searchQuery) ||
+            vendor.email.toLowerCase().includes(appState.searchQuery) ||
+            vendor.creci.toLowerCase().includes(appState.searchQuery)
+        );
+    }
+    
+    if (vendorsToShow.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="no-results">Nenhum vendedor encontrado</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    vendorsToShow.forEach(vendor => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td><input type="checkbox" class="vendor-checkbox" value="${vendor.id}"></td>
+            <td>
+                <div class="user-info-table">
+                    <div class="user-avatar-table">
+                        <img src="${vendor.avatar}" alt="${vendor.name}">
+                    </div>
+                    <div class="user-details">
+                        <strong>${vendor.name}</strong>
+                    </div>
+                </div>
+            </td>
+            <td>${vendor.email}</td>
+            <td>${vendor.phone}</td>
+            <td>${vendor.creci}</td>
+            <td><span class="status-badge ${vendor.status}">${getStatusText(vendor.status)}</span></td>
+            <td>${vendor.registration}</td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn-icon edit" title="Editar" onclick="editVendor(${vendor.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon delete" title="Excluir" onclick="deleteVendor(${vendor.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    // Configurar seleção de todos
+    const selectAll = document.getElementById('selectAllVendors');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.vendor-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+}
+
+function editVendor(id) {
+    alert(`Editando vendedor ID: ${id}`);
+    // Em uma aplicação real, isso abriria um modal de edição de vendedor
+}
+
+function deleteVendor(id) {
+    if (confirm('Tem certeza que deseja excluir este vendedor?')) {
+        const vendorIndex = adminData.vendors.findIndex(v => v.id === id);
+        if (vendorIndex !== -1) {
+            adminData.vendors.splice(vendorIndex, 1);
+            showMessage('Vendedor excluído com sucesso!', 'success');
+            loadVendorsTable();
         }
     }
 }

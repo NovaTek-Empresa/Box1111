@@ -359,14 +359,59 @@
                 <section id="vendors-section" class="content-section">
                     <div class="section-header">
                         <h2>Gerenciar Vendedores</h2>
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" id="addVendorBtn">
                             <i class="fas fa-plus"></i>
                             Adicionar Vendedor
                         </button>
                     </div>
                     <div class="content-card">
+                        <div class="card-header">
+                            <h3>Todos os Vendedores</h3>
+                            <div class="table-actions">
+                                <div class="filter-dropdown">
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-filter"></i>
+                                        Filtrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-body">
-                            <p>Conteúdo da seção Vendedores será carregado aqui.</p>
+                            <div class="table-container">
+                                <table class="data-table" id="vendorsTable">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="selectAllVendors"></th>
+                                            <th>Vendedor</th>
+                                            <th>Email</th>
+                                            <th>Telefone</th>
+                                            <th>CRECI</th>
+                                            <th>Status</th>
+                                            <th>Registro</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dados dos vendedores serão carregados via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-footer">
+                                <div class="table-info">
+                                    Mostrando 1-10 de 156 vendedores
+                                </div>
+                                <div class="pagination">
+                                    <button class="pagination-btn" disabled>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button class="pagination-btn active">1</button>
+                                    <button class="pagination-btn">2</button>
+                                    <button class="pagination-btn">3</button>
+                                    <button class="pagination-btn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
