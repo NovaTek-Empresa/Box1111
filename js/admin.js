@@ -270,14 +270,57 @@ const adminData = {
             icon: "fas fa-store",
             read: true
         }
-    ]
+    ],
+    reports: {
+        financeiro: [
+            { id: 1, imovel: "Casa Alto Padrão", proprietario: "João Silva", total: 45000, mes: "Outubro/2023", status: "Confirmado" },
+            { id: 2, imovel: "Sobrado Moderno", proprietario: "Maria Santos", total: 32000, mes: "Outubro/2023", status: "Confirmado" },
+            { id: 3, imovel: "Apartamento Centro", proprietario: "Pedro Costa", total: 28000, mes: "Outubro/2023", status: "Pendente" },
+            { id: 4, imovel: "Cobertura Duplex", proprietario: "Ana Rodrigues", total: 58000, mes: "Setembro/2023", status: "Confirmado" },
+            { id: 5, imovel: "Casa com Piscina", proprietario: "Lucas Ferreira", total: 41000, mes: "Setembro/2023", status: "Cancelado" },
+        ],
+        reservas: [
+            { id: 1, cliente: "Carlos Silva", imovel: "Casa Alto Padrão", dataEntrada: "01/11/2023", dataSaida: "08/11/2023", status: "Confirmada" },
+            { id: 2, cliente: "Mariana Oliveira", imovel: "Sobrado Moderno", dataEntrada: "05/11/2023", dataSaida: "12/11/2023", status: "Confirmada" },
+            { id: 3, cliente: "Roberto Santos", imovel: "Apartamento Centro", dataEntrada: "10/11/2023", dataSaida: "17/11/2023", status: "Pendente" },
+            { id: 4, cliente: "Ana Costa", imovel: "Cobertura Duplex", dataEntrada: "15/11/2023", dataSaida: "22/11/2023", status: "Cancelada" },
+        ],
+        imoveis: [
+            { id: 1, nome: "Casa Alto Padrão", cidade: "São Paulo", proprietario: "João Silva", visualizacoes: 1250, ocupacao: "75%" },
+            { id: 2, nome: "Sobrado Moderno", cidade: "São Paulo", proprietario: "Maria Santos", visualizacoes: 890, ocupacao: "60%" },
+            { id: 3, nome: "Apartamento Centro", cidade: "Rio de Janeiro", proprietario: "Pedro Costa", visualizacoes: 2100, ocupacao: "85%" },
+            { id: 4, nome: "Cobertura Duplex", cidade: "São Paulo", proprietario: "Ana Rodrigues", visualizacoes: 650, ocupacao: "40%" },
+            { id: 5, nome: "Casa com Piscina", cidade: "Minas Gerais", proprietario: "Lucas Ferreira", visualizacoes: 1450, ocupacao: "90%" },
+        ],
+        usuarios: [
+            { id: 1, nome: "Carlos Silva", tipo: "Cliente", dataCadastro: "15/10/2023", status: "Ativo" },
+            { id: 2, nome: "Mariana Oliveira", tipo: "Proprietário", dataCadastro: "12/10/2023", status: "Ativo" },
+            { id: 3, nome: "Roberto Santos", tipo: "Cliente", dataCadastro: "10/10/2023", status: "Ativo" },
+            { id: 4, nome: "Ana Costa", tipo: "Proprietário", dataCadastro: "08/10/2023", status: "Pendente" },
+            { id: 5, nome: "Fernando Lima", tipo: "Cliente", dataCadastro: "05/10/2023", status: "Inativo" },
+        ],
+        avaliacoes: [
+            { id: 1, imovel: "Casa Alto Padrão", nota: 4.8, comentario: "Excelente propriedade!", usuario: "Carlos Silva", data: "20/10/2023" },
+            { id: 2, imovel: "Sobrado Moderno", nota: 4.5, comentario: "Muito bom, recomendo", usuario: "Mariana Oliveira", data: "18/10/2023" },
+            { id: 3, imovel: "Apartamento Centro", nota: 4.2, comentario: "Bom custo-benefício", usuario: "Roberto Santos", data: "15/10/2023" },
+            { id: 4, imovel: "Cobertura Duplex", nota: 4.9, comentario: "Perfeito!", usuario: "Ana Costa", data: "10/10/2023" },
+        ],
+        operacional: [
+            { id: 1, tipo: "Check-in Previsto", data: "01/11/2023", quantidade: 12, status: "Confirmado" },
+            { id: 2, tipo: "Check-out Previsto", data: "05/11/2023", quantidade: 8, status: "Confirmado" },
+            { id: 3, tipo: "Atrasos", data: "04/11/2023", quantidade: 2, status: "Pendente" },
+            { id: 4, tipo: "Pendências Gerais", data: "02/11/2023", quantidade: 5, status: "Pendente" },
+        ]
+    }
 };
 
 // Estado da aplicação
 let appState = {
     currentSection: 'dashboard',
     editingProperty: null,
-    searchQuery: ''
+    searchQuery: '',
+    currentReport: 'financeiro',
+    reportFilters: {}
 };
 
 // Inicialização do painel administrativo
@@ -417,10 +460,7 @@ function loadSectionData(section) {
             // Carregar dados de categorias
             break;
         case 'reports':
-            // Carregar dados de relatórios
-            break;
-        case 'settings':
-            // Carregar dados de configurações
+            loadReportsSection();
             break;
     }
 }
