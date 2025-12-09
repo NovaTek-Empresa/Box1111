@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservar - BOX1111</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/vendor.css">
+</head>
+<body>
+    <!-- Header (copiado do index para manter design) -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="index.html" class="brand">
+                <div class="logo">BOX</div>
+                <div class="brand-text">
+                    <h1>BOX 11 11</h1>
+                    <p> Anuncie • Alugue</p>
+                </div>
+            </a>
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#properties">Imóveis</a></li>
+                <li><a href="Sobre Nós/">Sobre</a></li>
+                <li><a href="#contact">Contato</a></li>
+                <li><a href="vendor/index.html" class="btn-vendor">Área do Vendedor</a></li>
+                <li><a href="admin/index.html" class="btn-admin">Administração</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-outline" id="loginBtn">Entrar</a>
+                <a href="#" class="btn" id="registerBtn">Cadastrar</a>
+            </div>
+        </div>
+    </header>
+
+    <main style="margin-top: var(--header-height); padding: 40px 0;">
+        <div class="container">
+            <h2 class="section-title">Confirmar Reserva</h2>
+            <div class="booking-grid">
+                <section class="booking-form content-card">
+                    <div class="card-header">
+                        <h3>Informações e Pagamento</h3>
+                    </div>
+                    <div class="card-body">
+                    <div class="property-gallery">
+                        <div class="gallery-main">
+                            <img id="galleryMainImage" src="" alt="Imóvel">
+                        </div>
+                        <div class="gallery-thumbs" id="galleryThumbs">
+                            <!-- thumbnails -->
+                        </div>
+                    </div>
+                    <form id="bookingForm">
+                        <input type="hidden" id="propertyId">
+                        <input type="hidden" id="propertyTitle">
+
+                        <div class="form-section">
+                            <h3>1. Datas</h3>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="form-label">Data de entrada (check-in)</label>
+                                    <input type="date" id="checkin" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Data de saída (check-out)</label>
+                                    <input type="date" id="checkout" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>2. Quantidade de pessoas</h3>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="form-label">Número de hóspedes</label>
+                                    <input type="number" id="guests" class="form-control" min="1" value="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Bebês (opcional)</label>
+                                    <input type="number" id="babies" class="form-control" min="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Pets (opcional)</label>
+                                    <input type="number" id="pets" class="form-control" min="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>3. Forma de pagamento</h3>
+                            <div class="row">
+                                <div class="form-group" style="flex:1 1 100%;">
+                                    <label class="form-label">Escolha a forma de pagamento</label>
+                                    <div class="payment-options">
+                                        <label class="checkbox"><input type="radio" name="paymentMethod" value="pix" checked> PIX</label>
+                                        <label class="checkbox"><input type="radio" name="paymentMethod" value="card"> Cartão</label>
+                                        <label class="checkbox"><input type="radio" name="paymentMethod" value="boleto"> Boleto</label>
+                                        <label class="checkbox"><input type="radio" name="paymentMethod" value="cash"> Dinheiro (no local)</label>
+                                    </div>
+                                </div>
+
+                                <div id="paymentPix" class="payment-panel" style="display:block; width:100%;">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label class="form-label">Nome</label>
+                                            <input type="text" id="pixFirstName" class="form-control" placeholder="Nome">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Sobrenome</label>
+                                            <input type="text" id="pixLastName" class="form-control" placeholder="Sobrenome">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Chave PIX (CPF/CNPJ, e-mail ou telefone)</label>
+                                        <input type="text" id="pixKey" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div id="paymentCard" class="payment-panel" style="display:none; width:100%;">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label class="form-label">Número do cartão</label>
+                                            <input type="text" id="cardNumber" class="form-control" placeholder="____ ____ ____ ____" maxlength="19">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Nome no cartão</label>
+                                            <input type="text" id="cardName" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Data de validade</label>
+                                            <input type="month" id="cardExpiry" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">CVV</label>
+                                            <input type="password" id="cardCvv" class="form-control" maxlength="4">
+                                        </div>
+                                        <div class="form-group" style="flex:1 1 100%;">
+                                            <label class="form-label">Endereço de cobrança</label>
+                                            <input type="text" id="billingAddress" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="paymentBoleto" class="payment-panel" style="display:none; width:100%;">
+                                    <div class="form-group">
+                                        <label class="form-label">Nome completo para boleto</label>
+                                        <input type="text" id="boletoName" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">CPF/CNPJ</label>
+                                        <input type="text" id="boletoDocument" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div id="paymentCash" class="payment-panel" style="display:none; width:100%;">
+                                    <div class="row" style="align-items:center; gap:12px;">
+                                        <div style="flex:0 0 84px;">
+                                            <img id="sellerAvatarImg" src="https://via.placeholder.com/80" alt="Vendedor" style="width:84px;height:84px;border-radius:8px;object-fit:cover;box-shadow:var(--shadow-sm)">
+                                        </div>
+                                                <div style="flex:1">
+                                                    <p class="muted">Pagamento em dinheiro deverá ser combinado no local com o anfitrião.</p>
+                                                    <div style="margin-top:8px;">
+                                                        <textarea id="cashMessage" class="form-control" rows="4" placeholder="Ex.: Olá, sou João. Vou escolher pagar em dinheiro no local no check-in. Favor confirmar o horário e instruções."></textarea>
+                                                    </div>
+                                                    <div style="margin-top:8px;">
+                                                        <button type="button" class="btn btn-outline" id="sendCashMessage">Enviar mensagem ao vendedor</button>
+                                                    </div>
+                                                </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>6. Confirmação</h3>
+                            <div class="form-group">
+                                <label class="checkbox">
+                                    <input type="checkbox" id="acceptRules" required>
+                                    <span class="checkmark"></span>
+                                    Aceitar regras da casa
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox">
+                                    <input type="checkbox" id="acceptTerms" required>
+                                    <span class="checkmark"></span>
+                                    Aceitar termos e condições
+                                </label>
+                            </div>
+
+                            <button type="submit" id="confirmBtn" class="btn btn-accent" style="width:100%; margin-top:12px;">Confirmar reserva</button>
+                        </div>
+                    </form>
+                    </div>
+                </section>
+
+                <aside class="booking-summary">
+                    <div class="summary-card">
+                        <h3>4. Resumo da cobrança</h3>
+                        <div class="summary-row"><span>Imóvel</span><span id="summaryTitle">-</span></div>
+                        <div class="summary-row"><span>Valor por diária</span><span id="summaryNightly">R$ 0</span></div>
+                        <div class="summary-row"><span>Noites</span><span id="summaryNights">0</span></div>
+                        <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal">R$ 0</span></div>
+                        <div class="summary-row total"><span>Total final</span><span id="summaryTotal">R$ 0</span></div>
+                        <p class="muted" style="font-size:0.9rem; margin-top:8px;">Os valores são estimativas. Pagamento final será processado após confirmação.</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (copiado do index para manter design) -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>BOX1111</h3>
+                    <p>Plataforma completa para aluguel de imóveis. Conectamos compradores e vendedores de forma segura.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Links Rápidos</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#properties">Imóveis</a></li>
+                        <li><a href="#about">Sobre</a></li>
+                        <li><a href="#contact">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Categorias</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Casas</a></li>
+                        <li><a href="#">Apartamentos</a></li>
+                        <li><a href="#">Comercial</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contato</h3>
+                    <ul class="footer-links">
+                        <li><a href="mailto:contato@box1111.com.br">contato@box1111.com.br</a></li>
+                        <li>Rua Doutor Baeta Neves, 158 4o andar - Baeta Neves</li>
+                        <li>São Bernardo do Campo - SP, CEP 09751-030</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 BOX1111 — Todos os direitos reservados.</p>
+                <div class="developer-credit">
+                    Desenvolvido por <a href="https://novateksiteoficial.netlify.app/" target="_blank">NOVATEK</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/reservar.js"></script>
+</body>
+</html>

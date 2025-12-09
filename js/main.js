@@ -519,24 +519,54 @@ function openPropertyModal(propertyId) {
     document.getElementById('modalSellerType').textContent = property.seller.type;
     document.getElementById('modalSellerRating').textContent = property.seller.rating;
     
-    // Configurar botões de ação
-    const modalWhatsAppBtn = document.getElementById('modalWhatsAppBtn');
-    const modalCallBtn = document.getElementById('modalCallBtn');
-    const modalEmailBtn = document.getElementById('modalEmailBtn');
-    
-    if (modalWhatsAppBtn) {
-        modalWhatsAppBtn.href = `https://wa.me/${property.seller.phone}?text=Tenho interesse no imóvel: ${encodeURIComponent(property.title)}`;
-    }
-    
-    if (modalCallBtn) {
-        modalCallBtn.addEventListener('click', () => {
-            window.location.href = `tel:${property.seller.phone}`;
+    // Configurar botão de chat — redireciona para a área de vendedores
+    const modalChatBtn = document.getElementById('modalChatBtn');
+    if (modalChatBtn) {
+        modalChatBtn.href = 'vendor/index.html#messages';
+        modalChatBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'vendor/index.html#messages';
         });
     }
     
-    if (modalEmailBtn) {
-        modalEmailBtn.addEventListener('click', () => {
-            window.location.href = `mailto:${property.seller.email}?subject=Interesse no imóvel: ${encodeURIComponent(property.title)}`;
+    // Configurar botão de aluguel — redireciona para a página de reserva com preço por diária
+    const modalRentBtn = document.getElementById('modalRentBtn');
+    if (modalRentBtn) {
+        // tentar extrair número do preço
+        let nightly = 200; // valor padrão
+        try {
+            const raw = property.price || '';
+            // extrai números e converte formatação BR (ponto milhares, vírgula decimal)
+            const cleaned = raw.replace(/[^0-9.,]/g, '').trim();
+            let num = NaN;
+            if (cleaned.includes(',')) {
+                num = Number(cleaned.replace(/\./g, '').replace(',', '.'));
+            } else {
+                num = Number(cleaned.replace(/\./g, ''));
+            }
+            if (!isNaN(num) && num > 0) {
+                if (raw.toLowerCase().includes('/mês') || raw.toLowerCase().includes('mês')) {
+                    nightly = Math.round(num / 30);
+                } else if (property.transaction === 'aluguel') {
+                    nightly = Math.round(num / 30);
+                } else {
+                    nightly = Math.round(num / 100);
+                }
+            }
+        } catch (e) {
+            console.warn('Erro ao calcular diária', e);
+        }
+
+        // incluir até 3 imagens no link (quando disponíveis)
+        const img1 = property.images[0] ? encodeURIComponent(property.images[0]) : '';
+        const img2 = property.images[1] ? encodeURIComponent(property.images[1]) : '';
+        const img3 = property.images[2] ? encodeURIComponent(property.images[2]) : '';
+        const sellerAvatar = property.seller && property.seller.avatar ? encodeURIComponent(property.seller.avatar) : '';
+        const sellerPhone = property.seller && property.seller.phone ? encodeURIComponent(property.seller.phone) : '';
+        modalRentBtn.href = `reservar.html?propertyId=${property.id}&nightly=${nightly}&title=${encodeURIComponent(property.title)}&img1=${img1}&img2=${img2}&img3=${img3}&sellerAvatar=${sellerAvatar}&sellerPhone=${sellerPhone}`;
+        modalRentBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = modalRentBtn.href;
         });
     }
     
