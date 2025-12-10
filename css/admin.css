@@ -216,6 +216,40 @@ body {
     padding: 8px 12px;
 }
 
+.btn-home-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: clamp(12px, 2vh, 16px) clamp(12px, 2vw, 16px);
+    background: linear-gradient(135deg, var(--accent), #1ea346);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.22s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.btn-home-footer:hover {
+    background: linear-gradient(135deg, #1ea346, #16a34a);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+}
+
+.btn-home-footer:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.btn-home-footer i {
+    font-size: 1.1rem;
+}
+
 /* Collapse/Compact Sidebar */
 .admin-sidebar.collapsed {
     width: var(--sidebar-compact);
@@ -328,8 +362,9 @@ body {
 .header-right {
     display: flex;
     align-items: center;
-    gap: clamp(8px, 1.5vw, 20px);
+    gap: clamp(8px, 1.5vw, 16px);
     min-width: 0;
+    margin-left: auto;
 }
 
 .admin-search {
@@ -381,53 +416,62 @@ body {
 }
 
 .notification-btn {
-    background: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
     border: none;
-    font-size: 1.2rem;
-    color: var(--text-light);
+    font-size: 1.05rem;
     cursor: pointer;
     position: relative;
-    padding: 8px;
-    border-radius: 6px;
-    transition: var(--transition);
+    padding: 0;
+    border-radius: 12px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    box-shadow: var(--shadow);
     flex-shrink: 0;
 }
 
 .notification-btn:hover {
-    background: var(--bg);
-    color: var(--text);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    opacity: 0.98;
 }
 
 .notification-badge {
     position: absolute;
-    top: 0;
-    right: 0;
-    background: var(--danger);
+    top: -6px;
+    right: -6px;
+    background: var(--accent);
     color: white;
     border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 0.7rem;
+    width: 20px;
+    height: 20px;
+    font-size: 0.72rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    border: 2px solid white;
+    font-weight: 700;
+    border: 2px solid rgba(255,255,255,0.9);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 .notifications-dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 8px);
     right: 0;
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-lg);
-    width: clamp(280px, 90vw, 360px);
-    max-height: 480px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.12);
+    width: clamp(300px, 90vw, 380px);
+    max-height: 520px;
     overflow: hidden;
     display: none;
-    z-index: 100;
-    border: 1px solid var(--border);
+    z-index: 1000;
+    border: 1px solid rgba(17,24,39,0.06);
+    backdrop-filter: blur(4px);
 }
 
 .notifications-dropdown.show {
@@ -436,10 +480,10 @@ body {
 
 .notification-header {
     padding: clamp(12px, 2vh, 16px) clamp(12px, 2vw, 20px);
-    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: linear-gradient(90deg, rgba(0,0,0,0.03), rgba(34,197,94,0.06));
 }
 
 .notification-header h3 {
@@ -448,48 +492,71 @@ body {
 }
 
 .mark-all-read {
-    background: none;
-    border: none;
+    background: transparent;
+    border: 1px solid rgba(17,24,39,0.06);
     color: var(--primary);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 10px;
 }
 
 .notification-list {
-    max-height: 320px;
+    max-height: 360px;
     overflow-y: auto;
 }
 
+/* Remover barra de rolagem horizontal indesejada dentro do dropdown */
+.notifications-dropdown,
+.notifications-dropdown .notification-list,
 .notification-item {
-    padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2vw, 20px);
-    border-bottom: 1px solid var(--border);
+    overflow-x: hidden;
+}
+
+/* Garantir que o conteúdo quebre linhas corretamente e não force largura */
+.notification-item {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.notification-content p {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.notification-item {
+    padding: clamp(10px, 1.5vh, 14px) clamp(12px, 2vw, 18px);
+    border-bottom: 1px solid rgba(17,24,39,0.04);
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    transition: var(--transition);
+    transition: background 0.18s ease, transform 0.12s ease;
     cursor: pointer;
 }
 
 .notification-item:hover {
-    background: var(--bg);
+    background: rgba(34,197,94,0.04);
+    transform: translateX(3px);
 }
 
 .notification-item.unread {
-    background: rgba(0, 0, 0, 0.05);
+    background: linear-gradient(90deg, rgba(0,0,0,0.03), rgba(34,197,94,0.06));
 }
 
 .notification-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 18px rgba(34,197,94,0.08);
 }
 
 .notification-content {
@@ -1574,18 +1641,27 @@ body {
         white-space: normal;
     }
     
-    .sidebar-footer {
-        padding: 12px;
+    .admin-header {
+        padding: 14px 16px;
+        gap: 12px;
     }
-    
+
+    .header-left {
+        gap: 8px;
+    }
+
     .admin-header h1 {
         font-size: 1.1rem;
     }
-    
+
+    .header-right {
+        gap: 8px;
+    }
+
     .admin-search {
         display: none;
     }
-    
+
     .profile-btn span {
         display: none;
     }
@@ -1602,22 +1678,29 @@ body {
     .stat-card {
         padding: 16px;
         flex-direction: row;
+        align-items: center;
     }
     
     .stat-icon {
         width: 50px;
         height: 50px;
         font-size: 1.2rem;
+        flex-shrink: 0;
     }
-    
+
+    .stat-info {
+        flex: 1;
+    }
+
     .stat-info h3 {
         font-size: 1.3rem;
     }
     
     .stat-trend {
-        margin-top: 8px;
-        width: 100%;
-        justify-content: center;
+        margin-top: 0;
+        width: auto;
+        justify-content: flex-end;
+        flex-shrink: 0;
     }
     
     .section-header {
@@ -1721,32 +1804,123 @@ body {
         font-size: 0.8rem;
     }
     
-    .header-left {
-        width: 100%;
+    .admin-header {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        padding: 14px 16px;
         gap: 8px;
+    }
+
+    .header-left {
+        order: 0;
+        flex: 0 1 auto;
+        gap: 8px;
+        width: auto;
+    }
+
+    .admin-search {
+        flex: 1 1 auto;
+        min-width: 0;
         order: 1;
     }
-    
-    .header-right {
+
+    .admin-search input {
         width: 100%;
+        min-width: 0;
+    }
+
+    .header-right {
         order: 2;
+        flex: 0 1 auto;
         gap: 8px;
+        margin-left: 0;
+        width: auto;
     }
-    
+
     .admin-header h1 {
-        font-size: 1rem;
+        display: none;
     }
-    
-    .notification-btn,
+
+    .notification-btn {
+        padding: 8px !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        font-size: 1rem !important;
+    }
+
     .profile-btn {
-        padding: 6px;
+        padding: 8px !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        gap: 0 !important;
     }
-    
+
     .profile-btn img {
-        width: 28px;
-        height: 28px;
+        width: 32px !important;
+        height: 32px !important;
+        margin: 0 !important;
     }
-    
+
+    .profile-btn span {
+        display: none !important;
+    }
+
+    .profile-btn i {
+        display: none !important;
+    }
+
+    .profile-menu {
+        right: 0 !important;
+        min-width: 180px !important;
+    }
+
+    .notifications-dropdown {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 60vh;
+        border-radius: 16px 16px 0 0;
+        z-index: 1001;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 16px;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-info h3 {
+        font-size: 1.3rem;
+    }
+
+    .stat-trend {
+        margin-top: 0;
+        width: auto;
+        justify-content: flex-end;
+        flex-shrink: 0;
+    }
+
     .card-body {
         padding: 16px;
     }

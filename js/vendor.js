@@ -93,7 +93,65 @@ const vendorData = {
             'Considere aumentar preço em 10% para Casa Alto Padrão em feriados',
             'Itens com baixa taxa de conversão: revisar fotos/descrição'
         ]
-    }
+    },
+    notifications: [
+        {
+            id: 1,
+            title: "Nova solicitação de reserva",
+            message: "João Silva solicitou reserva para Casa Alto Padrão",
+            time: "Há 5 minutos",
+            icon: "fas fa-home",
+            read: false
+        },
+        {
+            id: 2,
+            title: "Pagamento recebido",
+            message: "Pagamento de R$ 2.500 da reserva ID: 456 foi confirmado",
+            time: "Há 1 hora",
+            icon: "fas fa-dollar-sign",
+            read: false
+        },
+        {
+            id: 3,
+            title: "Avaliação recebida",
+            message: "Ana Costa deixou uma avaliação 5 estrelas em Sobrado Moderno",
+            time: "Há 2 horas",
+            icon: "fas fa-star",
+            read: false
+        },
+        {
+            id: 4,
+            title: "Sugestão de melhoria",
+            message: "Sistema detectou fotos de baixa qualidade no seu imóvel",
+            time: "Há 1 dia",
+            icon: "fas fa-lightbulb",
+            read: true
+        },
+        {
+            id: 5,
+            title: "Nova mensagem de hóspede",
+            message: "Pedro Oliveira enviou uma mensagem sobre disponibilidade",
+            time: "Há 2 dias",
+            icon: "fas fa-envelope",
+            read: true
+        },
+        {
+            id: 6,
+            title: "Cancelamento de reserva",
+            message: "Reserva ID: 123 foi cancelada pelo cliente",
+            time: "Há 3 dias",
+            icon: "fas fa-times-circle",
+            read: true
+        },
+        {
+            id: 7,
+            title: "Proprietário solicitou atualização",
+            message: "Atualize as fotos do Apartamento Centro para aumentar visualizações",
+            time: "Há 4 dias",
+            icon: "fas fa-camera",
+            read: false
+        }
+    ]
 };
 
 // Dados de chat (simulação)
@@ -249,6 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Configurar busca
     setupVendorSearch();
+    
+    // Configurar notificações
+    setupNotifications();
     
     // Carregar dashboard por padrão na primeira carga
     loadSectionContent('dashboard');
@@ -1705,6 +1766,152 @@ function showSection(sectionId) {
     if (navLink) {
         navLink.parentElement.classList.add('active');
     }
+}
+
+// Configurar notificações
+function setupNotifications() {
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationsDropdown = document.getElementById('notificationsDropdown');
+    const markAllReadBtn = document.querySelector('.mark-all-read');
+    
+    if (notificationBtn && notificationsDropdown) {
+        // Acessibilidade: atributos ARIA
+        notificationBtn.setAttribute('aria-haspopup', 'dialog');
+        notificationBtn.setAttribute('aria-controls', 'notificationsDropdown');
+        notificationBtn.setAttribute('aria-expanded', 'false');
+
+        // Carregar notificações na primeira vez
+        loadNotifications();
+
+        // Toggle do dropdown de notificações (click)
+        notificationBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = notificationsDropdown.classList.toggle('show');
+            notificationBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            loadNotifications();
+
+            // se abriu, focar o primeiro item focável
+            if (isOpen) {
+                const first = notificationsDropdown.querySelector('.notification-item[tabindex]');
+                if (first) first.focus();
+            }
+        });
+
+        // Toggle via teclado (Enter / Space)
+        notificationBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                notificationBtn.click();
+            }
+        });
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', () => {
+            if (notificationsDropdown.classList.contains('show')) {
+                notificationsDropdown.classList.remove('show');
+                notificationBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Prevenir fechamento ao clicar dentro do dropdown
+        notificationsDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Fechar com Escape e gerenciar foco
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && notificationsDropdown.classList.contains('show')) {
+                notificationsDropdown.classList.remove('show');
+                notificationBtn.setAttribute('aria-expanded', 'false');
+                notificationBtn.focus();
+            }
+        });
+    }
+    
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', markAllNotificationsAsRead);
+    }
+}
+
+// Carregar notificações
+function loadNotifications() {
+    const notificationList = document.querySelector('.notification-list');
+    if (!notificationList) return;
+    
+    notificationList.innerHTML = '';
+    
+    const unreadCount = vendorData.notifications.filter(n => !n.read).length;
+    updateNotificationBadge(unreadCount);
+    
+    if (vendorData.notifications.length === 0) {
+        notificationList.innerHTML = '<div class="no-results">Nenhuma notificação</div>';
+        return;
+    }
+    
+    vendorData.notifications.forEach(notification => {
+        const notificationItem = document.createElement('div');
+        notificationItem.classList.add('notification-item');
+        if (!notification.read) {
+            notificationItem.classList.add('unread');
+        }
+
+        // tornar foco acessível
+        notificationItem.setAttribute('tabindex', '0');
+        notificationItem.setAttribute('role', 'button');
+
+        notificationItem.innerHTML = `
+            <div class="notification-icon" aria-hidden="true">
+                <i class="${notification.icon}"></i>
+            </div>
+            <div class="notification-content">
+                <p><strong>${notification.title}</strong> ${notification.message}</p>
+                <span class="notification-time">${notification.time}</span>
+            </div>
+        `;
+
+        // click e teclado ativam marcação como lida
+        notificationItem.addEventListener('click', () => {
+            markNotificationAsRead(notification.id);
+        });
+        notificationItem.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                markNotificationAsRead(notification.id);
+            }
+        });
+
+        notificationList.appendChild(notificationItem);
+    });
+}
+
+// Atualizar badge de notificações
+function updateNotificationBadge(count) {
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// Marcar notificação como lida
+function markNotificationAsRead(id) {
+    const notification = vendorData.notifications.find(n => n.id === id);
+    if (notification && !notification.read) {
+        notification.read = true;
+        loadNotifications();
+    }
+}
+
+// Marcar todas as notificações como lidas
+function markAllNotificationsAsRead() {
+    vendorData.notifications.forEach(notification => {
+        notification.read = true;
+    });
+    loadNotifications();
 }
 
 // Handle navigation link clicks

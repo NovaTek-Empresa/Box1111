@@ -705,21 +705,53 @@ function setupNotifications() {
     const markAllReadBtn = document.querySelector('.mark-all-read');
     
     if (notificationBtn && notificationsDropdown) {
-        // Toggle do dropdown de notificações
+        // Acessibilidade: atributos ARIA
+        notificationBtn.setAttribute('aria-haspopup', 'dialog');
+        notificationBtn.setAttribute('aria-controls', 'notificationsDropdown');
+        notificationBtn.setAttribute('aria-expanded', 'false');
+
+        // Toggle do dropdown de notificações (click)
         notificationBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            notificationsDropdown.classList.toggle('show');
+            const isOpen = notificationsDropdown.classList.toggle('show');
+            notificationBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             loadNotifications();
+
+            // se abriu, focar o primeiro item focável
+            if (isOpen) {
+                const first = notificationsDropdown.querySelector('.notification-item[tabindex]');
+                if (first) first.focus();
+            }
         });
-        
+
+        // Toggle via teclado (Enter / Space)
+        notificationBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                notificationBtn.click();
+            }
+        });
+
         // Fechar dropdown ao clicar fora
         document.addEventListener('click', () => {
-            notificationsDropdown.classList.remove('show');
+            if (notificationsDropdown.classList.contains('show')) {
+                notificationsDropdown.classList.remove('show');
+                notificationBtn.setAttribute('aria-expanded', 'false');
+            }
         });
-        
+
         // Prevenir fechamento ao clicar dentro do dropdown
         notificationsDropdown.addEventListener('click', (e) => {
             e.stopPropagation();
+        });
+
+        // Fechar com Escape e gerenciar foco
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && notificationsDropdown.classList.contains('show')) {
+                notificationsDropdown.classList.remove('show');
+                notificationBtn.setAttribute('aria-expanded', 'false');
+                notificationBtn.focus();
+            }
         });
     }
     
@@ -749,9 +781,13 @@ function loadNotifications() {
         if (!notification.read) {
             notificationItem.classList.add('unread');
         }
-        
+
+        // tornar foco acessível
+        notificationItem.setAttribute('tabindex', '0');
+        notificationItem.setAttribute('role', 'button');
+
         notificationItem.innerHTML = `
-            <div class="notification-icon">
+            <div class="notification-icon" aria-hidden="true">
                 <i class="${notification.icon}"></i>
             </div>
             <div class="notification-content">
@@ -759,11 +795,18 @@ function loadNotifications() {
                 <span class="notification-time">${notification.time}</span>
             </div>
         `;
-        
+
+        // click e teclado ativam marcação como lida
         notificationItem.addEventListener('click', () => {
             markNotificationAsRead(notification.id);
         });
-        
+        notificationItem.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                markNotificationAsRead(notification.id);
+            }
+        });
+
         notificationList.appendChild(notificationItem);
     });
 }
