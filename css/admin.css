@@ -740,6 +740,26 @@ body {
     color: var(--text);
 }
 
+/* Small inline filter used inside card headers */
+.section-filter {
+    margin-left: 12px;
+}
+
+.section-filter input[type="text"] {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: clamp(180px, 24vw, 300px);
+    font-size: 0.95rem;
+    background: white;
+}
+
+.section-filter input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border-color: var(--primary);
+}
+
 /* Stats Grid */
 .stats-grid {
     display: grid;
@@ -1230,6 +1250,471 @@ body {
     color: var(--danger);
 }
 
+/* Vendors section tweaks - make 'Gerenciar Vendedores' look like the public site */
+#vendors-section .section-header h2 {
+    font-size: clamp(1.4rem, 3.5vw, 1.7rem);
+    font-weight: 800;
+    position: relative;
+}
+
+#vendors-section .section-header h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 70px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 2px;
+}
+
+/* Make content-card use the same spacing and centered feel as the site */
+#vendors-section .content-card {
+    margin: 0 auto;
+    max-width: 1100px;
+}
+
+/* Table styling improvements to match site aesthetics */
+#vendors-section .table-container {
+    background: transparent;
+    border-radius: 12px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#vendors-section .data-table {
+    width: 100%;
+    min-width: 760px; /* allow horizontal scroll on small screens */
+    border-radius: 8px;
+    background: white;
+    box-shadow: var(--shadow);
+}
+
+#vendors-section .data-table th {
+    background: linear-gradient(90deg, rgba(250,250,250,0.9), rgba(245,245,245,0.9));
+    color: var(--text);
+    font-weight: 700;
+}
+
+#vendors-section .data-table td {
+    vertical-align: middle;
+}
+
+/* Make action buttons visually consistent with the site */
+#vendors-section .btn-primary,
+#vendors-section .btn-outline,
+#vendors-section .btn {
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-weight: 700;
+}
+
+/* Mobile: allow horizontal scroll and reduce font sizes for readability */
+@media (max-width: 900px) {
+    #vendors-section .content-card {
+        padding: 10px 12px;
+        max-width: 100%;
+    }
+
+    #vendors-section .data-table {
+        min-width: 640px;
+        font-size: 0.9rem;
+    }
+
+    #vendors-section .section-header h2::after {
+        bottom: -8px;
+        width: 56px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Tighten paddings and make table easy to scroll */
+    #vendors-section .card-body {
+        padding: 12px;
+    }
+
+    #vendors-section .data-table th,
+    #vendors-section .data-table td {
+        padding: 8px 10px;
+    }
+
+    #vendors-section .data-table {
+        min-width: 520px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Convert vendors table to cards on small screens so data is visible */
+@media (max-width: 520px) {
+    #vendors-section .table-container {
+        overflow: visible;
+    }
+
+    #vendors-section .data-table,
+    #vendors-section .data-table thead,
+    #vendors-section .data-table tbody,
+    #vendors-section .data-table th,
+    #vendors-section .data-table td,
+    #vendors-section .data-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    #vendors-section .data-table thead {
+        display: none;
+    }
+
+    #vendors-section .data-table tr {
+        background: white;
+        margin-bottom: 12px;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+    }
+
+    #vendors-section .data-table td {
+        padding: 8px 6px;
+        border: none;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Ensure cell children can shrink properly and show content */
+    #vendors-section .data-table td > * {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* Prevent checkboxes, action buttons and status badges from stretching */
+    #vendors-section .data-table td input[type="checkbox"],
+    #vendors-section .data-table td .vendor-checkbox {
+        flex: 0 0 auto;
+        width: 18px;
+        height: 18px;
+        margin: 0 6px 0 0;
+    }
+
+    #vendors-section .data-table td[data-label="Selecionar"] {
+        min-width: 64px;
+        justify-content: flex-start;
+    }
+
+    #vendors-section .data-table .status-badge {
+        flex: 0 0 auto;
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 12px;
+        white-space: nowrap;
+    }
+
+    /* Force visible colors and size for status badges on mobile */
+    #vendors-section .data-table .status-badge {
+        font-size: 0.9rem;
+        line-height: 1;
+        color: inherit !important;
+    }
+
+    #vendors-section .data-table .status-badge.active {
+        background: rgba(16, 185, 129, 0.12) !important;
+        color: var(--success) !important;
+    }
+
+    #vendors-section .data-table .status-badge.inactive {
+        background: rgba(239, 68, 68, 0.08) !important;
+        color: var(--danger) !important;
+    }
+
+    #vendors-section .data-table .status-badge.pending {
+        background: rgba(245, 158, 11, 0.08) !important;
+        color: var(--warning) !important;
+    }
+
+    /* Strong mobile-specific status cell rules to ensure visibility */
+    #vendors-section .data-table td[data-label="Status"] {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        justify-content: flex-start !important;
+    }
+
+    #vendors-section .data-table td[data-label="Status"] .status-badge {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 6px 10px !important;
+        border-radius: 12px !important;
+        color: #000 !important;
+        background: rgba(16,185,129,0.12) !important;
+        min-width: 56px !important;
+    }
+
+    /* Keep action buttons compact and not stretched */
+    #vendors-section .data-table .table-actions,
+    #vendors-section .data-table td .table-actions {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    #vendors-section .data-table .user-details {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    /* Force readable text color inside cards */
+    #vendors-section .data-table td,
+    #vendors-section .data-table td strong,
+    #vendors-section .data-table td span,
+    #vendors-section .data-table td a {
+        color: var(--text);
+    }
+
+    /* Explicit value wrapper styling to ensure visibility in mobile cards */
+    #vendors-section .data-table .td-value {
+        display: inline-block;
+        flex: 1 1 auto;
+        min-width: 0;
+        color: var(--text);
+        word-break: break-word;
+        overflow: hidden;
+    }
+
+    #vendors-section .data-table td[data-label]::before {
+        content: attr(data-label) ":";
+        min-width: 90px;
+        font-weight: 700;
+        color: var(--text-light);
+        display: inline-block;
+    }
+
+    /* Keep action buttons aligned right inside the card */
+    #vendors-section .data-table td[data-label="Ações"] {
+        justify-content: flex-end;
+    }
+
+    /* Avatar sizing in mobile cards */
+    #vendors-section .user-avatar-table {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    #vendors-section .user-avatar-table img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Ensure checkboxes are visible and aligned */
+    #vendors-section .data-table td[data-label="Selecionar"] {
+        padding-left: 2px;
+    }
+}
+
+/* ---- Users section: mirror vendors styles ---- */
+#users-section .section-header h2 {
+    font-size: clamp(1.4rem, 3.5vw, 1.7rem);
+    font-weight: 800;
+    position: relative;
+}
+
+#users-section .section-header h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 70px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 2px;
+}
+
+#users-section .content-card {
+    margin: 0 auto;
+    max-width: 1100px;
+}
+
+#users-section .table-container {
+    background: transparent;
+    border-radius: 12px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#users-section .data-table {
+    width: 100%;
+    min-width: 760px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: var(--shadow);
+}
+
+#users-section .data-table th {
+    background: linear-gradient(90deg, rgba(250,250,250,0.9), rgba(245,245,245,0.9));
+    color: var(--text);
+    font-weight: 700;
+}
+
+#users-section .data-table td {
+    vertical-align: middle;
+}
+
+#users-section .btn-primary {
+    background: linear-gradient(200deg, var(--primary), var(--accent));
+    color: #fff;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 900px) {
+    #users-section .content-card { padding:10px 12px; max-width:100%; }
+    #users-section .data-table { min-width:640px; font-size:0.9rem; }
+}
+
+@media (max-width: 520px) {
+    #users-section .table-container { overflow: visible; }
+    #users-section .data-table,
+    #users-section .data-table thead,
+    #users-section .data-table tbody,
+    #users-section .data-table th,
+    #users-section .data-table td,
+    #users-section .data-table tr { display:block; width:100%; }
+    #users-section .data-table thead { display:none; }
+    #users-section .data-table tr { background:white; margin-bottom:12px; border-radius:12px; padding:12px; box-shadow:var(--shadow); border:1px solid var(--border); }
+    #users-section .data-table td { padding:8px 6px; border:none; text-align:left; display:flex; align-items:center; gap:8px; }
+    #users-section .data-table td[data-label]::before { content: attr(data-label) ":"; min-width:90px; font-weight:700; color:var(--text-light); display:inline-block; }
+    #users-section .data-table td[data-label="Ações"] { justify-content:flex-end; }
+    #users-section .user-avatar-table { width:44px; height:44px; border-radius:8px; overflow:hidden; }
+    #users-section .user-avatar-table img { width:100%; height:100%; object-fit:cover; }
+    #users-section .data-table td[data-label="Selecionar"] { padding-left:2px; }
+    #users-section .data-table td > * { flex:1 1 auto; min-width:0; }
+    #users-section .data-table .td-value { display:inline-block; flex:1 1 auto; min-width:0; word-break:break-word; overflow:hidden; }
+    #users-section .data-table input[type="checkbox"], #users-section .data-table .user-checkbox { flex:0 0 auto; width:18px; height:18px; margin:0 6px 0 0; }
+    #users-section .data-table .status-badge { flex:0 0 auto; display:inline-block; padding:6px 10px; border-radius:12px; white-space:nowrap; font-size:0.9rem; line-height:1; color:inherit !important; }
+    #users-section .data-table td[data-label="Status"] { display:flex !important; align-items:center !important; gap:8px !important; justify-content:flex-start !important; }
+    #users-section .data-table td[data-label="Status"] .status-badge { display:inline-flex !important; align-items:center !important; justify-content:center !important; padding:6px 10px !important; border-radius:12px !important; color:#000 !important; background:rgba(16,185,129,0.12) !important; min-width:56px !important; }
+    #users-section .table-actions, #users-section .data-table td .table-actions { flex:0 0 auto; display:flex; gap:8px; align-items:center; }
+}
+
+/* Vendors - Add button gradient and styled checkboxes */
+#vendors-section .btn-primary {
+    background: linear-gradient(200deg, var(--primary), var(--accent));
+    color: #fff;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* Increase spacing/padding for the Add Vendor button to match Add User */
+
+/* Make Add buttons in section headers identical for Users and Vendors */
+#vendors-section .section-header .btn-primary,
+#users-section .section-header .btn-primary {
+    background: linear-gradient(200deg, var(--primary), var(--accent));
+    color: #fff;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    padding: clamp(10px, 1.5vh, 14px) clamp(14px, 2vw, 18px);
+    gap: 10px;
+    font-weight: 700;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+}
+
+#vendors-section .section-header .btn-primary:hover,
+#users-section .section-header .btn-primary:hover {
+    transform: translateY(-2px);
+    opacity: 0.98;
+}
+
+#vendors-section .btn-primary:hover {
+    transform: translateY(-2px);
+    opacity: 0.98;
+}
+
+/* Custom checkbox styling for vendor tables: black border and green/black fill */
+#vendors-section .data-table input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #000;
+    border-radius: 4px;
+    background: #fff;
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#vendors-section .data-table input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0.8);
+    opacity: 0;
+    transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+#vendors-section .data-table input[type="checkbox"]:checked {
+    background: linear-gradient(200deg, var(--primary), var(--accent));
+    border-color: #000;
+}
+
+#vendors-section .data-table input[type="checkbox"]:checked::after {
+    opacity: 1;
+    transform: rotate(45deg) scale(1);
+}
+
+/* Mirror vendor checkbox visuals for users table */
+#users-section .data-table input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #000;
+    border-radius: 4px;
+    background: #fff;
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#users-section .data-table input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0.8);
+    opacity: 0;
+    transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+#users-section .data-table input[type="checkbox"]:checked {
+    background: linear-gradient(200deg, var(--primary), var(--accent));
+    border-color: #000;
+}
+
+#users-section .data-table input[type="checkbox"]:checked::after {
+    opacity: 1;
+    transform: rotate(45deg) scale(1);
+}
+
 .status-badge.pending {
     background: rgba(245, 158, 11, 0.1);
     color: var(--warning);
@@ -1625,6 +2110,78 @@ body {
         padding: 12px 16px;
         position: relative;
         z-index: 1040;
+    }
+    
+    /* Vendors table: transformar em cartões no mobile */
+    #vendorsTable thead {
+        display: none;
+    }
+
+    #vendorsTable tbody tr {
+        display: block;
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        margin-bottom: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+    }
+
+    #vendorsTable tbody tr td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 10px;
+        border-bottom: none;
+    }
+
+    #vendorsTable tbody tr td[data-label]::before {
+        content: attr(data-label) ": ";
+        color: var(--text-light);
+        font-weight: 700;
+        margin-right: 8px;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    #vendorsTable tbody tr td .user-info-table {
+        align-items: center;
+    }
+
+    #vendorsTable tbody tr td .user-avatar-table {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-right: 10px;
+        flex: 0 0 auto;
+    }
+
+    #vendorsTable tbody tr td .user-avatar-table img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    #vendorsTable tbody tr td:first-child {
+        /* checkbox column */
+        flex: 0 0 auto;
+        margin-right: 12px;
+    }
+
+    #vendorsTable tbody tr td:last-child {
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    #vendorsTable tbody tr td .table-actions {
+        display: inline-flex;
+        gap: 8px;
+    }
+
+    #vendorsTable tbody tr td .btn-icon {
+        padding: 8px;
+        border-radius: 8px;
     }
     
     .sidebar-header {

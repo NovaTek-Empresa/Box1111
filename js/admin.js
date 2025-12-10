@@ -354,6 +354,35 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // Section filters: users and vendors (filter by name or email)
+    const usersSearch = document.getElementById('usersSearch');
+    if (usersSearch) {
+        usersSearch.addEventListener('input', (e) => {
+            appState.searchQuery = e.target.value.toLowerCase().trim();
+            loadUsersTable();
+        });
+        usersSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                appState.searchQuery = e.target.value.toLowerCase().trim();
+                loadUsersTable();
+            }
+        });
+    }
+
+    const vendorsSearch = document.getElementById('vendorsSearch');
+    if (vendorsSearch) {
+        vendorsSearch.addEventListener('input', (e) => {
+            appState.searchQuery = e.target.value.toLowerCase().trim();
+            loadVendorsTable();
+        });
+        vendorsSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                appState.searchQuery = e.target.value.toLowerCase().trim();
+                loadVendorsTable();
+            }
+        });
+    }
     
     // Botão para colapsar/expandir a sidebar (desktop)
     const adminCollapseBtn = document.getElementById('adminSidebarCollapse');
@@ -1108,8 +1137,8 @@ function loadUsersTable() {
         const row = document.createElement('tr');
         
         row.innerHTML = `
-            <td><input type="checkbox" class="user-checkbox" value="${user.id}"></td>
-            <td>
+            <td data-label="Selecionar"><input type="checkbox" class="user-checkbox" value="${user.id}"></td>
+            <td data-label="Usuário">
                 <div class="user-info-table">
                     <div class="user-avatar-table">
                         <img src="${user.avatar}" alt="${user.name}">
@@ -1119,11 +1148,11 @@ function loadUsersTable() {
                     </div>
                 </div>
             </td>
-            <td>${user.email}</td>
-            <td>${user.type}</td>
-            <td><span class="status-badge ${user.status}">${getStatusText(user.status)}</span></td>
-            <td>${user.registration}</td>
-            <td>
+            <td data-label="Email"><span class="td-value">${user.email}</span></td>
+            <td data-label="Tipo"><span class="td-value">${user.type}</span></td>
+            <td data-label="Status"><span class="status-badge ${user.status}">${getStatusText(user.status)}</span></td>
+            <td data-label="Registro"><span class="td-value">${user.registration}</span></td>
+            <td data-label="Ações">
                 <div class="table-actions">
                     <button class="btn-icon edit" title="Editar" onclick="editUser(${user.id})">
                         <i class="fas fa-edit"></i>
@@ -1244,8 +1273,8 @@ function loadVendorsTable() {
         const row = document.createElement('tr');
         
         row.innerHTML = `
-            <td><input type="checkbox" class="vendor-checkbox" value="${vendor.id}"></td>
-            <td>
+            <td data-label="Selecionar"><input type="checkbox" class="vendor-checkbox" value="${vendor.id}"></td>
+            <td data-label="Vendedor">
                 <div class="user-info-table">
                     <div class="user-avatar-table">
                         <img src="${vendor.avatar}" alt="${vendor.name}">
@@ -1255,12 +1284,12 @@ function loadVendorsTable() {
                     </div>
                 </div>
             </td>
-            <td>${vendor.email}</td>
-            <td>${vendor.phone}</td>
-            <td>${vendor.creci}</td>
-            <td><span class="status-badge ${vendor.status}">${getStatusText(vendor.status)}</span></td>
-            <td>${vendor.registration}</td>
-            <td>
+            <td data-label="Email"><span class="td-value">${vendor.email}</span></td>
+            <td data-label="Telefone"><span class="td-value">${vendor.phone}</span></td>
+            <td data-label="CRECI"><span class="td-value">${vendor.creci}</span></td>
+            <td data-label="Status"><span class="status-badge ${vendor.status}">${getStatusText(vendor.status)}</span></td>
+            <td data-label="Registro"><span class="td-value">${vendor.registration}</span></td>
+            <td data-label="Ações">
                 <div class="table-actions">
                     <button class="btn-icon edit" title="Editar" onclick="editVendor(${vendor.id})">
                         <i class="fas fa-edit"></i>
