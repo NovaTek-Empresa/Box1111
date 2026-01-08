@@ -7,7 +7,7 @@ let properties = [
         description: "Mansão moderna com 5 suítes, piscina, área gourmet, 980 m². Acabamento de alto padrão e automação residencial. Localizada em condomínio fechado com segurança 24h, área de lazer completa e proximidade com escolas e comércio.",
         location: "Jardins, São Paulo - SP",
         type: "casa",
-        transaction: "venda",
+        transaction: "aluguel",
         features: ["5 suítes", "Piscina", "Área gourmet", "5 vagas", "980 m²", "Condomínio fechado"],
         images: [
             "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop",
@@ -32,7 +32,7 @@ let properties = [
         description: "Sobrado reformado com 3 dormitórios, suíte, cozinha planejada e quintal. Localização próxima ao comércio e áreas de lazer. Excelente oportunidade para famílias que buscam conforto e praticidade.",
         location: "Vila Mariana, São Paulo - SP",
         type: "casa",
-        transaction: "venda",
+        transaction: "aluguel",
         features: ["3 dormitórios", "2 banheiros", "2 vagas", "180 m²", "Quintal", "Reformado"],
         images: [
             "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=80&auto=format&fit=crop",
@@ -57,7 +57,7 @@ let properties = [
         description: "Apartamento bem localizado no centro da cidade, próximo a tudo. Prédio com portaria 24h e área de lazer. Excelente opção para quem busca praticidade e localização.",
         location: "Centro, São Paulo - SP",
         type: "apartamento",
-        transaction: "venda",
+        transaction: "aluguel",
         features: ["2 quartos", "2 banheiros", "1 vaga", "75 m²", "Centro", "Portaria 24h"],
         images: [
             "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80&auto=format&fit=crop",
@@ -107,7 +107,7 @@ let properties = [
         description: "Loja comercial em ponto estratégico, com alto fluxo de pessoas. Ideal para diversos tipos de negócio. Reformada recentemente com ótimo acabamento.",
         location: "Moema, São Paulo - SP",
         type: "comercial",
-        transaction: "venda",
+        transaction: "aluguel",
         features: ["120 m²", "2 banheiros", "Reformada", "Ponto comercial", "Alto fluxo"],
         images: [
             "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200&q=80&auto=format&fit=crop",
@@ -132,7 +132,7 @@ let properties = [
         description: "Terreno plano e regular, ideal para construção residencial ou comercial. Localizado em bairro em desenvolvimento com boa infraestrutura e facilidade de acesso.",
         location: "Interlagos, São Paulo - SP",
         type: "terreno",
-        transaction: "venda",
+        transaction: "aluguel",
         features: ["500 m²", "Plano", "Regular", "Boa localização", "Infraestrutura"],
         images: [
             "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop",
@@ -431,7 +431,7 @@ function loadProperties() {
         propertyCard.innerHTML = `
             <div class="property-image">
                 <img src="${property.images[0]}" alt="${property.title}">
-                <div class="property-badge">${property.transaction === 'venda' ? 'Venda' : 'Aluguel'}</div>
+                <div class="property-badge">${property.transaction === 'aluguel' ? 'Aluguel' : 'aluguel'}</div>
             </div>
             <div class="property-content">
                 <div class="property-header">
@@ -592,7 +592,7 @@ function setupFilters() {
             
             if (filter === 'todos') {
                 appState.filteredProperties = [...properties];
-            } else if (filter === 'venda' || filter === 'aluguel') {
+            } else if (filter === 'aluguel' || filter === 'aluguel') {
                 appState.filteredProperties = properties.filter(p => p.transaction === filter);
             } else if (filter === 'casas' || filter === 'apartamentos') {
                 const type = filter === 'casas' ? 'casa' : 'apartamento';
