@@ -1,4 +1,4 @@
-// Dados do painel do vendedor (simulação)
+// Dados do painel do anfitrião (simulação)
 const vendorData = {
     stats: {
         properties: 12,
@@ -227,7 +227,7 @@ document.querySelector(".badge-on").textContent = countNotification(chatData);
 // Variável temporária de anexo na conversa atual
 let currentChatAttachment = null;
 
-// Inicialização do painel do vendedor
+// Inicialização do painel do anfitrião
 document.addEventListener('DOMContentLoaded', () => {
     // Toggle da sidebar em dispositivos móveis
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -396,7 +396,7 @@ function loadRecentProperties() {
     });
 }
 
-// Configurar busca do vendedor
+// Configurar busca do anfitrião
 function setupVendorSearch() {
     const searchInput = document.querySelector('.vendor-search input');
     const searchButton = document.querySelector('.vendor-search button');
@@ -724,7 +724,7 @@ function loadSectionContent(section) {
                                             </label>
                                         </div>
                                         <h3 id="profileName">Carlos Silva</h3>
-                                        <p class="muted">Vendedor • Conta verificada</p>
+                                        <p class="muted">Anfitrião • Conta verificada</p>
                                         <div class="profile-actions">
                                             <button id="btnEditProfile" class="btn">Editar Perfil</button>
                                             <button id="btnViewPublic" class="btn btn-outline">Ver Perfil Público</button>
@@ -815,40 +815,6 @@ function loadSectionContent(section) {
                                             <div class="form-actions">
                                                 <button type="submit" class="btn btn-accent">Salvar Alterações</button>
                                                 <button type="button" id="btnCancelProfile" class="btn btn-outline">Cancelar</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-
-                                <div class="content-card">
-                                    <div class="card-header"><h3>Métodos de Pagamento</h3></div>
-                                    <div class="card-body">
-                                        <p class="muted">Adicione cartões ou contas para receber pagamentos.</p>
-                                        <div id="paymentsList" class="payments-list" style="margin-top:10px"></div>
-
-                                        <form id="addPaymentForm" class="small-form" style="margin-top:12px">
-                                            <div class="form-row">
-                                                <div class="form-group">
-                                                    <label for="paymentType">Tipo</label>
-                                                    <select id="paymentType">
-                                                        <option value="credit">Cartão de Crédito</option>
-                                                        <option value="debit">Cartão de Débito</option>
-                                                        <option value="pix">PIX</option>
-                                                        <option value="boleto">Boleto</option>
-                                                        <option value="cash">Pago na Entrada (Dinheiro)</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="paymentLabel">Apelido</label>
-                                                    <input id="paymentLabel" type="text" placeholder="Ex: Conta PJ / Visa Corporativo">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="paymentValue">Número / Chave</label>
-                                                <input id="paymentValue" type="text" placeholder="Número do cartão (xxxx xxxx xxxx xxxx) ou chave PIX">
-                                            </div>
-                                            <div class="form-actions">
-                                                <button type="submit" class="btn btn-accent">Adicionar Método</button>
                                             </div>
                                         </form>
                                     </div>

@@ -258,6 +258,87 @@ header.scrolled {
     flex-shrink: 0;
 }
 
+/* Host button and user avatar/dropdown */
+.host-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(0,0,0,0.06);
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 200px;
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    padding: 8px 0;
+    display: none;
+    z-index: 1100;
+}
+
+.user-dropdown.show { display: block; }
+
+.user-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.user-dropdown .dropdown-item:hover { background: rgba(0,0,0,0.03); }
+
+.dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+@media (max-width: 720px) {
+    .user-avatar { width: 34px; height: 34px; }
+    .host-btn { padding: 8px 10px; font-size: 0.85rem; }
+    .auth-buttons { gap: 8px; }
+}
+
+/* Estilos para a página de listagem (filtros) */
+.properties-filters { background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.properties-filters input[type="number"], .properties-filters select { background: #fff; }
+.property-card { display:flex; gap:12px; border-radius: 12px; background: var(--card); padding: 12px; border:1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom:12px; align-items:center; }
+.property-image img { width: 160px; height: 110px; object-fit:cover; border-radius: 8px; }
+.property-content { flex:1; }
+.property-price { font-weight:800; color:var(--primary); }
+.property-features .property-feature { display:inline-block; margin-right:6px; padding:4px 8px; background: rgba(0,0,0,0.03); border-radius:6px; font-size:0.85rem; }
+
+@media (max-width: 720px) {
+    .property-card { flex-direction:column; align-items:flex-start; }
+    .property-image img { width:100%; height:180px; }
+}
+
 .auth-buttons .btn {
     font-size: clamp(0.75rem, 1.2vw, 0.9rem);
     padding: clamp(6px, 1vh, 10px) clamp(10px, 1.5vw, 16px);

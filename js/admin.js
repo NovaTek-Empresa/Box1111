@@ -113,6 +113,7 @@ const adminData = {
             id: 1,
             name: "Carlos Silva",
             email: "carlos.silva@email.com",
+            phone: "(11) 98765-4321",
             type: "Cliente",
             status: "active",
             registration: "15/10/2023",
@@ -122,7 +123,8 @@ const adminData = {
             id: 2,
             name: "Mariana Oliveira",
             email: "mariana.oliveira@email.com",
-            type: "Vendedor",
+            phone: "(11) 99876-5432",
+            type: "Anfitrião",
             status: "active",
             registration: "12/10/2023",
             avatar: "https://randomuser.me/api/portraits/women/44.jpg"
@@ -131,6 +133,7 @@ const adminData = {
             id: 3,
             name: "Roberto Santos",
             email: "roberto.santos@email.com",
+            phone: "(11) 97654-3210",
             type: "Cliente",
             status: "active",
             registration: "10/10/2023",
@@ -140,7 +143,8 @@ const adminData = {
             id: 4,
             name: "Ana Costa",
             email: "ana.costa@email.com",
-            type: "Vendedor",
+            phone: "(11) 96543-2109",
+            type: "Anfitrião",
             status: "pending",
             registration: "08/10/2023",
             avatar: "https://randomuser.me/api/portraits/women/68.jpg"
@@ -149,6 +153,7 @@ const adminData = {
             id: 5,
             name: "Fernando Lima",
             email: "fernando.lima@email.com",
+            phone: "(11) 95432-1098",
             type: "Cliente",
             status: "inactive",
             registration: "05/10/2023",
@@ -264,8 +269,8 @@ const adminData = {
         },
         {
             id: 4,
-            title: "Novo vendedor aprovado",
-            message: "Maria Santos foi aprovada como vendedora",
+            title: "Novo anfitrião aprovado",
+            message: "Maria Santos foi aprovada como anfitriã",
             time: "Há 1 dia",
             icon: "fas fa-store",
             read: true
@@ -1149,7 +1154,7 @@ function loadUsersTable() {
                 </div>
             </td>
             <td data-label="Email"><span class="td-value">${user.email}</span></td>
-            <td data-label="Tipo"><span class="td-value">${user.type}</span></td>
+            <td data-label="Telefone"><span class="td-value">${user.phone || '-'}</span></td>
             <td data-label="Status"><span class="status-badge ${user.status}">${getStatusText(user.status)}</span></td>
             <td data-label="Registro"><span class="td-value">${user.registration}</span></td>
             <td data-label="Ações">
@@ -1189,7 +1194,7 @@ function filterUsersTable(query) {
     loadUsersTable();
 }
 
-// Filtrar tabela de vendedores
+// Filtrar tabela de anfitriões
 function filterVendorsTable(query) {
     loadVendorsTable();
 }
@@ -1242,7 +1247,7 @@ function deleteUser(id) {
     }
 }
 
-// Carregar tabela de vendedores
+// Carregar tabela de anfitriões
 function loadVendorsTable() {
     const tableBody = document.querySelector('#vendorsTable tbody');
     if (!tableBody) return;
@@ -1263,7 +1268,7 @@ function loadVendorsTable() {
     if (vendorsToShow.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="no-results">Nenhum vendedor encontrado</td>
+                <td colspan="8" class="no-results">Nenhum anfitrião encontrado</td>
             </tr>
         `;
         return;
@@ -1272,9 +1277,16 @@ function loadVendorsTable() {
     vendorsToShow.forEach(vendor => {
         const row = document.createElement('tr');
         
+        // Mostrar botão de aprovar apenas se status for pending
+        const approveButton = vendor.status === 'pending' ? `
+            <button class="btn-icon approve" title="Aprovar" onclick="approveVendor(${vendor.id})">
+                <i class="fas fa-check"></i>
+            </button>
+        ` : '';
+        
         row.innerHTML = `
             <td data-label="Selecionar"><input type="checkbox" class="vendor-checkbox" value="${vendor.id}"></td>
-            <td data-label="Vendedor">
+            <td data-label="Anfitrião">
                 <div class="user-info-table">
                     <div class="user-avatar-table">
                         <img src="${vendor.avatar}" alt="${vendor.name}">
@@ -1291,6 +1303,7 @@ function loadVendorsTable() {
             <td data-label="Registro"><span class="td-value">${vendor.registration}</span></td>
             <td data-label="Ações">
                 <div class="table-actions">
+                    ${approveButton}
                     <button class="btn-icon edit" title="Editar" onclick="editVendor(${vendor.id})">
                         <i class="fas fa-edit"></i>
                     </button>
@@ -1317,16 +1330,25 @@ function loadVendorsTable() {
 }
 
 function editVendor(id) {
-    alert(`Editando vendedor ID: ${id}`);
-    // Em uma aplicação real, isso abriria um modal de edição de vendedor
+    // Abre o modal de edição de anfitrião
+    openVendorModal(id);
+}
+
+function approveVendor(id) {
+    const vendor = adminData.vendors.find(v => v.id === id);
+    if (vendor) {
+        vendor.status = 'active';
+        showMessage(`Anfitrião ${vendor.name} aprovado com sucesso!`, 'success');
+        loadVendorsTable();
+    }
 }
 
 function deleteVendor(id) {
-    if (confirm('Tem certeza que deseja excluir este vendedor?')) {
+    if (confirm('Tem certeza que deseja excluir este anfitrião?')) {
         const vendorIndex = adminData.vendors.findIndex(v => v.id === id);
         if (vendorIndex !== -1) {
             adminData.vendors.splice(vendorIndex, 1);
-            showMessage('Vendedor excluído com sucesso!', 'success');
+            showMessage('Anfitrião excluído com sucesso!', 'success');
             loadVendorsTable();
         }
     }
@@ -1397,3 +1419,503 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ===== MODAL DE USUÁRIOS =====
+let currentUserId = null;
+let isUserEditMode = false;
+
+// Aguardar o DOM estar pronto
+document.addEventListener('DOMContentLoaded', function() {
+    initializeUserModal();
+    initializeVendorModal();
+});
+
+function initializeUserModal() {
+    const userModal = document.getElementById('userModal');
+    if (!userModal) return;
+    
+    const userModalTitle = document.getElementById('userModalTitle');
+    const userForm = document.getElementById('userForm');
+    const closeUserModalBtn = document.getElementById('closeUserModalBtn');
+    const cancelUserModalBtn = document.getElementById('cancelUserModalBtn');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const userModalMessage = document.getElementById('userModalMessage');
+    
+    // Abrir modal para criar novo usuário
+    if (addUserBtn) {
+        addUserBtn.addEventListener('click', function() {
+            openUserModal();
+        });
+    }
+    
+    // Fechar modal
+    closeUserModalBtn.addEventListener('click', closeUserModal);
+    cancelUserModalBtn.addEventListener('click', closeUserModal);
+    
+    // Fechar modal ao clicar no overlay
+    userModal.querySelector('.modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeUserModal();
+        }
+    });
+    
+    // Salvar usuário
+    userForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateUserForm()) {
+            showUserMessage('Por favor, corrija os erros no formulário', 'error');
+            return;
+        }
+        
+        const userData = {
+            name: document.getElementById('userName').value.trim(),
+            email: document.getElementById('userEmail').value.trim(),
+            phone: document.getElementById('userPhone').value.trim(),
+            status: document.getElementById('userStatus').value,
+            registration: document.getElementById('userRegistration').value
+        };
+        
+        if (isUserEditMode) {
+            // Editar usuário existente
+            const user = adminData.users.find(u => u.id === currentUserId);
+            if (user) {
+                Object.assign(user, userData);
+                showUserMessage(`Usuário ${userData.name} atualizado com sucesso!`, 'success');
+            }
+        } else {
+            // Criar novo usuário
+            const newUser = {
+                id: Math.max(...adminData.users.map(u => u.id), 0) + 1,
+                avatar: 'https://randomuser.me/api/portraits/men/' + Math.floor(Math.random() * 70) + '.jpg',
+                type: 'Cliente',
+                ...userData
+            };
+            adminData.users.push(newUser);
+            showUserMessage(`Usuário ${userData.name} criado com sucesso!`, 'success');
+        }
+        
+        loadUsersTable();
+        
+        setTimeout(() => {
+            closeUserModal();
+        }, 1500);
+    });
+}
+
+function openUserModal(userId = null) {
+    const userModal = document.getElementById('userModal');
+    const userModalTitle = document.getElementById('userModalTitle');
+    const userForm = document.getElementById('userForm');
+    
+    isUserEditMode = !!userId;
+    currentUserId = userId;
+    
+    // Limpar formulário
+    userForm.reset();
+    clearUserErrors();
+    hideUserMessage();
+    
+    if (isUserEditMode) {
+        const user = adminData.users.find(u => u.id === userId);
+        if (!user) return;
+        
+        // Preencher formulário com dados do usuário
+        document.getElementById('userId').value = user.id;
+        document.getElementById('userName').value = user.name;
+        document.getElementById('userEmail').value = user.email;
+        document.getElementById('userPhone').value = user.phone;
+        document.getElementById('userStatus').value = user.status;
+        document.getElementById('userRegistration').value = user.registration;
+        
+        userModalTitle.textContent = `Editar Usuário - ${user.name}`;
+    } else {
+        userModalTitle.textContent = 'Adicionar Usuário';
+        document.getElementById('userRegistration').value = new Date().toISOString().split('T')[0];
+    }
+    
+    userModal.classList.add('active');
+}
+
+function closeUserModal() {
+    const userModal = document.getElementById('userModal');
+    const userForm = document.getElementById('userForm');
+    
+    userModal.classList.remove('active');
+    userForm.reset();
+    clearUserErrors();
+    hideUserMessage();
+    currentUserId = null;
+    isUserEditMode = false;
+}
+
+// Validar email
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Limpar todos os erros de usuário
+function clearUserErrors() {
+    document.querySelectorAll('#userForm .error-message').forEach(el => {
+        el.textContent = '';
+        el.classList.remove('show');
+    });
+    document.querySelectorAll('#userForm input, #userForm select').forEach(el => {
+        el.classList.remove('error');
+    });
+}
+
+// Mostrar erro em um campo de usuário
+function showUserError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorElement = document.getElementById(fieldId + 'Error');
+    
+    if (field) {
+        field.classList.add('error');
+    }
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+}
+
+// Validar formulário de usuário
+function validateUserForm() {
+    clearUserErrors();
+    let isValid = true;
+    
+    const name = document.getElementById('userName').value.trim();
+    const email = document.getElementById('userEmail').value.trim();
+    const phone = document.getElementById('userPhone').value.trim();
+    const status = document.getElementById('userStatus').value;
+    
+    if (!name) {
+        showUserError('userName', 'Nome é obrigatório');
+        isValid = false;
+    }
+    
+    if (!email) {
+        showUserError('userEmail', 'Email é obrigatório');
+        isValid = false;
+    } else if (!isValidEmail(email)) {
+        showUserError('userEmail', 'Email inválido');
+        isValid = false;
+    }
+    
+    if (!phone) {
+        showUserError('userPhone', 'Telefone é obrigatório');
+        isValid = false;
+    }
+    
+    if (!status) {
+        showUserError('userStatus', 'Status é obrigatório');
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+// Mostrar mensagem de usuário
+function showUserMessage(message, type = 'success') {
+    const userModalMessage = document.getElementById('userModalMessage');
+    if (!userModalMessage) return;
+    
+    userModalMessage.textContent = message;
+    userModalMessage.className = `modal-message show ${type}`;
+    setTimeout(() => {
+        hideUserMessage();
+    }, 3000);
+}
+
+// Esconder mensagem de usuário
+function hideUserMessage() {
+    const userModalMessage = document.getElementById('userModalMessage');
+    if (!userModalMessage) return;
+    
+    userModalMessage.className = 'modal-message';
+    userModalMessage.textContent = '';
+}
+
+// Modificar função editUser para abrir o modal
+window.editUser = function(id) {
+    openUserModal(id);
+};
+
+// ===== MODAL DE ANFITRIÕES =====
+
+function initializeVendorModal() {
+    const modal = document.getElementById('vendorModal');
+    if (!modal) return; // Se modal não existe, sair
+    
+    const modalTitle = document.getElementById('modalTitle');
+    const vendorForm = document.getElementById('vendorForm');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const addVendorBtn = document.getElementById('addVendorBtn');
+    const approveBtn = document.getElementById('approveVendorBtn');
+    const rejectBtn = document.getElementById('rejectVendorBtn');
+    const modalMessage = document.getElementById('modalMessage');
+    
+    // Abrir modal para criar novo anfitrião
+    if (addVendorBtn) {
+        addVendorBtn.addEventListener('click', function() {
+            openVendorModal();
+        });
+    }
+    
+    // Fechar modal
+    closeModalBtn.addEventListener('click', closeVendorModal);
+    cancelModalBtn.addEventListener('click', closeVendorModal);
+    
+    // Fechar modal ao clicar no overlay
+    modal.querySelector('.modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeVendorModal();
+        }
+    });
+    
+    // Salvar anfitrião
+    vendorForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateVendorForm()) {
+            showMessage('Por favor, corrija os erros no formulário', 'error');
+            return;
+        }
+        
+        const vendorData = {
+            name: document.getElementById('vendorName').value.trim(),
+            email: document.getElementById('vendorEmail').value.trim(),
+            phone: document.getElementById('vendorPhone').value.trim(),
+            creci: document.getElementById('vendorCreci').value.trim(),
+            status: document.getElementById('vendorStatus').value,
+            registration: document.getElementById('vendorRegistration').value
+        };
+        
+        if (isEditMode) {
+            // Editar anfitrião existente
+            const vendor = adminData.vendors.find(v => v.id === currentVendorId);
+            if (vendor) {
+                Object.assign(vendor, vendorData);
+                showMessage(`Anfitrião ${vendorData.name} atualizado com sucesso!`, 'success');
+            }
+        } else {
+            // Criar novo anfitrião
+            const newVendor = {
+                id: Math.max(...adminData.vendors.map(v => v.id), 0) + 1,
+                avatar: 'https://randomuser.me/api/portraits/men/' + Math.floor(Math.random() * 70) + '.jpg',
+                ...vendorData
+            };
+            adminData.vendors.push(newVendor);
+            showMessage(`Anfitrião ${vendorData.name} criado com sucesso!`, 'success');
+        }
+        
+        loadVendorsTable();
+        
+        setTimeout(() => {
+            closeVendorModal();
+        }, 1500);
+    });
+    
+    // Aprovar anfitrião
+    approveBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!validateVendorForm()) {
+            showMessage('Por favor, corrija os erros no formulário', 'error');
+            return;
+        }
+        
+        const vendor = adminData.vendors.find(v => v.id === currentVendorId);
+        if (vendor) {
+            vendor.name = document.getElementById('vendorName').value.trim();
+            vendor.email = document.getElementById('vendorEmail').value.trim();
+            vendor.phone = document.getElementById('vendorPhone').value.trim();
+            vendor.creci = document.getElementById('vendorCreci').value.trim();
+            vendor.registration = document.getElementById('vendorRegistration').value;
+            vendor.status = 'active';
+            
+            showMessage(`Anfitrião ${vendor.name} aprovado com sucesso!`, 'success');
+            loadVendorsTable();
+            
+            setTimeout(() => {
+                closeVendorModal();
+            }, 1500);
+        }
+    });
+    
+    // Reprovar anfitrião
+    rejectBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (confirm('Tem certeza que deseja reprovar este anfitrião?')) {
+            const vendor = adminData.vendors.find(v => v.id === currentVendorId);
+            if (vendor) {
+                vendor.status = 'inactive';
+                showMessage(`Anfitrião ${vendor.name} reprovado!`, 'success');
+                loadVendorsTable();
+                
+                setTimeout(() => {
+                    closeVendorModal();
+                }, 1500);
+            }
+        }
+    });
+}
+
+function openVendorModal(vendorId = null) {
+    const modal = document.getElementById('vendorModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const vendorForm = document.getElementById('vendorForm');
+    const approveBtn = document.getElementById('approveVendorBtn');
+    const rejectBtn = document.getElementById('rejectVendorBtn');
+    
+    isEditMode = !!vendorId;
+    currentVendorId = vendorId;
+    
+    // Limpar formulário
+    vendorForm.reset();
+    clearAllErrors();
+    hideMessage();
+    
+    if (isEditMode) {
+        const vendor = adminData.vendors.find(v => v.id === vendorId);
+        if (!vendor) return;
+        
+        // Preencher formulário com dados do vendedor
+        document.getElementById('vendorId').value = vendor.id;
+        document.getElementById('vendorName').value = vendor.name;
+        document.getElementById('vendorEmail').value = vendor.email;
+        document.getElementById('vendorPhone').value = vendor.phone;
+        document.getElementById('vendorCreci').value = vendor.creci;
+        document.getElementById('vendorStatus').value = vendor.status;
+        document.getElementById('vendorRegistration').value = vendor.registration;
+        
+        modalTitle.textContent = `Editar Anfitrião - ${vendor.name}`;
+        
+        // Mostrar botões de aprovar/reprovar se estiver pendente
+        if (vendor.status === 'pending') {
+            approveBtn.style.display = 'flex';
+            rejectBtn.style.display = 'flex';
+        } else {
+            approveBtn.style.display = 'none';
+            rejectBtn.style.display = 'none';
+        }
+    } else {
+        modalTitle.textContent = 'Adicionar Anfitrião';
+        approveBtn.style.display = 'none';
+        rejectBtn.style.display = 'none';
+        document.getElementById('vendorRegistration').value = new Date().toISOString().split('T')[0];
+    }
+    
+    modal.classList.add('active');
+}
+function closeVendorModal() {
+    const modal = document.getElementById('vendorModal');
+    const vendorForm = document.getElementById('vendorForm');
+    
+    modal.classList.remove('active');
+    vendorForm.reset();
+    clearAllErrors();
+    hideMessage();
+    currentVendorId = null;
+    isEditMode = false;
+}
+
+// Validar email
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Limpar todos os erros
+function clearAllErrors() {
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.textContent = '';
+        el.classList.remove('show');
+    });
+    document.querySelectorAll('.form-group input, .form-group select').forEach(el => {
+        el.classList.remove('error');
+    });
+}
+
+// Mostrar erro em um campo
+function showError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorElement = document.getElementById(fieldId + 'Error');
+    
+    if (field) {
+        field.classList.add('error');
+    }
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+}
+
+// Validar formulário
+function validateVendorForm() {
+    clearAllErrors();
+    let isValid = true;
+    
+    const name = document.getElementById('vendorName').value.trim();
+    const email = document.getElementById('vendorEmail').value.trim();
+    const phone = document.getElementById('vendorPhone').value.trim();
+    const creci = document.getElementById('vendorCreci').value.trim();
+    const status = document.getElementById('vendorStatus').value;
+    
+    if (!name) {
+        showError('vendorName', 'Nome é obrigatório');
+        isValid = false;
+    }
+    
+    if (!email) {
+        showError('vendorEmail', 'Email é obrigatório');
+        isValid = false;
+    } else if (!isValidEmail(email)) {
+        showError('vendorEmail', 'Email inválido');
+        isValid = false;
+    }
+    
+    if (!phone) {
+        showError('vendorPhone', 'Telefone é obrigatório');
+        isValid = false;
+    }
+    
+    if (!creci) {
+        showError('vendorCreci', 'CRECI é obrigatório');
+        isValid = false;
+    }
+    
+    if (!status) {
+        showError('vendorStatus', 'Status é obrigatório');
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+// Mostrar mensagem
+function showMessage(message, type = 'success') {
+    const modalMessage = document.getElementById('modalMessage');
+    if (!modalMessage) return;
+    
+    modalMessage.textContent = message;
+    modalMessage.className = `modal-message show ${type}`;
+    setTimeout(() => {
+        hideMessage();
+    }, 3000);
+}
+
+// Esconder mensagem
+function hideMessage() {
+    const modalMessage = document.getElementById('modalMessage');
+    if (!modalMessage) return;
+    
+    modalMessage.className = 'modal-message';
+    modalMessage.textContent = '';
+}
+
+// Modificar função editVendor para abrir o modal
+window.editVendor = function(id) {
+    openVendorModal(id);
+};

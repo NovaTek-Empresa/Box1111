@@ -312,6 +312,7 @@ if (loginForm) {
         appState.currentUser = {
             id: 1,
             name: 'Usuário Teste',
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent('Usuário Teste')}&background=0D8ABC&color=fff&rounded=true`,
             email: email,
             type: 'user' // user, vendor, admin
         };
@@ -338,6 +339,7 @@ if (registerForm) {
         appState.currentUser = {
             id: Date.now(),
             name: name,
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff&rounded=true`,
             email: email,
             phone: phone,
             type: 'user' // user, vendor, admin
@@ -358,22 +360,34 @@ function updateUIForLoggedUser() {
     if (authButtons && appState.currentUser) {
         authButtons.innerHTML = `
             <div class="user-menu">
-                <button class="btn btn-outline" id="userMenuBtn">
-                    <i class="fas fa-user"></i>
-                    ${appState.currentUser.name}
+                <button class="user-avatar" id="userAvatarBtn">
+                    <img src="${appState.currentUser.avatar || ''}" alt="${appState.currentUser.name}">
                 </button>
                 <div class="user-dropdown" id="userDropdown">
-                    <a href="vendor/index.html" class="dropdown-item">
+                    <a href="vendor/index.html" class="dropdown-item" id="menuMyListings">
                         <i class="fas fa-store"></i>
                         Meus Anúncios
                     </a>
-                    <a href="#" class="dropdown-item">
+                    <a href="#" class="dropdown-item" id="menuFavorites">
                         <i class="fas fa-heart"></i>
                         Favoritos
                     </a>
-                    <a href="#" class="dropdown-item">
+                    <a href="#" class="dropdown-item" id="menuSettings">
                         <i class="fas fa-cog"></i>
                         Configurações
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" id="menuBeHost">
+                        <i class="fas fa-user-shield"></i>
+                        Se tornar um anfitrião
+                    </a>
+                    <a href="#" class="dropdown-item" id="menuBeCoHost">
+                        <i class="fas fa-users"></i>
+                        Se tornar um coanfitrião
+                    </a>
+                    <a href="#" class="dropdown-item" id="menuFindCoHost">
+                        <i class="fas fa-search"></i>
+                        Buscar um coanfitrião
                     </a>
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-item" id="logoutBtn">
@@ -385,18 +399,25 @@ function updateUIForLoggedUser() {
         `;
         
         // Adicionar eventos para o menu do usuário
-        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userAvatarBtn = document.getElementById('userAvatarBtn');
         const userDropdown = document.getElementById('userDropdown');
         const logoutBtn = document.getElementById('logoutBtn');
+        const menuBeHost = document.getElementById('menuBeHost');
+        const menuBeCoHost = document.getElementById('menuBeCoHost');
+        const menuFindCoHost = document.getElementById('menuFindCoHost');
+        const menuFavorites = document.getElementById('menuFavorites');
+        const menuSettings = document.getElementById('menuSettings');
+        const menuMyListings = document.getElementById('menuMyListings');
         
-        if (userMenuBtn && userDropdown) {
-            userMenuBtn.addEventListener('click', () => {
+        if (userAvatarBtn && userDropdown) {
+            userAvatarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 userDropdown.classList.toggle('show');
             });
-            
+
             // Fechar dropdown ao clicar fora
             window.addEventListener('click', (e) => {
-                if (!e.target.matches('#userMenuBtn')) {
+                if (!e.target.closest('#userAvatarBtn')) {
                     if (userDropdown.classList.contains('show')) {
                         userDropdown.classList.remove('show');
                     }
@@ -409,6 +430,56 @@ function updateUIForLoggedUser() {
                 e.preventDefault();
                 appState.currentUser = null;
                 location.reload();
+            });
+        }
+
+        if (menuBeHost) {
+            menuBeHost.addEventListener('click', (e) => {
+                e.preventDefault();
+                userDropdown.classList.remove('show');
+                if (appState.currentUser) window.location.href = 'vendor/index.html?action=be-host';
+                else { registerModal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            });
+        }
+
+        if (menuBeCoHost) {
+            menuBeCoHost.addEventListener('click', (e) => {
+                e.preventDefault();
+                userDropdown.classList.remove('show');
+                if (appState.currentUser) window.location.href = 'vendor/index.html?action=be-cohost';
+                else { registerModal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            });
+        }
+
+        if (menuFindCoHost) {
+            menuFindCoHost.addEventListener('click', (e) => {
+                e.preventDefault();
+                userDropdown.classList.remove('show');
+                window.location.href = 'vendor/index.html?action=find-cohost';
+            });
+        }
+
+        if (menuFavorites) {
+            menuFavorites.addEventListener('click', (e) => {
+                e.preventDefault();
+                userDropdown.classList.remove('show');
+                // implementar redirecionamento para favoritos
+                window.location.href = 'favorites.html';
+            });
+        }
+
+        if (menuSettings) {
+            menuSettings.addEventListener('click', (e) => {
+                e.preventDefault();
+                userDropdown.classList.remove('show');
+                window.location.href = 'account-settings.html';
+            });
+        }
+
+        if (menuMyListings) {
+            menuMyListings.addEventListener('click', (e) => {
+                // link já aponta para vendor/index.html, apenas fechar dropdown
+                userDropdown.classList.remove('show');
             });
         }
     }
@@ -647,6 +718,15 @@ function setupSearch() {
         
         // Recarregar propriedades
         loadProperties();
+
+        // Ir para seção de imóveis (mostrar resultados)
+        const propertiesSection = document.getElementById('properties');
+        if (propertiesSection) {
+            window.scrollTo({
+                top: propertiesSection.offsetTop - 80,
+                behavior: 'smooth'
+            });
+        }
     }
     
     if (searchButton) {
@@ -710,6 +790,8 @@ document.addEventListener('DOMContentLoaded', () => {
         appState.currentUser = JSON.parse(savedUser);
         updateUIForLoggedUser();
     }
+
+    
     
     window.addEventListener('scroll', checkScroll);
     checkScroll(); // Verificar elementos visíveis no carregamento

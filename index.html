@@ -26,7 +26,7 @@
                 <li><a href="#properties">Imóveis</a></li>
                 <li><a href="Sobre Nós/">Sobre</a></li>
                 <li><a href="#contact">Contato</a></li>
-                <li><a href="vendor/index.html" class="btn-vendor">Área do Vendedor</a></li>
+                <li><a href="vendor/index.html" class="btn-vendor">Área do Anfitrião</a></li>
                 <li><a href="admin/index.html" class="btn-admin">Administração</a></li>
             </ul>
             <div class="auth-buttons">
@@ -105,8 +105,13 @@
             <div class="properties-grid" id="propertiesGrid">
                 <!-- Os imóveis serão carregados via JavaScript -->
             </div>
-            <div class="load-more-container">
-                <button class="btn btn-outline" id="loadMoreBtn">Carregar Mais Imóveis</button>
+            <div style="display:flex; gap:12px; align-items:center; justify-content:flex-end; margin-top:18px;">
+                <div class="view-all-container">
+                    <a href="all-properties.html" class="btn btn-outline">Ver todos os imóveis</a>
+                </div>
+                <div class="load-more-container">
+                    <button class="btn btn-outline" id="loadMoreBtn">Carregar Mais Imóveis</button>
+                </div>
             </div>
         </div>
     </section>
@@ -124,7 +129,7 @@
                 <div class="step-card fade-up">
                     <div class="step-number">2</div>
                     <h3>Entre em Contato</h3>
-                    <p>Use nosso chat ou WhatsApp para conversar com vendedores</p>
+                    <p>Use nosso chat ou WhatsApp para conversar com anfitriões</p>
                 </div>
                 <div class="step-card fade-up">
                     <div class="step-number">3</div>
@@ -141,7 +146,7 @@
             <div class="footer-content">
                 <div class="footer-column">
                     <h3>BOX1111</h3>
-                    <p>Plataforma completa para aluguel de imóveis. Conectamos compradores e vendedores de forma segura.</p>
+                    <p>Plataforma completa para aluguel de imóveis. Conectamos compradores e anfitriões de forma segura.</p>
                 </div>
                 <div class="footer-column">
                     <h3>Links Rápidos</h3>
@@ -312,10 +317,10 @@
                     </div>
                     <div class="modal-sidebar">
                         <div class="seller-info">
-                            <h4>Informações do Vendedor</h4>
+                            <h4>Informações do Anfitrião</h4>
                             <div class="agent-info">
                                 <div class="agent-avatar">
-                                    <img src="" alt="Vendedor" id="modalSellerAvatar">
+                                    <img src="" alt="Anfitrião" id="modalSellerAvatar">
                                 </div>
                                 <div class="agent-details">
                                     <h4 id="modalSellerName"></h4>
@@ -333,7 +338,7 @@
                                 </a>
                                 <a href="#" class="btn btn-outline" id="modalChatBtn" target="_blank">
                                     <i class="fas fa-comments"></i>
-                                    Conversar com Vendedor
+                                    Conversar com Anfitrião
                                 </a>
                             </div>
                         </div>

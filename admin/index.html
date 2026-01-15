@@ -44,7 +44,7 @@
                     <li class="nav-item" data-section="vendors">
                         <a href="#vendors">
                             <i class="fas fa-store"></i>
-                            <span>Vendedores</span>
+                            <span>Anfitriões</span>
                         </a>
                     </li>
 <li class="nav-item" data-section="reports">
@@ -158,7 +158,7 @@
                             </div>
                             <div class="stat-info">
                                 <h3>156</h3>
-                                <p>Vendedores Ativos</p>
+                                <p>Anfitriões Ativos</p>
                             </div>
                             <div class="stat-trend down">
                                 <i class="fas fa-arrow-down"></i>
@@ -272,7 +272,7 @@
                 <section id="users-section" class="content-section">
                     <div class="section-header">
                         <h2>Gerenciar Usuários</h2>
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" id="addUserBtn">
                             <i class="fas fa-plus"></i>
                             Adicionar Usuário
                         </button>
@@ -292,7 +292,7 @@
                                             <th><input type="checkbox" id="selectAllUsers"></th>
                                             <th>Usuário</th>
                                             <th>Email</th>
-                                            <th>Tipo</th>
+                                            <th>Telefone</th>
                                             <th>Status</th>
                                             <th>Registro</th>
                                             <th>Ações</th>
@@ -329,17 +329,17 @@
                 <!-- Vendors Section -->
                 <section id="vendors-section" class="content-section">
                     <div class="section-header">
-                        <h2>Gerenciar Vendedores</h2>
+                        <h2>Gerenciar Anfitriões</h2>
                         <button class="btn btn-primary" id="addVendorBtn">
                             <i class="fas fa-plus"></i>
-                            Adicionar Vendedor
+                            Adicionar Anfitrião
                         </button>
                     </div>
                     <div class="content-card">
                         <div class="card-header">
-                            <h3>Todos os Vendedores</h3>
+                            <h3>Todos os Anfitriões</h3>
                             <div class="section-filter">
-                                <input type="text" id="vendorsSearch" placeholder="Buscar por nome ou email" aria-label="Buscar vendedores por nome ou email">
+                                <input type="text" id="vendorsSearch" placeholder="Buscar por nome ou email" aria-label="Buscar anfitriões por nome ou email">
                             </div>
                         </div>
                         <div class="card-body">
@@ -348,7 +348,7 @@
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox" id="selectAllVendors"></th>
-                                            <th>Vendedor</th>
+                                            <th>Anfitrião</th>
                                             <th>Email</th>
                                             <th>Telefone</th>
                                             <th>CRECI</th>
@@ -364,7 +364,7 @@
                             </div>
                             <div class="table-footer">
                                 <div class="table-info">
-                                    Mostrando 1-10 de 156 vendedores
+                                    Mostrando 1-10 de 156 anfitriões
                                 </div>
                                 <div class="pagination">
                                     <button class="pagination-btn" disabled>
@@ -560,6 +560,156 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="../js/admin.js"></script>
     <script src="../js/reports.js"></script>
+
+    <!-- Modal para Criar/Editar Anfitrião -->
+    <div id="vendorModal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Adicionar Anfitrião</h2>
+                <button class="modal-close" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="vendorForm" class="modal-form">
+                <input type="hidden" id="vendorId">
+                
+                <div class="form-group">
+                    <label for="vendorName">Anfitrião (Nome) *</label>
+                    <input type="text" id="vendorName" name="name" required placeholder="Digite o nome do vendedor">
+                    <span class="error-message" id="nameError"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vendorEmail">Email *</label>
+                        <input type="email" id="vendorEmail" name="email" required placeholder="Digite o email">
+                        <span class="error-message" id="emailError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorPhone">Telefone *</label>
+                        <input type="tel" id="vendorPhone" name="phone" required placeholder="(11) 9XXXX-XXXX">
+                        <span class="error-message" id="phoneError"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vendorCreci">CRECI *</label>
+                        <input type="text" id="vendorCreci" name="creci" required placeholder="Digite o CRECI">
+                        <span class="error-message" id="creciError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorStatus">Status *</label>
+                        <select id="vendorStatus" name="status" required>
+                            <option value="">Selecione um status</option>
+                            <option value="active">Ativo</option>
+                            <option value="pending">Pendente</option>
+                            <option value="inactive">Inativo</option>
+                        </select>
+                        <span class="error-message" id="statusError"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="vendorRegistration">Registro</label>
+                    <input type="date" id="vendorRegistration" name="registration">
+                </div>
+
+                <div class="modal-actions">
+                    <div class="left-actions">
+                        <button type="button" id="rejectVendorBtn" class="btn btn-danger" style="display: none;">
+                            <i class="fas fa-times-circle"></i>
+                            Reprovar
+                        </button>
+                    </div>
+                    <div class="right-actions">
+                        <button type="button" id="approveVendorBtn" class="btn btn-success" style="display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            Aprovar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Salvar Alterações
+                        </button>
+                        <button type="button" class="btn btn-outline" id="cancelModalBtn">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-message" id="modalMessage" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Criar/Editar Usuário -->
+    <div id="userModal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Adicionar Usuário</h2>
+                <button class="modal-close" id="closeUserModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="userForm" class="modal-form">
+                <input type="hidden" id="userId">
+                
+                <div class="form-group">
+                    <label for="userName">Nome *</label>
+                    <input type="text" id="userName" name="name" required placeholder="Digite o nome do usuário">
+                    <span class="error-message" id="userNameError"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userEmail">Email *</label>
+                        <input type="email" id="userEmail" name="email" required placeholder="Digite o email">
+                        <span class="error-message" id="userEmailError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPhone">Telefone *</label>
+                        <input type="tel" id="userPhone" name="phone" required placeholder="(11) 9XXXX-XXXX">
+                        <span class="error-message" id="userPhoneError"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userStatus">Status *</label>
+                        <select id="userStatus" name="status" required>
+                            <option value="">Selecione um status</option>
+                            <option value="active">Ativo</option>
+                            <option value="pending">Pendente</option>
+                            <option value="inactive">Inativo</option>
+                        </select>
+                        <span class="error-message" id="userStatusError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="userRegistration">Registro</label>
+                        <input type="date" id="userRegistration" name="registration">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <div class="left-actions">
+                    </div>
+                    <div class="right-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Salvar Alterações
+                        </button>
+                        <button type="button" class="btn btn-outline" id="cancelUserModalBtn">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-message" id="userModalMessage" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
 
