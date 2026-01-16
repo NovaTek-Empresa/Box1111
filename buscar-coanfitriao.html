@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Coanfitrião — BOX 11 11</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/buscar-coanfitriao.css">
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="index.html" class="brand">
+                <div class="logo">BOX</div>
+                <div class="brand-text">
+                    <h1>BOX 11 11</h1>
+                    <p> Anuncie • Alugue</p>
+                </div>
+            </a>
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#properties">Imóveis</a></li>
+                <li><a href="Sobre Nós/">Sobre</a></li>
+                <li><a href="index.html#contact">Contato</a></li>
+                <li><a href="vendor/index.html" class="btn-vendor">Área do Anfitrião</a></li>
+                <li><a href="admin/index.html" class="btn-admin">Administração</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-outline" id="loginBtn">Entrar</a>
+                <a href="#" class="btn" id="registerBtn">Cadastrar</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="cohost-search-main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Buscar Coanfitrião</h1>
+                <p>Encontre o coanfitrião ideal para gerenciar seus imóveis</p>
+            </div>
+
+            <!-- Search and Filters Container -->
+            <div class="search-filters-wrapper">
+                <!-- Search Bar -->
+                <div class="search-bar-section">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="search-input" 
+                            placeholder="Buscar por nome, username ou email..."
+                        >
+                        <button class="clear-search" id="clearSearch" title="Limpar busca">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="filters-section">
+                    <div class="filters-toggle" id="filtersToggle">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>Filtros</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+
+                    <div class="filters-container" id="filtersContainer">
+                        <!-- Categoria Filter -->
+                        <div class="filter-group">
+                            <label for="categoryFilter">Categoria</label>
+                            <select id="categoryFilter" class="filter-select">
+                                <option value="">Todas as categorias</option>
+                                <option value="imovel">Imóvel Residencial</option>
+                                <option value="comercial">Imóvel Comercial</option>
+                                <option value="terreno">Terreno</option>
+                                <option value="multifamiliar">Multifamiliar</option>
+                            </select>
+                        </div>
+
+                        <!-- Disponibilidade Filter -->
+                        <div class="filter-group">
+                            <label for="availabilityFilter">Disponibilidade</label>
+                            <select id="availabilityFilter" class="filter-select">
+                                <option value="">Qualquer período</option>
+                                <option value="imediata">Disponível imediatamente</option>
+                                <option value="2-semanas">Nos próximos 2 semanas</option>
+                                <option value="1-mes">Nos próximos 30 dias</option>
+                            </select>
+                        </div>
+
+                        <!-- Rating Filter -->
+                        <div class="filter-group">
+                            <label for="ratingFilter">Avaliação Mínima</label>
+                            <select id="ratingFilter" class="filter-select">
+                                <option value="">Qualquer avaliação</option>
+                                <option value="4.5">4.5 ⭐ ou acima</option>
+                                <option value="4">4.0 ⭐ ou acima</option>
+                                <option value="3.5">3.5 ⭐ ou acima</option>
+                            </select>
+                        </div>
+
+                        <!-- Clear Filters -->
+                        <button class="btn-clear-filters" id="clearFilters">
+                            <i class="fas fa-redo"></i>
+                            Limpar filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <!-- Results Count -->
+                <div class="results-header">
+                    <p class="results-count" id="resultsCount">Carregando...</p>
+                </div>
+
+                <!-- Loading State -->
+                <div class="loading-state" id="loadingState">
+                    <div class="spinner"></div>
+                    <p>Buscando coanfitriões...</p>
+                </div>
+
+                <!-- Cohosts List -->
+                <div class="cohosts-list" id="cohostsList">
+                    <!-- Cards serão inseridos aqui via JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Nenhum coanfitrião encontrado</h3>
+                    <p>Tente ajustar seus filtros ou refinar sua busca</p>
+                    <button class="btn" id="resetSearch">
+                        <i class="fas fa-redo"></i>
+                        Resetar busca
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para Ver Perfil -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo do modal será inserido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Convite -->
+    <div class="modal" id="inviteModal">
+        <div class="modal-content modal-invite">
+            <button class="modal-close" id="closeInviteModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2>Convite para Coanfitrião</h2>
+            <form id="inviteForm">
+                <input type="hidden" id="inviteUserId">
+                
+                <div class="form-group">
+                    <label for="inviteMessage">Mensagem (opcional)</label>
+                    <textarea 
+                        id="inviteMessage" 
+                        class="form-textarea" 
+                        placeholder="Descreva por que gostaria de trabalhar com este coanfitrião..."
+                        rows="5"
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="propertySelect">Selecione o imóvel (opcional)</label>
+                    <select id="propertySelect" class="filter-select">
+                        <option value="">Sem imóvel específico</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="cancelInvite">Cancelar</button>
+                    <button type="submit" class="btn">Enviar Convite</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>BOX 11 11</h4>
+                    <p>Plataforma imobiliária moderna e segura para anfitriões e hóspedes.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Links Úteis</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#">Imóveis</a></li>
+                        <li><a href="#">Sobre Nós</a></li>
+                        <li><a href="#">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Redes Sociais</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BOX 11 11. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/buscar-coanfitriao.js"></script>
+</body>
+</html>

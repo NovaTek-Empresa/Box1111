@@ -455,7 +455,7 @@ function updateUIForLoggedUser() {
             menuFindCoHost.addEventListener('click', (e) => {
                 e.preventDefault();
                 userDropdown.classList.remove('show');
-                window.location.href = 'vendor/index.html?action=find-cohost';
+                window.location.href = 'buscar-coanfitriao.html';
             });
         }
 
