@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Imóvel — BOX1111</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/property-details.css">
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="index.html" class="brand">
+                <div class="logo">BOX</div>
+                <div class="brand-text">
+                    <h1>BOX 11 11</h1>
+                    <p>Anuncie • Alugue</p>
+                </div>
+            </a>
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#properties">Imóveis</a></li>
+                <li><a href="Sobre Nós/">Sobre</a></li>
+                <li><a href="#contact">Contato</a></li>
+                <li><a href="vendor/index.html" class="btn-vendor">Área do Anfitrião</a></li>
+                <li><a href="admin/index.html" class="btn-admin">Administração</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-outline" id="loginBtn">Entrar</a>
+                <a href="#" class="btn" id="registerBtn">Cadastrar</a>
+            </div>
+        </div>
+    </header>
+
+    <main style="margin-top: var(--header-height);">
+        <!-- Galeria Premium com Carrossel -->
+        <section class="gallery-section">
+            <div class="gallery-container">
+                <!-- Galeria Principal -->
+                <div class="gallery-main-wrapper">
+                    <div class="gallery-main" id="galleryMain">
+                        <img id="mainImage" src="https://via.placeholder.com/1000x600?text=Imóvel" alt="Imóvel" class="main-image">
+                        
+                        <!-- Skeleton Loading -->
+                        <div class="skeleton-main" id="skeletonMain"></div>
+                        
+                        <!-- Contador -->
+                        <div class="gallery-counter">
+                            <span id="currentImageIndex">1</span>/<span id="totalImageCount">1</span>
+                        </div>
+
+                        <!-- Controles do Carrossel -->
+                        <button class="carousel-btn prev" id="prevBtn" aria-label="Imagem anterior">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-btn next" id="nextBtn" aria-label="Próxima imagem">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+
+                        <!-- Botão Fullscreen -->
+                        <button class="fullscreen-btn" id="fullscreenBtn" aria-label="Abrir em tela cheia">
+                            <i class="fas fa-expand"></i>
+                        </button>
+
+                        <!-- Ações de Favoritar e Compartilhar -->
+                        <div class="gallery-actions">
+                            <button class="action-btn favorite-btn" id="favoriteBtn" aria-label="Adicionar aos favoritos">
+                                <i class="far fa-heart"></i>
+                                <span class="action-label">Favoritar</span>
+                            </button>
+                            <button class="action-btn share-btn" id="shareBtn" aria-label="Compartilhar imóvel">
+                                <i class="fas fa-share-alt"></i>
+                                <span class="action-label">Compartilhar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Miniaturas -->
+                    <div class="gallery-thumbnails" id="galleryThumbnails"></div>
+                </div>
+
+                <!-- Status de Disponibilidade -->
+                <div class="availability-badge" id="availabilityBadge">
+                    <i class="fas fa-check-circle"></i>
+                    Disponível agora
+                </div>
+            </div>
+        </section>
+
+        <!-- Fullscreen Modal -->
+        <div class="fullscreen-modal" id="fullscreenModal">
+            <div class="fullscreen-container">
+                <button class="fullscreen-close" id="closeFullscreen">
+                    <i class="fas fa-times"></i>
+                </button>
+                <img id="fullscreenImage" src="" alt="Imóvel">
+                <div class="fullscreen-counter">
+                    <span id="fullscreenCurrentIndex">1</span>/<span id="fullscreenTotalCount">1</span>
+                </div>
+                <button class="fullscreen-carousel-btn prev" id="fullscreenPrevBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="fullscreen-carousel-btn next" id="fullscreenNextBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="container content-wrapper">
+            <div class="property-main">
+                <!-- Informações do Imóvel -->
+                <section class="property-info">
+                    <!-- Cabeçalho com Preço e Título -->
+                    <div class="info-header">
+                        <div class="info-title-section">
+                            <h1 class="property-title" id="propertyTitle">Carregando...</h1>
+                            <p class="property-location" id="propertyLocation">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="locationText">Carregando...</span>
+                            </p>
+                        </div>
+
+                        <div class="price-section">
+                            <div class="price-badge">
+                                <span class="price-label">Valor</span>
+                                <div class="price-value" id="propertyPrice">R$ 0</div>
+                                <span class="price-period" id="pricePeriod">/mês</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumo Rápido com Ícones -->
+                    <div class="quick-summary">
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <div class="summary-content">
+                                <span class="summary-label">Quartos</span>
+                                <span class="summary-value" id="bedroomCount">0</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="fas fa-door-open"></i>
+                            </div>
+                            <div class="summary-content">
+                                <span class="summary-label">Suítes</span>
+                                <span class="summary-value" id="suitesCount">0</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="fas fa-bath"></i>
+                            </div>
+                            <div class="summary-content">
+                                <span class="summary-label">Banheiros</span>
+                                <span class="summary-value" id="bathroomCount">0</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="summary-content">
+                                <span class="summary-label">Vagas</span>
+                                <span class="summary-value" id="parkingCount">0</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="fas fa-ruler"></i>
+                            </div>
+                            <div class="summary-content">
+                                <span class="summary-label">Metragem</span>
+                                <span class="summary-value" id="propertySize">0 m²</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call-to-Actions Principais -->
+                    <div class="cta-section">
+                        <button class="btn btn-primary cta-btn" id="rentBtn">
+                            <i class="fas fa-calendar-check"></i>
+                            Alugar agora
+                        </button>
+                        <button class="btn btn-secondary cta-btn" id="contactHostBtn">
+                            <i class="fas fa-message"></i>
+                            Conversar com anfitrião
+                        </button>
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="description-section">
+                        <h2 class="section-heading">Sobre este imóvel</h2>
+                        <p class="description-text" id="propertyDescription">Carregando descrição...</p>
+                    </div>
+
+                    <!-- Features e Comodidades -->
+                    <div class="features-section">
+                        <h2 class="section-heading">O que oferecemos</h2>
+                        <div class="features-grid" id="featuresList"></div>
+                    </div>
+
+                    <!-- Mini Mapa -->
+                    <div class="map-section">
+                        <h2 class="section-heading">Localização</h2>
+                        <div class="map-container" id="mapContainer">
+                            <div id="miniMap" class="mini-map"></div>
+                            <div class="map-address" id="mapAddress">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="mapAddressText">Carregando endereço...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Taxas e Condições -->
+                    <div class="fees-section">
+                        <h2 class="section-heading">Taxas e Condições</h2>
+                        <div class="fees-table">
+                            <div class="fee-row">
+                                <span class="fee-label">Valor mensal</span>
+                                <span class="fee-value" id="monthlyFee">R$ 0</span>
+                            </div>
+                            <div class="fee-row">
+                                <span class="fee-label">Condomínio</span>
+                                <span class="fee-value" id="condominiumFee">-</span>
+                            </div>
+                            <div class="fee-row">
+                                <span class="fee-label">IPTU</span>
+                                <span class="fee-value" id="iptuFee">-</span>
+                            </div>
+                            <div class="fee-row">
+                                <span class="fee-label">Caução</span>
+                                <span class="fee-value" id="depositFee">-</span>
+                            </div>
+                            <div class="fee-row">
+                                <span class="fee-label">Taxas de serviço</span>
+                                <span class="fee-value" id="serviceFee">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Seção do Anfitrião -->
+                <section class="host-section">
+                    <h2 class="section-heading">Informações do Anfitrião</h2>
+                    <div class="host-card">
+                        <div class="host-header">
+                            <img class="host-avatar" id="hostAvatar" src="https://via.placeholder.com/100" alt="Anfitrião">
+                            <div class="host-info">
+                                <div class="host-name-section">
+                                    <h3 class="host-name" id="hostName">Carregando...</h3>
+                                    <span class="host-badge" id="hostBadge">
+                                        <i class="fas fa-check-circle"></i>
+                                        Verificado
+                                    </span>
+                                </div>
+                                <p class="host-type" id="hostType">Carregando...</p>
+                                <div class="host-rating">
+                                    <div class="stars" id="hostRating"></div>
+                                    <span class="rating-text" id="ratingText">Carregando...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="host-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Tempo de resposta</span>
+                                <span class="stat-value" id="responseTime">~2 horas</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Taxa de aceitação</span>
+                                <span class="stat-value" id="acceptanceRate">98%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Imóveis anunciados</span>
+                                <span class="stat-value" id="propertyCount">5</span>
+                            </div>
+                        </div>
+
+                        <div class="host-description" id="hostDescription">
+                            Anfitrião experiente e confiável. Buscamos sempre proporcionar a melhor experiência para nossos hóspedes.
+                        </div>
+
+                        <button class="btn btn-outline" id="hostContactBtn">
+                            <i class="fas fa-envelope"></i>
+                            Enviar mensagem
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Avaliações -->
+                <section class="reviews-section">
+                    <h2 class="section-heading">Avaliações</h2>
+
+                    <!-- Formulário de Avaliação -->
+                    <div class="review-form-container">
+                        <h3 class="review-form-title">Deixe sua avaliação</h3>
+                        <form id="reviewForm" class="review-form">
+                            <!-- Campo de Estrelas -->
+                            <div class="form-group">
+                                <label for="stars" class="form-label">Classificação *</label>
+                                <div class="stars-input" id="starsInput">
+                                    <button type="button" class="star-btn" data-rating="1" title="1 estrela">
+                                        <i class="far fa-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="2" title="2 estrelas">
+                                        <i class="far fa-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="3" title="3 estrelas">
+                                        <i class="far fa-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="4" title="4 estrelas">
+                                        <i class="far fa-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="5" title="5 estrelas">
+                                        <i class="far fa-star"></i>
+                                    </button>
+                                </div>
+                                <span class="stars-count" id="starsCount">Nenhuma classificação</span>
+                                <input type="hidden" id="ratingValue" value="0">
+                            </div>
+
+                            <!-- Campo de Nome -->
+                            <div class="form-group">
+                                <label for="reviewName" class="form-label">Seu nome *</label>
+                                <input type="text" id="reviewName" name="name" class="form-input" placeholder="João Silva" required>
+                            </div>
+
+                            <!-- Campo de Email -->
+                            <div class="form-group">
+                                <label for="reviewEmail" class="form-label">Seu email *</label>
+                                <input type="email" id="reviewEmail" name="email" class="form-input" placeholder="joao@email.com" required>
+                            </div>
+
+                            <!-- Campo de Texto -->
+                            <div class="form-group">
+                                <label for="reviewText" class="form-label">Sua avaliação *</label>
+                                <textarea id="reviewText" name="text" class="form-textarea" placeholder="Compartilhe sua experiência com este imóvel..." rows="5" required></textarea>
+                                <small class="char-count"><span id="charCount">0</span>/500</small>
+                            </div>
+
+                            <!-- Botão de Envio -->
+                            <button type="submit" class="btn btn-primary review-submit-btn">
+                                <i class="fas fa-paper-plane"></i> Enviar Avaliação
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Avaliações -->
+                    <div class="reviews-list" id="reviewsList">
+                        <div class="reviews-placeholder">
+                            <p>Nenhuma avaliação ainda. Seja o primeiro a avaliar este imóvel!</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar com Resumo -->
+            <aside class="property-sidebar">
+                <div class="sidebar-card sticky-card">
+                    <h3 class="sidebar-title">Resumo da Reserva</h3>
+
+                    <div class="booking-summary">
+                        <div class="summary-row">
+                            <span class="summary-label">Imóvel</span>
+                            <span class="summary-value" id="sidebarTitle">-</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Valor/noite</span>
+                            <span class="summary-value" id="sidebarNightly">R$ 0</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" id="sidebarRentBtn">
+                        <i class="fas fa-calendar-check"></i>
+                        Alugar agora
+                    </button>
+
+                    <button class="btn btn-secondary btn-block" id="sidebarContactBtn">
+                        <i class="fas fa-message"></i>
+                        Conversar
+                    </button>
+
+                    <div class="safety-info">
+                        <p class="safety-text">
+                            <i class="fas fa-shield-alt"></i>
+                            Sua reserva está protegida. Cancelamento até 7 dias antes = reembolso total.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="margin-top: 60px;">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>BOX1111</h3>
+                    <p>Plataforma completa para aluguel de imóveis. Conectamos compradores e anfitriões de forma segura.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Links Rápidos</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#properties">Imóveis</a></li>
+                        <li><a href="#about">Sobre</a></li>
+                        <li><a href="#contact">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Categorias</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Casas</a></li>
+                        <li><a href="#">Apartamentos</a></li>
+                        <li><a href="#">Comercial</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contato</h3>
+                    <ul class="footer-links">
+                        <li><a href="mailto:contato@box1111.com.br">contato@box1111.com.br</a></li>
+                        <li>Rua Doutor Baeta Neves, 158 4o andar - Baeta Neves</li>
+                        <li>São Bernardo do Campo - SP, CEP 09751-030</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 BOX1111 — Todos os direitos reservados.</p>
+                <div class="developer-credit">
+                    Desenvolvido por <a href="https://novateksiteoficial.netlify.app/" target="_blank">NOVATEK</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-content">
+            <h3>Compartilhar este imóvel</h3>
+            <div class="share-options">
+                <button class="share-option" id="shareWhatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    WhatsApp
+                </button>
+                <button class="share-option" id="shareEmail">
+                    <i class="fas fa-envelope"></i>
+                    E-mail
+                </button>
+                <button class="share-option" id="shareCopy">
+                    <i class="fas fa-link"></i>
+                    Copiar link
+                </button>
+                <button class="share-option" id="shareFacebook">
+                    <i class="fab fa-facebook-f"></i>
+                    Facebook
+                </button>
+            </div>
+            <button class="btn btn-outline" id="closeShareModal">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="contact-modal" id="contactModal">
+        <div class="contact-content">
+            <button class="contact-close" id="closeContactModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3>Conversar com o anfitrião</h3>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="contactName">Seu nome</label>
+                    <input type="text" id="contactName" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Seu e-mail</label>
+                    <input type="email" id="contactEmail" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactPhone">Seu telefone (opcional)</label>
+                    <input type="tel" id="contactPhone" placeholder="(11) 99999-9999">
+                </div>
+                <div class="form-group">
+                    <label for="contactMessage">Sua mensagem</label>
+                    <textarea id="contactMessage" rows="5" placeholder="Olá, gostaria de saber mais sobre este imóvel..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Enviar mensagem</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/property-details.js"></script>
+</body>
+</html>

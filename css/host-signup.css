@@ -1,0 +1,813 @@
+/* ========================================
+   HOST SIGNUP - RESPONSIVE WIZARD
+   ======================================== */
+
+:root {
+  --primary-color: #000000;
+  --accent-color: #22c55e;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --border-color: #e5e5e5;
+  --bg-light: #f9f9f9;
+  --bg-lighter: #fafafa;
+  --bg-error: #fee2e2;
+  --error-color: #dc2626;
+  --success-color: #22c55e;
+  --warning-color: #eab308;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
+.signup-container {
+  max-width: 800px;
+  margin: var(--spacing-xl) auto;
+  padding: var(--spacing-lg);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   PROGRESS SECTION
+   ======================================== */
+
+.progress-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.progress-header h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-color), #16a34a);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 20%;
+}
+
+/* Progress Steps */
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-lighter);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.step.active .step-number {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+.step.active .step-label {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.step.completed .step-number {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.step.completed .step-number::after {
+  content: '\f05d';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+}
+
+/* ========================================
+   FORM STEPS
+   ======================================== */
+
+.signup-form {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+
+.form-step {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.form-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-step h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.step-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+/* ========================================
+   FORM GROUPS
+   ======================================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: var(--bg-lighter);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.form-group input.error,
+.form-group select.error {
+  border-color: var(--error-color);
+  background: var(--bg-error);
+}
+
+.error-message {
+  font-size: 0.75rem;
+  color: var(--error-color);
+  font-weight: 500;
+  min-height: 18px;
+  display: block;
+}
+
+/* ========================================
+   FILE UPLOAD
+   ======================================== */
+
+.file-upload {
+  position: relative;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.upload-area {
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--bg-lighter);
+}
+
+.upload-area:hover {
+  border-color: var(--accent-color);
+  background: rgba(34, 197, 94, 0.02);
+}
+
+.upload-area i {
+  font-size: 2.5rem;
+  color: var(--accent-color);
+  margin-bottom: var(--spacing-sm);
+  display: block;
+}
+
+.upload-area p {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: var(--spacing-sm) 0 var(--spacing-xs) 0;
+}
+
+.file-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.file-name {
+  font-size: 0.75rem;
+  color: var(--success-color);
+  font-weight: 600;
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-name::before {
+  content: '\f05d';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+}
+
+/* ========================================
+   INFO BOX
+   ======================================== */
+
+.info-box {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: #f0fdf4;
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  color: #166534;
+  margin-top: var(--spacing-lg);
+}
+
+.info-box i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-color);
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* ========================================
+   CONFIRMATION SECTION
+   ======================================== */
+
+.confirmation-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.confirmation-item {
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-lighter);
+  transition: all 0.3s ease;
+}
+
+.confirmation-item:hover {
+  border-color: var(--accent-color);
+  background: white;
+}
+
+.confirmation-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.confirmation-header i {
+  font-size: 1.5rem;
+  color: var(--accent-color);
+}
+
+.confirmation-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.confirmation-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.confirmation-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent-color);
+  margin: 0 0 var(--spacing-md) 0;
+  padding: var(--spacing-sm);
+  background: #f0fdf4;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.resend-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+  text-align: center;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+  text-decoration: underline;
+  font-family: inherit;
+  font-size: inherit;
+  transition: color 0.3s ease;
+}
+
+.btn-link:hover {
+  color: #16a34a;
+}
+
+/* ========================================
+   RADIO GROUP (Payment Method)
+   ======================================== */
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--bg-lighter);
+}
+
+.radio-label:hover {
+  border-color: var(--accent-color);
+  background: white;
+}
+
+.radio-label input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+  border-color: var(--accent-color);
+  background: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+.radio-custom::after {
+  content: '\f05d';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  color: white;
+  font-size: 0.75rem;
+  display: none;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+  display: block;
+}
+
+.radio-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radio-content strong {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.radio-content p {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.payment-fields {
+  padding: var(--spacing-lg);
+  background: var(--bg-lighter);
+  border-radius: 8px;
+  margin-top: var(--spacing-lg);
+  border-left: 4px solid var(--accent-color);
+  animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   STATUS SECTION
+   ======================================== */
+
+.status-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.status-badge {
+  padding: var(--spacing-lg);
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.status-badge.analyzing {
+  background: #fef3c7;
+  border: 2px solid #fbbf24;
+  color: #92400e;
+}
+
+.status-badge.verified {
+  background: #f0fdf4;
+  border: 2px solid var(--accent-color);
+  color: #166534;
+}
+
+.status-badge.rejected {
+  background: var(--bg-error);
+  border: 2px solid var(--error-color);
+  color: #991b1b;
+}
+
+.status-badge i {
+  font-size: 2.5rem;
+  animation: spin 2s linear infinite;
+}
+
+.status-badge.verified i,
+.status-badge.rejected i {
+  animation: none;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.status-badge h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.status-badge p {
+  font-size: 0.875rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Checklist */
+.checklist {
+  padding: var(--spacing-lg);
+  background: var(--bg-lighter);
+  border-radius: 8px;
+}
+
+.checklist h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+#checklistItems {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+#checklistItems li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: 0.875rem;
+  padding: var(--spacing-sm);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+#checklistItems li.completed {
+  color: var(--success-color);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+#checklistItems li.pending {
+  color: var(--warning-color);
+  background: rgba(234, 179, 8, 0.05);
+}
+
+#checklistItems i {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.status-info {
+  padding: var(--spacing-md);
+  background: #f0fdf4;
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  color: #166534;
+}
+
+.status-info p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* ========================================
+   FORM ACTIONS
+   ======================================== */
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  justify-content: space-between;
+}
+
+.form-actions .btn {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #16a34a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: white;
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.05);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--accent-color);
+  border: 2px solid var(--border-color);
+  font-size: 0.75rem;
+  padding: 8px 12px;
+  flex: initial;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-color);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .signup-container {
+    margin: var(--spacing-lg) auto;
+    padding: var(--spacing-md);
+    border-radius: 8px;
+  }
+
+  .progress-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .progress-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .progress-steps {
+    gap: 4px;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+
+  .step-label {
+    font-size: 0.65rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-container {
+    margin: var(--spacing-md) auto;
+    padding: var(--spacing-md);
+  }
+
+  .progress-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .progress-steps {
+    justify-content: space-around;
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .step-label {
+    font-size: 0.6rem;
+  }
+
+  .form-step h3 {
+    font-size: 1.25rem;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="tel"],
+  .form-group select {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  .upload-area {
+    padding: var(--spacing-md);
+  }
+
+  .upload-area i {
+    font-size: 2rem;
+  }
+
+  .radio-label {
+    padding: var(--spacing-sm);
+  }
+
+  .confirmation-item {
+    padding: var(--spacing-sm);
+  }
+}

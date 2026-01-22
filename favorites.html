@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoritos — Box11</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Container para página de favoritos */
+        .favorites-container {
+            min-height: 100vh;
+            background: var(--bg, #f8fafc);
+            padding: 60px 20px 40px;
+        }
+
+        .favorites-header {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+
+        .favorites-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text, #000);
+            margin-bottom: 8px;
+        }
+
+        .favorites-header p {
+            font-size: 1rem;
+            color: var(--text-light, #666);
+        }
+
+        .favorites-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .favorites-empty {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .favorites-empty i {
+            font-size: 4rem;
+            color: var(--border, #e5e5e5);
+            margin-bottom: 16px;
+        }
+
+        .favorites-empty h2 {
+            font-size: 1.5rem;
+            color: var(--text, #000);
+            margin-bottom: 8px;
+        }
+
+        .favorites-empty p {
+            color: var(--text-light, #666);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .favorite-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .favorite-card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .favorite-image {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: var(--border, #e5e5e5);
+        }
+
+        .favorite-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .favorite-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(34, 197, 94, 0.95);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .favorite-remove {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #ef4444;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .favorite-remove:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .favorite-content {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .favorite-price {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent, #22c55e);
+            margin-bottom: 8px;
+        }
+
+        .favorite-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text, #000);
+            margin-bottom: 6px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .favorite-location {
+            font-size: 0.85rem;
+            color: var(--text-light, #666);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .favorite-location i {
+            color: var(--accent, #22c55e);
+        }
+
+        .favorite-footer {
+            margin-top: auto;
+        }
+
+        .favorite-details-btn {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--accent, #22c55e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .favorite-details-btn:hover {
+            background: var(--accent-dark, #16a34a);
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            color: var(--text, #000);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: var(--accent, #22c55e);
+            transform: translateX(-4px);
+        }
+
+        @media (max-width: 768px) {
+            .favorites-container {
+                padding: 80px 16px 32px;
+            }
+
+            .favorites-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .favorites-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header" class="header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <span class="logo-text">BOX11</span>
+                </a>
+            </div>
+            <nav class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="all-properties.html">Imóveis</a>
+                <a href="#properties">Sobre</a>
+            </nav>
+            <div class="auth-buttons" id="authButtons">
+                <a href="#" class="btn" id="loginBtn">Entrar</a>
+                <a href="#" class="btn btn-primary" id="registerBtn">Cadastrar</a>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Favoritos Section -->
+    <main class="favorites-container">
+        <div class="favorites-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Voltar
+            </a>
+            <h1>Meus Favoritos</h1>
+            <p>Imóveis que você favoritou e pode consultar a qualquer momento</p>
+        </div>
+
+        <div class="favorites-content">
+            <div class="favorites-grid" id="favoritesGrid">
+                <!-- Favoritos serão carregados via JavaScript -->
+            </div>
+            <div class="favorites-empty" id="favoritesEmpty" style="display: none;">
+                <i class="fas fa-heart"></i>
+                <h2>Nenhum favorito ainda</h2>
+                <p>Você não tem imóveis favoritados. Explore nossos imóveis e adicione seus favoritos!</p>
+                <a href="all-properties.html" class="btn btn-primary">Ver imóveis</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals (compartilhados) -->
+    <div class="modal-backdrop" id="loginModal">
+        <div class="modal modal-lg modal-login">
+            <div class="modal-header modal-header-login">
+                <div>
+                    <h2 class="modal-title-login">Bem-vindo de volta</h2>
+                    <p class="modal-subtitle">Acesse sua conta para continuar</p>
+                </div>
+                <button class="close-modal" id="closeLoginModal" aria-label="Fechar"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body modal-body-login">
+                <form id="loginForm" class="login-form">
+                    <!-- Email -->
+                    <div class="form-group form-group-icon">
+                        <label class="form-label" for="loginEmail">E-mail</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input 
+                                type="email" 
+                                id="loginEmail" 
+                                class="form-control form-control-lg" 
+                                placeholder="seu@email.com"
+                                autocomplete="email"
+                                required
+                                autofocus>
+                        </div>
+                        <span class="error-message" id="error-loginEmail"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group form-group-icon">
+                        <label class="form-label" for="loginPassword">Senha</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input 
+                                type="password" 
+                                id="loginPassword" 
+                                class="form-control form-control-lg" 
+                                placeholder="••••••••"
+                                autocomplete="current-password"
+                                required>
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                id="toggleLoginPassword" 
+                                aria-label="Mostrar/ocultar senha">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="error-message" id="error-loginPassword"></span>
+                    </div>
+
+                    <!-- Remember & Forgot -->
+                    <div class="form-options-login">
+                        <label class="checkbox checkbox-sm">
+                            <input type="checkbox" id="rememberMe">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-label">Lembrar-me</span>
+                        </label>
+                        <a href="#" class="forgot-password-link">Esqueci minha senha</a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-login" id="loginSubmitBtn">
+                        <span class="btn-text">Entrar</span>
+                        <span class="btn-loader" style="display: none;">
+                            <span class="spinner-border spinner-border-sm"></span>
+                        </span>
+                    </button>
+                </form>
+                <div class="auth-divider">
+                    <span>ou</span>
+                </div>
+                <div class="social-auth">
+                    <button class="btn btn-outline social-btn">
+                        <i class="fab fa-google"></i>
+                        Entrar com Google
+                    </button>
+                    <button class="btn btn-outline social-btn">
+                        <i class="fab fa-facebook-f"></i>
+                        Entrar com Facebook
+                    </button>
+                </div>
+                <div class="auth-switch">
+                    <p>Ainda não tem conta? <a href="#" id="switchToRegister">Criar conta</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Carregar favoritos do localStorage
+        function loadFavorites() {
+            const favoritesGrid = document.getElementById('favoritesGrid');
+            const favoritesEmpty = document.getElementById('favoritesEmpty');
+            
+            // Simular favoritos armazenados (em produção, seria do servidor)
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            
+            if (favorites.length === 0) {
+                favoritesGrid.style.display = 'none';
+                favoritesEmpty.style.display = 'block';
+                return;
+            }
+
+            favoritesGrid.innerHTML = '';
+            
+            favorites.forEach(propertyId => {
+                // Encontrar propriedade no array global
+                const property = properties.find(p => p.id === propertyId);
+                if (!property) return;
+
+                const card = document.createElement('div');
+                card.className = 'favorite-card';
+                card.innerHTML = `
+                    <div class="favorite-image">
+                        <img src="${property.images[0]}" alt="${property.title}">
+                        <div class="favorite-badge">Favorito</div>
+                        <button class="favorite-remove" onclick="removeFavorite(${property.id})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    <div class="favorite-content">
+                        <div class="favorite-price">${property.price}</div>
+                        <h3 class="favorite-title">${property.title}</h3>
+                        <p class="favorite-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${property.location}
+                        </p>
+                        <div class="favorite-footer">
+                            <button class="favorite-details-btn" onclick="goToProperty(${property.id})">
+                                Ver Detalhes
+                            </button>
+                        </div>
+                    </div>
+                `;
+                favoritesGrid.appendChild(card);
+            });
+        }
+
+        function removeFavorite(propertyId) {
+            let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            favorites = favorites.filter(id => id !== propertyId);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            loadFavorites();
+        }
+
+        function goToProperty(propertyId) {
+            window.location.href = `property-details.html?id=${propertyId}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFavorites);
+    </script>
+</body>
+</html>

@@ -594,6 +594,58 @@ body.modal-open {
     text-align: center;
 }
 
+/* Estilos para o modal de perfil melhorado */
+.detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.detail-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary-color, #007bff);
+}
+
+.services-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.service-badge {
+    display: inline-block;
+    background-color: var(--bg-light, #f5f5f5);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    border: 1px solid var(--primary-color, #007bff);
+    color: var(--primary-color, #007bff);
+}
+
+.address-full {
+    display: block;
+    line-height: 1.8;
+}
+
+.profile-modal-header .username {
+    color: var(--text-light);
+    margin: 4px 0 12px 0;
+    font-size: 0.95rem;
+}
 
 /* Modal Invite */
 .modal-invite {

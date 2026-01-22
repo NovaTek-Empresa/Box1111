@@ -789,21 +789,40 @@ function loadSectionContent(section) {
                                                 </div>
                                             </div>
 
+                                            <div class="form-row cep-component">
+                                                <div class="form-group" style="max-width:160px">
+                                                    <label for="profileCep">CEP *</label>
+                                                    <input id="profileCep" name="cep" type="text" required placeholder="00000-000">
+                                                </div>
+                                                <div class="form-group" style="flex:2">
+                                                    <label for="profileStreet">Rua / Logradouro *</label>
+                                                    <input id="profileStreet" name="street" type="text" required placeholder="Rua exemplo">
+                                                </div>
+                                                <div class="form-group" style="max-width:120px">
+                                                    <label for="profileNumber">Número *</label>
+                                                    <input id="profileNumber" name="number" type="text" required placeholder="123">
+                                                </div>
+                                            </div>
+
                                             <div class="form-row">
                                                 <div class="form-group" style="flex:1">
-                                                    <label for="profileAddress">Endereço</label>
-                                                    <input id="profileAddress" type="text" value="Rua das Flores, 123">
+                                                    <label for="profileComplement">Complemento</label>
+                                                    <input id="profileComplement" name="complement" type="text" placeholder="Apto, bloco">
+                                                </div>
+                                                <div class="form-group" style="flex:1">
+                                                    <label for="profileNeighborhood">Bairro</label>
+                                                    <input id="profileNeighborhood" name="neighborhood" type="text" placeholder="Bairro">
                                                 </div>
                                             </div>
 
                                             <div class="form-row">
                                                 <div class="form-group">
-                                                    <label for="profileCity">Cidade</label>
-                                                    <input id="profileCity" type="text" value="São Paulo">
+                                                    <label for="profileCity">Cidade *</label>
+                                                    <input id="profileCity" name="city" type="text" required placeholder="São Paulo">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="profileState">Estado</label>
-                                                    <input id="profileState" type="text" value="SP">
+                                                    <label for="profileState">Estado *</label>
+                                                    <input id="profileState" name="state" type="text" required placeholder="SP">
                                                 </div>
                                             </div>
 
@@ -898,8 +917,7 @@ function setupPropertyForm() {
     if (form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            alert('Imóvel adicionado com sucesso!');
-            // Em uma aplicação real, isso enviaria os dados para a API
+            submitAddPropertyForm();
         });
     }
     
@@ -980,9 +998,40 @@ function setupProfileInteractions() {
         });
     }
 
+    // Attach CEP component to profile fields (if disponível)
+    if (window.attachCepComponent) {
+        try { window.attachCepComponent('profile'); } catch(e){}
+    }
+
     if (profileForm) {
         profileForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const fd = new FormData(profileForm);
+            const cep = (fd.get('cep') || '').toString().replace(/\D/g,'');
+            const street = (fd.get('street') || '').toString().trim();
+            const number = (fd.get('number') || '').toString().trim();
+            const city = (fd.get('city') || '').toString().trim();
+            const state = (fd.get('state') || '').toString().trim();
+
+            function showFieldError(el, msg){
+                if (!el) return;
+                el.classList.add('input-error');
+                let next = el.nextElementSibling;
+                if (!next || !next.classList || !next.classList.contains('error-text')){
+                    next = document.createElement('div'); next.className = 'error-text'; el.parentNode.insertBefore(next, el.nextSibling);
+                }
+                next.textContent = msg;
+            }
+
+            // Clear previous errors
+            ['profileCep','profileStreet','profileNumber','profileCity','profileState'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.classList.remove('input-error'); const n=el.nextElementSibling; if(n&&n.classList&&n.classList.contains('error-text')) n.remove(); }});
+
+            if (!/^[0-9]{8}$/.test(cep)) { showFieldError(document.getElementById('profileCep'),'CEP inválido'); return; }
+            if (!street) { showFieldError(document.getElementById('profileStreet'),'Rua é obrigatória'); return; }
+            if (!number) { showFieldError(document.getElementById('profileNumber'),'Número é obrigatório'); return; }
+            if (!city) { showFieldError(document.getElementById('profileCity'),'Cidade é obrigatória'); return; }
+            if (!state) { showFieldError(document.getElementById('profileState'),'Estado é obrigatório'); return; }
+
             alert('Perfil salvo com sucesso!');
         });
     }
@@ -1432,9 +1481,15 @@ function submitAddPropertyForm() {
         type: formData.get('type'),
         transaction: 'aluguel',
         price: formData.get('price'),
-        location: formData.get('location'),
-        city: formData.get('city'),
-        state: formData.get('state'),
+        address: {
+            cep: (formData.get('cep')||'').toString().replace(/\D/g,''),
+            street: formData.get('street'),
+            number: formData.get('number'),
+            complement: formData.get('complement'),
+            neighborhood: formData.get('neighborhood'),
+            city: formData.get('city'),
+            state: formData.get('state')
+        },
         description: formData.get('description'),
         bedrooms: formData.get('bedrooms'),
         bathrooms: formData.get('bathrooms'),
@@ -1449,9 +1504,15 @@ function submitAddPropertyForm() {
     };
 
     // Validate required fields
+    const addr = propertyData.address || {};
     if (!propertyData.title || !propertyData.type || !propertyData.price ||
-        !propertyData.location || !propertyData.area || !propertyData.description) {
+        !addr.cep || !addr.street || !addr.number || !addr.city || !addr.state || !propertyData.area || !propertyData.description) {
         alert('Por favor, preencha todos os campos obrigatórios (marcados com *)');
+        return;
+    }
+
+    if (!/^[0-9]{8}$/.test((addr.cep||'').toString().replace(/\D/g,''))) {
+        alert('CEP inválido');
         return;
     }
 
@@ -1884,6 +1945,10 @@ function markAllNotificationsAsRead() {
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize add property form
     initAddPropertyForm();
+    // Attach CEP component for add-property (and profile if present)
+    if (window.attachCepComponent) {
+        try { window.attachCepComponent('property'); window.attachCepComponent('profile'); } catch(e){}
+    }
     
     // Navigation
     document.querySelectorAll('.nav-item a').forEach(link => {

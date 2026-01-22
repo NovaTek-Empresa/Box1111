@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Anfitrião — BOX1111</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/host-signup.css">
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="index.html" class="brand">
+                <div class="logo">BOX</div>
+                <div class="brand-text">
+                    <h1>BOX 11 11</h1>
+                    <p>Anuncie • Alugue</p>
+                </div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#properties">Imóveis</a></li>
+                <li><a href="Sobre Nós/">Sobre</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="index.html" class="btn btn-outline">Voltar</a>
+            </div>
+        </div>
+    </header>
+
+    <main style="margin-top: var(--header-height);">
+        <div class="signup-container">
+            <!-- Progress Indicator -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <h2>Cadastro de Anfitrião</h2>
+                    <p class="progress-text" id="progressText">Etapa 1 de 5</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-steps">
+                    <div class="step active" id="step-1">
+                        <div class="step-number">1</div>
+                        <p class="step-label">Dados Pessoais</p>
+                    </div>
+                    <div class="step" id="step-2">
+                        <div class="step-number">2</div>
+                        <p class="step-label">Documentos</p>
+                    </div>
+                    <div class="step" id="step-3">
+                        <div class="step-number">3</div>
+                        <p class="step-label">Confirmação</p>
+                    </div>
+                    <div class="step" id="step-4">
+                        <div class="step-number">4</div>
+                        <p class="step-label">Pagamento</p>
+                    </div>
+                    <div class="step" id="step-5">
+                        <div class="step-number">5</div>
+                        <p class="step-label">Status</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <form id="signupForm" class="signup-form">
+                <!-- Step 1: Personal Data -->
+                <div class="form-step active" id="form-step-1" data-step="1">
+                    <h3>Dados Pessoais</h3>
+                    <p class="step-description">Preencha seus dados básicos para começar</p>
+
+                    <div class="form-group">
+                        <label for="fullName">Nome Completo *</label>
+                        <input type="text" id="fullName" name="fullName" placeholder="Ex: João Silva Santos" required>
+                        <span class="error-message" id="error-fullName"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cpf">CPF *</label>
+                            <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+                            <span class="error-message" id="error-cpf"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-mail *</label>
+                            <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                            <span class="error-message" id="error-email"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Telefone *</label>
+                        <input type="tel" id="phone" name="phone" placeholder="(11) 99999-9999" required>
+                        <span class="error-message" id="error-phone"></span>
+                    </div>
+                </div>
+
+                <!-- Step 2: Documents -->
+                <div class="form-step" id="form-step-2" data-step="2">
+                    <h3>Validação de Documentos</h3>
+                    <p class="step-description">Envie seus documentos para verificação</p>
+
+                    <div class="form-group">
+                        <label for="document">Upload de Documento (RG ou CNH) *</label>
+                        <div class="file-upload">
+                            <input type="file" id="document" name="document" accept="image/*" required>
+                            <div class="upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Clique para fazer upload ou arraste o arquivo</p>
+                                <span class="file-hint">PNG, JPG até 5MB</span>
+                            </div>
+                        </div>
+                        <span class="error-message" id="error-document"></span>
+                        <p id="document-name" class="file-name"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="selfie">Upload de Selfie *</label>
+                        <div class="file-upload">
+                            <input type="file" id="selfie" name="selfie" accept="image/*" required>
+                            <div class="upload-area">
+                                <i class="fas fa-camera"></i>
+                                <p>Clique para fazer upload ou arraste a foto</p>
+                                <span class="file-hint">PNG, JPG até 5MB</span>
+                            </div>
+                        </div>
+                        <span class="error-message" id="error-selfie"></span>
+                        <p id="selfie-name" class="file-name"></p>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Seus documentos serão verificados em até 24 horas. Envie fotos claras com todos os dados legíveis.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div class="form-step" id="form-step-3" data-step="3">
+                    <h3>Confirmação de Contato</h3>
+                    <p class="step-description">Confirme seu e-mail e telefone</p>
+
+                    <div class="confirmation-group">
+                        <div class="confirmation-item">
+                            <div class="confirmation-header">
+                                <i class="fas fa-envelope"></i>
+                                <h4>Verificação de E-mail</h4>
+                            </div>
+                            <p class="confirmation-text">Enviamos um código de confirmação para:</p>
+                            <p class="confirmation-value" id="confirmEmail"></p>
+                            <div class="form-group">
+                                <input type="text" id="emailCode" placeholder="Código de 6 dígitos" maxlength="6">
+                                <button type="button" class="btn btn-secondary" id="verifyEmailBtn">Verificar E-mail</button>
+                                <span class="error-message" id="error-emailCode"></span>
+                            </div>
+                            <p class="resend-text">Não recebeu? <button type="button" class="btn-link" id="resendEmailBtn">Reenviar</button></p>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-group">
+                        <div class="confirmation-item">
+                            <div class="confirmation-header">
+                                <i class="fas fa-mobile-alt"></i>
+                                <h4>Verificação de Telefone</h4>
+                            </div>
+                            <p class="confirmation-text">Enviaremos um SMS ou WhatsApp para:</p>
+                            <p class="confirmation-value" id="confirmPhone"></p>
+                            <div class="form-group">
+                                <input type="text" id="phoneCode" placeholder="Código de 6 dígitos" maxlength="6">
+                                <button type="button" class="btn btn-secondary" id="verifyPhoneBtn">Verificar Telefone</button>
+                                <span class="error-message" id="error-phoneCode"></span>
+                            </div>
+                            <p class="resend-text">Não recebeu? <button type="button" class="btn-link" id="resendPhoneBtn">Reenviar</button></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Financial Data -->
+                <div class="form-step" id="form-step-4" data-step="4">
+                    <h3>Dados Financeiros</h3>
+                    <p class="step-description">Configure sua forma de recebimento</p>
+
+                    <div class="form-group">
+                        <label>Forma de Recebimento *</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="paymentMethod" value="pix" required>
+                                <span class="radio-custom"></span>
+                                <div class="radio-content">
+                                    <strong>Pix</strong>
+                                    <p>Receba instantaneamente</p>
+                                </div>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="paymentMethod" value="bank" required>
+                                <span class="radio-custom"></span>
+                                <div class="radio-content">
+                                    <strong>Conta Bancária</strong>
+                                    <p>Transferência automática</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pix Fields -->
+                    <div class="payment-fields" id="pixFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="pixKey">Chave Pix *</label>
+                            <input type="text" id="pixKey" name="pixKey" placeholder="CPF, email, telefone ou chave aleatória">
+                            <span class="error-message" id="error-pixKey"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="pixKeyType">Tipo de Chave *</label>
+                            <select id="pixKeyType" name="pixKeyType">
+                                <option value="">Selecione o tipo</option>
+                                <option value="cpf">CPF</option>
+                                <option value="email">E-mail</option>
+                                <option value="phone">Telefone</option>
+                                <option value="random">Chave Aleatória</option>
+                            </select>
+                            <span class="error-message" id="error-pixKeyType"></span>
+                        </div>
+                    </div>
+
+                    <!-- Bank Fields -->
+                    <div class="payment-fields" id="bankFields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bank">Banco *</label>
+                                <input type="text" id="bank" name="bank" placeholder="Ex: Itaú, Bradesco, Santander">
+                                <span class="error-message" id="error-bank"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="accountType">Tipo de Conta *</label>
+                                <select id="accountType" name="accountType">
+                                    <option value="">Selecione</option>
+                                    <option value="checking">Corrente</option>
+                                    <option value="savings">Poupança</option>
+                                </select>
+                                <span class="error-message" id="error-accountType"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="agency">Agência *</label>
+                                <input type="text" id="agency" name="agency" placeholder="0000">
+                                <span class="error-message" id="error-agency"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="accountNumber">Número da Conta *</label>
+                                <input type="text" id="accountNumber" name="accountNumber" placeholder="000000-0">
+                                <span class="error-message" id="error-accountNumber"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="accountHolder">Titular da Conta *</label>
+                            <input type="text" id="accountHolder" name="accountHolder" placeholder="Nome completo">
+                            <span class="error-message" id="error-accountHolder"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Status -->
+                <div class="form-step" id="form-step-5" data-step="5">
+                    <h3>Status do Cadastro</h3>
+                    <p class="step-description">Acompanhe sua verificação</p>
+
+                    <div class="status-container" id="statusContainer">
+                        <div class="status-badge analyzing">
+                            <i class="fas fa-hourglass-half"></i>
+                            <h4>Em Análise</h4>
+                            <p>Seus documentos estão sendo verificados</p>
+                        </div>
+
+                        <div class="checklist">
+                            <h4>Etapas Concluídas</h4>
+                            <ul id="checklistItems">
+                                <li class="completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Dados pessoais enviados</span>
+                                </li>
+                                <li class="completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Documentos enviados</span>
+                                </li>
+                                <li class="completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>E-mail verificado</span>
+                                </li>
+                                <li class="completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Telefone verificado</span>
+                                </li>
+                                <li class="pending">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <span>Análise de documentos</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="status-info">
+                            <p>Você receberá um e-mail assim que a análise for concluída. Enquanto isso, você pode explorar a plataforma e preparar suas propriedades para anúncio.</p>
+                        </div>
+
+                        <a href="index.html" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Voltar ao Início
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Form Buttons -->
+                <div class="form-actions" id="formActions">
+                    <button type="button" class="btn btn-outline" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>BOX 11 11</h4>
+                    <p>Plataforma imobiliária moderna e segura para anfitriões e hóspedes.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Links Úteis</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#">Termos de Serviço</a></li>
+                        <li><a href="#">Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BOX 11 11. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/host-signup.js"></script>
+</body>
+</html>

@@ -6,11 +6,21 @@ const cohosts = [
         username: "@marinasantos",
         email: "marina.santos@email.com",
         avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-        bio: "Gerenciadora de propriedades com 5 anos de experiência. Especialista em imóveis residenciais.",
+        cpf: "123.456.789-00",
+        phone: "(11) 98765-4321",
+        experience: "3to5",
+        availability: "integral",
+        services: ["atendimento", "agendamento", "acompanhamento"],
+        address: {
+            street: "Rua A",
+            number: "123",
+            neighborhood: "Centro",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Centro",
         rating: 4.9,
         reviews: 127,
-        category: "imovel",
-        availability: "imediata",
         description: "Marina é uma profissional dedicada com excelente histórico de gerenciamento de imóveis. Oferece suporte completo aos anfitriões."
     },
     {
@@ -19,12 +29,22 @@ const cohosts = [
         username: "@carloslima",
         email: "carlos.lima@email.com",
         avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-        bio: "Especialista em imóveis comerciais com 8 anos no mercado. Focado em maximizar lucro.",
+        cpf: "234.567.890-11",
+        phone: "(11) 98765-4322",
+        experience: "more5",
+        availability: "integral",
+        services: ["atendimento", "agendamento"],
+        address: {
+            street: "Rua B",
+            number: "456",
+            neighborhood: "Vila Mariana",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Sul",
         rating: 4.7,
         reviews: 95,
-        category: "comercial",
-        availability: "imediata",
-        description: "Carlos tem vasta experiência com propriedades comerciais e oferece estratégias inovadoras de gestão."
+        description: "Carlos tem vasta experiência e oferece estratégias inovadoras de gestão."
     },
     {
         id: 3,
@@ -32,12 +52,22 @@ const cohosts = [
         username: "@julianacosta",
         email: "juliana.costa@email.com",
         avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-        bio: "Gerenciadora de imóveis multifamiliares. Experiência com condomínios e edifícios.",
+        cpf: "345.678.901-22",
+        phone: "(11) 98765-4323",
+        experience: "3to5",
+        availability: "parttime",
+        services: ["atendimento", "acompanhamento", "suporte"],
+        address: {
+            street: "Rua C",
+            number: "789",
+            neighborhood: "Pinheiros",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Oeste",
         rating: 4.8,
         reviews: 156,
-        category: "multifamiliar",
-        availability: "2-semanas",
-        description: "Juliana especializa-se em gerenciar imóveis multifamiliares com excelentes resultados para seus clientes."
+        description: "Juliana especializa-se em gerenciar imóveis com excelentes resultados para seus clientes."
     },
     {
         id: 4,
@@ -45,12 +75,22 @@ const cohosts = [
         username: "@robertoalves",
         email: "roberto.alves@email.com",
         avatar: "https://randomuser.me/api/portraits/men/4.jpg",
-        bio: "Gestor de terrenos e propriedades rurais. Desenvolvimento e investimento imobiliário.",
+        cpf: "456.789.012-33",
+        phone: "(11) 98765-4324",
+        experience: "1to3",
+        availability: "ondemand",
+        services: ["agendamento", "acompanhamento"],
+        address: {
+            street: "Rua D",
+            number: "321",
+            neighborhood: "Tatuapé",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Leste",
         rating: 4.6,
         reviews: 72,
-        category: "terreno",
-        availability: "1-mes",
-        description: "Roberto é especialista em gestão de terrenos com foco em desenvolvimento sustentável."
+        description: "Roberto é especialista em gestão com foco em desenvolvimento sustentável."
     },
     {
         id: 5,
@@ -58,11 +98,21 @@ const cohosts = [
         username: "@amandasilva",
         email: "amanda.silva@email.com",
         avatar: "https://randomuser.me/api/portraits/women/5.jpg",
-        bio: "Gerenciadora full-service de imóveis residenciais de alto padrão.",
+        cpf: "567.890.123-44",
+        phone: "(11) 98765-4325",
+        experience: "more5",
+        availability: "integral",
+        services: ["atendimento", "agendamento", "acompanhamento", "suporte"],
+        address: {
+            street: "Rua E",
+            number: "654",
+            neighborhood: "Jardins",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Centro",
         rating: 4.95,
         reviews: 203,
-        category: "imovel",
-        availability: "imediata",
         description: "Amanda oferece gerenciamento premium com atendimento personalizado e resultados excepcionais."
     },
     {
@@ -71,12 +121,22 @@ const cohosts = [
         username: "@felipemendes",
         email: "felipe.mendes@email.com",
         avatar: "https://randomuser.me/api/portraits/men/6.jpg",
-        bio: "Especialista em imóveis comerciais e shopping centers. Gestão de aluguéis premium.",
+        cpf: "678.901.234-55",
+        phone: "(11) 98765-4326",
+        experience: "3to5",
+        availability: "integral",
+        services: ["atendimento", "agendamento"],
+        address: {
+            street: "Rua F",
+            number: "987",
+            neighborhood: "Brooklin",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Sul",
         rating: 4.5,
         reviews: 68,
-        category: "comercial",
-        availability: "imediata",
-        description: "Felipe tem expertise em imóveis comerciais de alto valor com rentabilidade garantida."
+        description: "Felipe tem expertise em imóveis de alto valor com rentabilidade garantida."
     },
     {
         id: 7,
@@ -84,11 +144,21 @@ const cohosts = [
         username: "@beatrizolive",
         email: "beatriz.oliveira@email.com",
         avatar: "https://randomuser.me/api/portraits/women/7.jpg",
-        bio: "Gerenciadora de propriedades com foco em sustentabilidade e inovação tecnológica.",
+        cpf: "789.012.345-66",
+        phone: "(11) 98765-4327",
+        experience: "1to3",
+        availability: "parttime",
+        services: ["atendimento", "suporte"],
+        address: {
+            street: "Rua G",
+            number: "246",
+            neighborhood: "Itaim",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Oeste",
         rating: 4.85,
         reviews: 134,
-        category: "imovel",
-        availability: "2-semanas",
         description: "Beatriz utiliza tecnologia avançada para maximizar a rentabilidade e satisfação dos clientes."
     },
     {
@@ -97,11 +167,21 @@ const cohosts = [
         username: "@gustavocosta",
         email: "gustavo.costa@email.com",
         avatar: "https://randomuser.me/api/portraits/men/8.jpg",
-        bio: "Gerente imobiliário com experiência em portfólios diversificados. Crescimento garantido.",
+        cpf: "890.123.456-77",
+        phone: "(11) 98765-4328",
+        experience: "3to5",
+        availability: "integral",
+        services: ["agendamento", "acompanhamento", "suporte"],
+        address: {
+            street: "Rua H",
+            number: "135",
+            neighborhood: "Mooca",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Leste",
         rating: 4.7,
         reviews: 91,
-        category: "multifamiliar",
-        availability: "imediata",
         description: "Gustavo tem excelente track record em gestão de múltiplas propriedades simultaneamente."
     },
     {
@@ -110,12 +190,22 @@ const cohosts = [
         username: "@fernandarocha",
         email: "fernanda.rocha@email.com",
         avatar: "https://randomuser.me/api/portraits/women/9.jpg",
-        bio: "Especialista em imóveis residenciais para aluguéis de curta duração e temporada.",
+        cpf: "901.234.567-88",
+        phone: "(11) 98765-4329",
+        experience: "more5",
+        availability: "integral",
+        services: ["atendimento", "agendamento", "acompanhamento"],
+        address: {
+            street: "Rua I",
+            number: "579",
+            neighborhood: "Higienópolis",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Centro",
         rating: 4.92,
         reviews: 189,
-        category: "imovel",
-        availability: "imediata",
-        description: "Fernanda domina o mercado de aluguel temporário com estratégias eficientes de marketing."
+        description: "Fernanda domina o mercado com estratégias eficientes de gerenciamento."
     },
     {
         id: 10,
@@ -123,12 +213,22 @@ const cohosts = [
         username: "@marcosgomes",
         email: "marcos.gomes@email.com",
         avatar: "https://randomuser.me/api/portraits/men/10.jpg",
-        bio: "Gestor de propriedades com foco em automação e eficiência operacional.",
+        cpf: "012.345.678-99",
+        phone: "(11) 98765-4330",
+        experience: "1to3",
+        availability: "parttime",
+        services: ["atendimento", "suporte"],
+        address: {
+            street: "Rua J",
+            number: "864",
+            neighborhood: "Santana",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Norte",
         rating: 4.65,
         reviews: 110,
-        category: "comercial",
-        availability: "2-semanas",
-        description: "Marcos utiliza sistemas automatizados para reduzir custos e melhorar a experiência do hóspede."
+        description: "Marcos utiliza sistemas automatizados para reduzir custos e melhorar a experiência."
     },
     {
         id: 11,
@@ -136,11 +236,21 @@ const cohosts = [
         username: "@carolinadias",
         email: "carolina.dias@email.com",
         avatar: "https://randomuser.me/api/portraits/women/11.jpg",
-        bio: "Gerenciadora especializada em imóveis de luxo e propriedades premium em localidades chave.",
+        cpf: "123.456.789-01",
+        phone: "(11) 98765-4331",
+        experience: "more5",
+        availability: "ondemand",
+        services: ["atendimento", "agendamento", "suporte"],
+        address: {
+            street: "Rua K",
+            number: "753",
+            neighborhood: "Perdizes",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Norte",
         rating: 4.88,
         reviews: 167,
-        category: "imovel",
-        availability: "1-mes",
         description: "Carolina oferece gerenciamento de elite para propriedades de alto padrão com resultados premium."
     },
     {
@@ -149,12 +259,22 @@ const cohosts = [
         username: "@thiagosouza",
         email: "thiago.souza@email.com",
         avatar: "https://randomuser.me/api/portraits/men/12.jpg",
-        bio: "Especialista em terrenos para desenvolvimento imobiliário e investimento de longo prazo.",
+        cpf: "234.567.890-12",
+        phone: "(11) 98765-4332",
+        experience: "3to5",
+        availability: "integral",
+        services: ["agendamento", "acompanhamento"],
+        address: {
+            street: "Rua L",
+            number: "468",
+            neighborhood: "Vila Guilherme",
+            city: "São Paulo",
+            state: "SP"
+        },
+        region: "Zona Leste",
         rating: 4.6,
         reviews: 84,
-        category: "terreno",
-        availability: "imediata",
-        description: "Thiago ajuda a maximizar o potencial de desenvolvimento de terrenos e propriedades rurais."
+        description: "Thiago ajuda a maximizar o potencial de desenvolvimento de propriedades."
     }
 ];
 
@@ -162,7 +282,7 @@ const cohosts = [
 let filteredCohosts = [...cohosts];
 let currentFilters = {
     search: '',
-    category: '',
+    region: '',
     availability: '',
     rating: ''
 };
@@ -172,7 +292,7 @@ const searchInput = document.getElementById('searchInput');
 const clearSearch = document.getElementById('clearSearch');
 const filtersToggle = document.getElementById('filtersToggle');
 const filtersContainer = document.getElementById('filtersContainer');
-const categoryFilter = document.getElementById('categoryFilter');
+const regionFilter = document.getElementById('regionFilter');
 const availabilityFilter = document.getElementById('availabilityFilter');
 const ratingFilter = document.getElementById('ratingFilter');
 const clearFiltersBtn = document.getElementById('clearFilters');
@@ -192,7 +312,7 @@ const cancelInvite = document.getElementById('cancelInvite');
 searchInput.addEventListener('input', debounce(handleSearch, 300));
 clearSearch.addEventListener('click', clearSearchInput);
 filtersToggle.addEventListener('click', toggleFilters);
-categoryFilter.addEventListener('change', handleFilterChange);
+regionFilter.addEventListener('change', handleFilterChange);
 availabilityFilter.addEventListener('change', handleFilterChange);
 ratingFilter.addEventListener('change', handleFilterChange);
 clearFiltersBtn.addEventListener('click', clearAllFilters);
@@ -242,8 +362,8 @@ function handleFilterChange(e) {
     const filterId = e.target.id;
     const value = e.target.value;
 
-    if (filterId === 'categoryFilter') {
-        currentFilters.category = value;
+    if (filterId === 'regionFilter') {
+        currentFilters.region = value;
     } else if (filterId === 'availabilityFilter') {
         currentFilters.availability = value;
     } else if (filterId === 'ratingFilter') {
@@ -256,11 +376,11 @@ function handleFilterChange(e) {
 function clearAllFilters() {
     currentFilters = {
         search: currentFilters.search,
-        category: '',
+        region: '',
         availability: '',
         rating: ''
     };
-    categoryFilter.value = '';
+    regionFilter.value = '';
     availabilityFilter.value = '';
     ratingFilter.value = '';
     applyFilters();
@@ -269,12 +389,12 @@ function clearAllFilters() {
 function resetAllSearch() {
     currentFilters = {
         search: '',
-        category: '',
+        region: '',
         availability: '',
         rating: ''
     };
     searchInput.value = '';
-    categoryFilter.value = '';
+    regionFilter.value = '';
     availabilityFilter.value = '';
     ratingFilter.value = '';
     filtersContainer.classList.remove('active');
@@ -298,9 +418,9 @@ function applyFilters() {
                 cohost.username.toLowerCase().includes(searchTerm) ||
                 cohost.email.toLowerCase().includes(searchTerm);
 
-            // Filtro de categoria
-            const matchesCategory =
-                !currentFilters.category || cohost.category === currentFilters.category;
+            // Filtro de região
+            const matchesRegion =
+                !currentFilters.region || cohost.region === currentFilters.region;
 
             // Filtro de disponibilidade
             const matchesAvailability =
@@ -312,7 +432,7 @@ function applyFilters() {
                 !currentFilters.rating ||
                 parseFloat(cohost.rating) >= parseFloat(currentFilters.rating);
 
-            return matchesSearch && matchesCategory && matchesAvailability && matchesRating;
+            return matchesSearch && matchesRegion && matchesAvailability && matchesRating;
         });
 
         loadingState.style.display = 'none';
@@ -402,41 +522,107 @@ function updateResultsCount() {
     }
 }
 
+// Funções de tradução para o modal de perfil
+function translateExperience(level) {
+    const translations = {
+        'none': 'Sem experiência',
+        'less1': 'Menos de 1 ano',
+        '1to3': '1 a 3 anos',
+        '3to5': '3 a 5 anos',
+        'more5': 'Mais de 5 anos'
+    };
+    return translations[level] || level;
+}
+
+function translateAvailability(type) {
+    const translations = {
+        'integral': 'Integral (40h+)',
+        'parttime': 'Meio período (20-40h)',
+        'ondemand': 'Sob demanda'
+    };
+    return translations[type] || type;
+}
+
+function translateService(service) {
+    const translations = {
+        'atendimento': 'Atendimento a interessados',
+        'agendamento': 'Agendamento de visitas',
+        'acompanhamento': 'Acompanhamento de visitas',
+        'suporte': 'Suporte ao anfitrião'
+    };
+    return translations[service] || service;
+}
+
 // Modal de Perfil
 function openProfileModal(cohostId) {
     const cohost = cohosts.find(c => c.id === cohostId);
     if (!cohost) return;
 
     const modalBody = document.getElementById('modalBody');
+    const servicesHtml = cohost.services.map(service => 
+        `<span class="service-badge">${translateService(service)}</span>`
+    ).join('');
+    
     modalBody.innerHTML = `
         <div class="profile-modal-header">
             <img src="${cohost.avatar}" alt="${cohost.name}" class="profile-avatar-large">
             <h2>${cohost.name}</h2>
-            <p>${cohost.username}</p>
+            <p class="username">@${cohost.username}</p>
             <div class="cohost-rating">
                 <div class="stars">
                     ${createStars(cohost.rating)}
                 </div>
-                <span class="rating-value">${cohost.rating.toFixed(1)}</span>
+                <span class="rating-value">${cohost.rating.toFixed(1)} • ${cohost.reviews} avaliações</span>
             </div>
         </div>
 
         <div class="profile-details">
-            <div class="detail-item">
-                <span class="detail-label">Email:</span>
-                <span class="detail-value">${cohost.email}</span>
+            <div class="detail-section">
+                <h3 class="section-title">Informações Pessoais</h3>
+                <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">${cohost.email}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Telefone:</span>
+                    <span class="detail-value">${cohost.phone}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">CPF:</span>
+                    <span class="detail-value">${cohost.cpf}</span>
+                </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">Bio:</span>
-                <span class="detail-value">${cohost.bio}</span>
+
+            <div class="detail-section">
+                <h3 class="section-title">Experiência e Disponibilidade</h3>
+                <div class="detail-item">
+                    <span class="detail-label">Experiência:</span>
+                    <span class="detail-value">${translateExperience(cohost.experience)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Disponibilidade:</span>
+                    <span class="detail-value">${translateAvailability(cohost.availability)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Região de Atuação:</span>
+                    <span class="detail-value">${cohost.region}</span>
+                </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">Descrição:</span>
-                <span class="detail-value">${cohost.description}</span>
+
+            <div class="detail-section">
+                <h3 class="section-title">Serviços Oferecidos</h3>
+                <div class="services-list">
+                    ${servicesHtml}
+                </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">Avaliações:</span>
-                <span class="detail-value">${cohost.reviews} clientes satisfeitos</span>
+
+            <div class="detail-section">
+                <h3 class="section-title">Endereço</h3>
+                <div class="detail-item">
+                    <span class="detail-value address-full">
+                        ${cohost.address.street}, ${cohost.address.number} - ${cohost.address.neighborhood}, ${cohost.address.city} - ${cohost.address.state}
+                    </span>
+                </div>
             </div>
         </div>
 

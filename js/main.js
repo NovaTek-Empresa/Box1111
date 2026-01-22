@@ -305,26 +305,228 @@ const registerForm = document.getElementById('registerForm');
 if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
+        
+        const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
+        const submitBtn = document.getElementById('loginSubmitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoader = submitBtn.querySelector('.btn-loader');
         
-        // Simulação de login
-        appState.currentUser = {
-            id: 1,
-            name: 'Usuário Teste',
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent('Usuário Teste')}&background=0D8ABC&color=fff&rounded=true`,
-            email: email,
-            type: 'user' // user, vendor, admin
-        };
+        // Validar campos
+        let isValid = true;
         
-        alert('Login realizado com sucesso!');
-        loginModal.style.display = 'none';
-        document.body.style.overflow = '';
-        loginForm.reset();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showLoginError('loginEmail', 'E-mail inválido');
+            isValid = false;
+        } else {
+            clearLoginError('loginEmail');
+        }
         
-        // Atualizar interface para usuário logado
-        updateUIForLoggedUser();
+        if (!password || password.length < 6) {
+            showLoginError('loginPassword', 'Senha deve ter no mínimo 6 caracteres');
+            isValid = false;
+        } else {
+            clearLoginError('loginPassword');
+        }
+        
+        if (!isValid) return;
+        
+        // Mostrar loader
+        submitBtn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'flex';
+        
+        // Simular requisição (2s)
+        setTimeout(() => {
+            // Simulação de login
+            appState.currentUser = {
+                id: 1,
+                name: 'Usuário Teste',
+                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent('Usuário Teste')}&background=0D8ABC&color=fff&rounded=true`,
+                email: email,
+                type: 'user'
+            };
+            
+            // Resetar botão
+            submitBtn.disabled = false;
+            btnText.style.display = 'flex';
+            btnLoader.style.display = 'none';
+            
+            // Fechar modal e limpar
+            loginModal.style.display = 'none';
+            document.body.style.overflow = '';
+            loginForm.reset();
+            
+            // Atualizar interface
+            updateUIForLoggedUser();
+            
+            // Mensagem de sucesso
+            showNotification('✓ Login realizado com sucesso!', 'success');
+        }, 1500);
     });
+
+    // Toggle senha
+    const toggleBtn = document.getElementById('toggleLoginPassword');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const passwordInput = document.getElementById('loginPassword');
+            const icon = toggleBtn.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    // Toggle senha do registro
+    const toggleRegisterPasswordBtn = document.getElementById('toggleRegisterPassword');
+    if (toggleRegisterPasswordBtn) {
+        toggleRegisterPasswordBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const passwordInput = document.getElementById('registerPassword');
+            const icon = toggleRegisterPasswordBtn.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    // Toggle confirmar senha do registro
+    const toggleRegisterConfirmPasswordBtn = document.getElementById('toggleRegisterConfirmPassword');
+    if (toggleRegisterConfirmPasswordBtn) {
+        toggleRegisterConfirmPasswordBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const passwordInput = document.getElementById('registerConfirmPassword');
+            const icon = toggleRegisterConfirmPasswordBtn.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    // Validação em tempo real
+    const emailInput = document.getElementById('loginEmail');
+    const passwordInput = document.getElementById('loginPassword');
+    
+    if (emailInput) {
+        emailInput.addEventListener('blur', () => {
+            const email = emailInput.value.trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showLoginError('loginEmail', 'E-mail inválido');
+            } else {
+                clearLoginError('loginEmail');
+            }
+        });
+    }
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            clearLoginError('loginPassword');
+        });
+    }
+}
+
+function showLoginError(fieldId, message) {
+    const input = document.getElementById(fieldId);
+    const errorEl = document.getElementById(`error-${fieldId}`);
+    
+    if (input) {
+        input.classList.add('error');
+    }
+    if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.classList.add('show');
+    }
+}
+
+function clearLoginError(fieldId) {
+    const input = document.getElementById(fieldId);
+    const errorEl = document.getElementById(`error-${fieldId}`);
+    
+    if (input) {
+        input.classList.remove('error');
+    }
+    if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.remove('show');
+    }
+}
+
+function showRegisterError(fieldId, message) {
+    const input = document.getElementById(fieldId);
+    const errorEl = document.getElementById(`error-${fieldId}`);
+    
+    if (input) {
+        input.classList.add('error');
+    }
+    if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.classList.add('show');
+    }
+}
+
+function clearRegisterError(fieldId) {
+    const input = document.getElementById(fieldId);
+    const errorEl = document.getElementById(`error-${fieldId}`);
+    
+    if (input) {
+        input.classList.remove('error');
+    }
+    if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.remove('show');
+    }
+}
+// Notificação toast melhorada
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    const bgColor = type === 'success' ? '#22c55e' : type === 'warning' ? '#eab308' : '#dc2626';
+    const icon = type === 'success' ? '✓' : type === 'warning' ? '⚠' : '✕';
+    
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: ${bgColor};
+        color: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        z-index: 3000;
+        animation: slideUpNotif 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        max-width: 400px;
+        word-break: break-word;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'fadeOutNotif 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3500);
 }
 
 if (registerForm) {
@@ -334,25 +536,136 @@ if (registerForm) {
         const email = document.getElementById('registerEmail').value;
         const phone = document.getElementById('registerPhone').value;
         const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('registerConfirmPassword').value;
+        
+        // Validações
+        let hasErrors = false;
+        
+        if (!name.trim()) {
+            showRegisterError('registerName', 'Nome é obrigatório');
+            hasErrors = true;
+        } else {
+            clearRegisterError('registerName');
+        }
+        
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showRegisterError('registerEmail', 'E-mail inválido');
+            hasErrors = true;
+        } else {
+            clearRegisterError('registerEmail');
+        }
+        
+        if (!phone.trim()) {
+            showRegisterError('registerPhone', 'Telefone é obrigatório');
+            hasErrors = true;
+        } else {
+            clearRegisterError('registerPhone');
+        }
+        
+        if (password.length < 6) {
+            showRegisterError('registerPassword', 'Senha deve ter no mínimo 6 caracteres');
+            hasErrors = true;
+        } else {
+            clearRegisterError('registerPassword');
+        }
+        
+        if (password !== confirmPassword) {
+            showRegisterError('registerConfirmPassword', 'Senhas não conferem');
+            hasErrors = true;
+        } else {
+            clearRegisterError('registerConfirmPassword');
+        }
+        
+        if (hasErrors) return;
         
         // Simulação de registro
-        appState.currentUser = {
-            id: Date.now(),
-            name: name,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff&rounded=true`,
-            email: email,
-            phone: phone,
-            type: 'user' // user, vendor, admin
-        };
+        const submitBtn = document.getElementById('registerSubmitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoader = submitBtn.querySelector('.btn-loader');
         
-        alert('Conta criada com sucesso!');
-        registerModal.style.display = 'none';
-        document.body.style.overflow = '';
-        registerForm.reset();
+        submitBtn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline-block';
         
-        // Atualizar interface para usuário logado
-        updateUIForLoggedUser();
+        setTimeout(() => {
+            appState.currentUser = {
+                id: Date.now(),
+                name: name,
+                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff&rounded=true`,
+                email: email,
+                phone: phone,
+                type: 'user' // user, vendor, admin
+            };
+            
+            showNotification('✓ Conta criada com sucesso!', 'success');
+            registerModal.style.display = 'none';
+            document.body.style.overflow = '';
+            registerForm.reset();
+            
+            // Atualizar interface para usuário logado
+            updateUIForLoggedUser();
+            
+            // Reset do botão
+            submitBtn.disabled = false;
+            btnText.style.display = 'inline-block';
+            btnLoader.style.display = 'none';
+        }, 1500);
     });
+    
+    // Validação em tempo real para registro
+    const registerNameInput = document.getElementById('registerName');
+    const registerEmailInput = document.getElementById('registerEmail');
+    const registerPhoneInput = document.getElementById('registerPhone');
+    const registerPasswordInput = document.getElementById('registerPassword');
+    const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
+    
+    if (registerNameInput) {
+        registerNameInput.addEventListener('blur', () => {
+            if (registerNameInput.value.trim()) {
+                clearRegisterError('registerName');
+            }
+        });
+        registerNameInput.addEventListener('input', () => {
+            clearRegisterError('registerName');
+        });
+    }
+    
+    if (registerEmailInput) {
+        registerEmailInput.addEventListener('blur', () => {
+            const email = registerEmailInput.value.trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showRegisterError('registerEmail', 'E-mail inválido');
+            } else {
+                clearRegisterError('registerEmail');
+            }
+        });
+        registerEmailInput.addEventListener('input', () => {
+            clearRegisterError('registerEmail');
+        });
+    }
+    
+    if (registerPhoneInput) {
+        registerPhoneInput.addEventListener('blur', () => {
+            if (registerPhoneInput.value.trim()) {
+                clearRegisterError('registerPhone');
+            }
+        });
+        registerPhoneInput.addEventListener('input', () => {
+            clearRegisterError('registerPhone');
+        });
+    }
+    
+    if (registerPasswordInput) {
+        registerPasswordInput.addEventListener('input', () => {
+            clearRegisterError('registerPassword');
+        });
+    }
+    
+    if (registerConfirmPasswordInput) {
+        registerConfirmPasswordInput.addEventListener('input', () => {
+            clearRegisterError('registerConfirmPassword');
+        });
+    }
 }
 
 function updateUIForLoggedUser() {
@@ -360,7 +673,8 @@ function updateUIForLoggedUser() {
     if (authButtons && appState.currentUser) {
         authButtons.innerHTML = `
             <div class="user-menu">
-                <button class="user-avatar" id="userAvatarBtn">
+                <span class="user-name" id="userNameDisplay" data-action="toggle-dropdown">${appState.currentUser.name}</span>
+                <button class="user-avatar" id="userAvatarBtn" title="${appState.currentUser.name}" data-action="toggle-dropdown">
                     <img src="${appState.currentUser.avatar || ''}" alt="${appState.currentUser.name}">
                 </button>
                 <div class="user-dropdown" id="userDropdown">
@@ -377,18 +691,25 @@ function updateUIForLoggedUser() {
                         Configurações
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item" id="menuBeHost">
+                    <a href="host-signup.html" class="dropdown-item" id="menuBeHost">
                         <i class="fas fa-user-shield"></i>
-                        Se tornar um anfitrião
+                        Seja um anfitrião
                     </a>
                     <a href="#" class="dropdown-item" id="menuBeCoHost">
                         <i class="fas fa-users"></i>
-                        Se tornar um coanfitrião
+                        Seja um coanfitrião
                     </a>
                     <a href="#" class="dropdown-item" id="menuFindCoHost">
                         <i class="fas fa-search"></i>
                         Buscar um coanfitrião
                     </a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-button">
+                        <button id="menuConversations" style="background: linear-gradient(135deg, var(--accent), #16a34a); color: #000; border: none; border-radius: 8px; padding: 10px 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="fas fa-comments"></i>
+                            Ver Conversas
+                        </button>
+                    </div>
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-item" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i>
@@ -408,16 +729,24 @@ function updateUIForLoggedUser() {
         const menuFavorites = document.getElementById('menuFavorites');
         const menuSettings = document.getElementById('menuSettings');
         const menuMyListings = document.getElementById('menuMyListings');
+        const userNameDisplay = document.getElementById('userNameDisplay');
         
         if (userAvatarBtn && userDropdown) {
-            userAvatarBtn.addEventListener('click', (e) => {
+            const toggleDropdown = (e) => {
                 e.stopPropagation();
                 userDropdown.classList.toggle('show');
-            });
+            };
+            
+            userAvatarBtn.addEventListener('click', toggleDropdown);
+            
+            // Também permite clicar no nome para abrir o menu
+            if (userNameDisplay) {
+                userNameDisplay.addEventListener('click', toggleDropdown);
+            }
 
             // Fechar dropdown ao clicar fora
             window.addEventListener('click', (e) => {
-                if (!e.target.closest('#userAvatarBtn')) {
+                if (!e.target.closest('#userAvatarBtn') && !e.target.closest('#userNameDisplay')) {
                     if (userDropdown.classList.contains('show')) {
                         userDropdown.classList.remove('show');
                     }
@@ -437,8 +766,7 @@ function updateUIForLoggedUser() {
             menuBeHost.addEventListener('click', (e) => {
                 e.preventDefault();
                 userDropdown.classList.remove('show');
-                if (appState.currentUser) window.location.href = 'vendor/index.html?action=be-host';
-                else { registerModal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+                window.location.href = 'host-signup.html';
             });
         }
 
@@ -446,7 +774,7 @@ function updateUIForLoggedUser() {
             menuBeCoHost.addEventListener('click', (e) => {
                 e.preventDefault();
                 userDropdown.classList.remove('show');
-                if (appState.currentUser) window.location.href = 'vendor/index.html?action=be-cohost';
+                if (appState.currentUser) window.location.href = 'be-cohost.html';
                 else { registerModal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
             });
         }
@@ -456,6 +784,21 @@ function updateUIForLoggedUser() {
                 e.preventDefault();
                 userDropdown.classList.remove('show');
                 window.location.href = 'buscar-coanfitriao.html';
+            });
+        }
+
+        const menuConversations = document.getElementById('menuConversations');
+        if (menuConversations) {
+            menuConversations.addEventListener('click', (e) => {
+                e.preventDefault();
+                userDropdown.classList.remove('show');
+                if (appState.currentUser) {
+                    window.location.href = 'conversations.html';
+                } else {
+                    showNotification('Faça login para acessar suas conversas', 'warning');
+                    registerModal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
             });
         }
 
@@ -517,15 +860,24 @@ function loadProperties() {
                 <div class="property-features">
                     ${property.features.slice(0, 3).map(feature => `<span class="property-feature">${feature}</span>`).join('')}
                 </div>
-                <button class="btn btn-outline" style="width: 100%;">Ver Detalhes</button>
+                <button class="btn btn-outline view-details-btn" style="width: 100%;">Ver Detalhes</button>
             </div>
         `;
         
         propertiesGrid.appendChild(propertyCard);
         
-        // Adicionar evento de clique para abrir modal
+        // Adicionar evento de clique no botão de detalhes para ir para página premium
+        const viewDetailsBtn = propertyCard.querySelector('.view-details-btn');
+        if (viewDetailsBtn) {
+            viewDetailsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.location.href = `property-details.html?id=${property.id}`;
+            });
+        }
+        
+        // Adicionar evento de clique no card para ir para página premium também
         propertyCard.addEventListener('click', () => {
-            openPropertyModal(property.id);
+            window.location.href = `property-details.html?id=${property.id}`;
         });
     });
     

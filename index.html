@@ -50,7 +50,6 @@
             </div>
             <div class="hero-actions fade-up">
                 <a href="#properties" class="btn btn-accent">Ver Imóveis</a>
-                <a href="#" class="btn btn-outline" id="sellPropertyBtn">Anunciar Imóvel</a>
             </div>
         </div>
     </section>
@@ -185,46 +184,95 @@
 
     <!-- Login Modal -->
     <div class="modal-backdrop" id="loginModal">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h3 class="modal-title">Entrar na Plataforma</h3>
-                <button class="close-modal" id="closeLoginModal"><i class="fas fa-times"></i></button>
+        <div class="modal modal-login modal-sm">
+            <div class="modal-header modal-header-login">
+                <div>
+                    <h2 class="modal-title-login">Bem-vindo de volta</h2>
+                    <p class="modal-subtitle">Acesse sua conta para continuar</p>
+                </div>
+                <button class="close-modal" id="closeLoginModal" aria-label="Fechar"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body">
-                <form id="loginForm">
-                    <div class="form-group">
+            <div class="modal-body modal-body-login">
+                <form id="loginForm" class="login-form">
+                    <!-- E-mail Field -->
+                    <div class="form-group form-group-icon">
                         <label class="form-label" for="loginEmail">E-mail</label>
-                        <input type="email" id="loginEmail" class="form-control" required>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input 
+                                type="email" 
+                                id="loginEmail" 
+                                class="form-control form-control-lg" 
+                                placeholder="seu@email.com"
+                                autocomplete="email"
+                                required
+                                autofocus>
+                        </div>
+                        <span class="error-message" id="error-loginEmail"></span>
                     </div>
-                    <div class="form-group">
+
+                    <!-- Password Field -->
+                    <div class="form-group form-group-icon">
                         <label class="form-label" for="loginPassword">Senha</label>
-                        <input type="password" id="loginPassword" class="form-control" required>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input 
+                                type="password" 
+                                id="loginPassword" 
+                                class="form-control form-control-lg" 
+                                placeholder="••••••••"
+                                autocomplete="current-password"
+                                required>
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                id="toggleLoginPassword" 
+                                aria-label="Mostrar/ocultar senha">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="error-message" id="error-loginPassword"></span>
                     </div>
-                    <div class="form-options">
-                        <label class="checkbox">
+
+                    <!-- Remember & Forgot -->
+                    <div class="form-options-login">
+                        <label class="checkbox checkbox-sm">
                             <input type="checkbox" id="rememberMe">
                             <span class="checkmark"></span>
-                            Lembrar-me
+                            <span class="checkbox-label">Lembrar-me</span>
                         </label>
-                        <a href="#" class="forgot-password">Esqueci minha senha</a>
+                        <a href="#" class="forgot-password-link">Esqueci minha senha</a>
                     </div>
-                    <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Entrar</button>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-login" id="loginSubmitBtn">
+                        <span class="btn-text">Entrar</span>
+                        <span class="btn-loader" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                    </button>
                 </form>
+
+                <!-- Divider -->
                 <div class="auth-divider">
-                    <span>ou</span>
+                    <span class="divider-text">ou continue com</span>
                 </div>
-                <div class="social-auth">
-                    <button class="btn btn-outline social-btn">
+
+                <!-- Social Auth -->
+                <div class="social-auth social-auth-login">
+                    <button type="button" class="btn-social" aria-label="Continuar com Google">
                         <i class="fab fa-google"></i>
-                        Entrar com Google
+                        <span>Google</span>
                     </button>
-                    <button class="btn btn-outline social-btn">
+                    <button type="button" class="btn-social" aria-label="Continuar com Facebook">
                         <i class="fab fa-facebook-f"></i>
-                        Entrar com Facebook
+                        <span>Facebook</span>
                     </button>
                 </div>
-                <div class="auth-switch">
-                    <p>Não tem uma conta? <a href="#" id="switchToRegister">Cadastre-se</a></p>
+
+                <!-- Signup Link -->
+                <div class="auth-switch auth-switch-login">
+                    <p>Não tem uma conta? <a href="#" id="switchToRegister" class="signup-link">Cadastre-se</a></p>
                 </div>
             </div>
         </div>
@@ -233,32 +281,105 @@
     <!-- Register Modal -->
     <div class="modal-backdrop" id="registerModal">
         <div class="modal modal-sm">
-            <div class="modal-header">
-                <h3 class="modal-title">Criar Conta</h3>
-                <button class="close-modal" id="closeRegisterModal"><i class="fas fa-times"></i></button>
+            <div class="modal-header modal-header-login">
+                <div>
+                    <h3 class="modal-title-login">Criar Conta</h3>
+                    <p class="modal-subtitle">Cadastre-se para começar</p>
+                </div>
+                <button class="close-modal" id="closeRegisterModal" aria-label="Fechar"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body">
-                <form id="registerForm">
-                    <div class="form-group">
+            <div class="modal-body modal-body-login">
+                <form id="registerForm" class="login-form">
+                    <!-- Nome Field -->
+                    <div class="form-group form-group-icon">
                         <label class="form-label" for="registerName">Nome Completo</label>
-                        <input type="text" id="registerName" class="form-control" required>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input 
+                                type="text" 
+                                id="registerName" 
+                                class="form-control form-control-lg" 
+                                placeholder="Seu nome completo"
+                                required>
+                        </div>
+                        <span class="error-message" id="error-registerName"></span>
                     </div>
-                    <div class="form-group">
+
+                    <!-- E-mail Field -->
+                    <div class="form-group form-group-icon">
                         <label class="form-label" for="registerEmail">E-mail</label>
-                        <input type="email" id="registerEmail" class="form-control" required>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input 
+                                type="email" 
+                                id="registerEmail" 
+                                class="form-control form-control-lg" 
+                                placeholder="seu@email.com"
+                                required>
+                        </div>
+                        <span class="error-message" id="error-registerEmail"></span>
                     </div>
-                    <div class="form-group">
+
+                    <!-- Telefone Field -->
+                    <div class="form-group form-group-icon">
                         <label class="form-label" for="registerPhone">Telefone</label>
-                        <input type="tel" id="registerPhone" class="form-control" required>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input 
+                                type="tel" 
+                                id="registerPhone" 
+                                class="form-control form-control-lg" 
+                                placeholder="(11) 9999-9999"
+                                required>
+                        </div>
+                        <span class="error-message" id="error-registerPhone"></span>
                     </div>
-                    <div class="form-group">
+
+                    <!-- Password Field -->
+                    <div class="form-group form-group-icon">
                         <label class="form-label" for="registerPassword">Senha</label>
-                        <input type="password" id="registerPassword" class="form-control" required>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input 
+                                type="password" 
+                                id="registerPassword" 
+                                class="form-control form-control-lg" 
+                                placeholder="••••••••"
+                                required>
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                id="toggleRegisterPassword" 
+                                aria-label="Mostrar/ocultar senha">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="error-message" id="error-registerPassword"></span>
                     </div>
-                    <div class="form-group">
+
+                    <!-- Confirm Password Field -->
+                    <div class="form-group form-group-icon">
                         <label class="form-label" for="registerConfirmPassword">Confirmar Senha</label>
-                        <input type="password" id="registerConfirmPassword" class="form-control" required>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input 
+                                type="password" 
+                                id="registerConfirmPassword" 
+                                class="form-control form-control-lg" 
+                                placeholder="••••••••"
+                                required>
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                id="toggleRegisterConfirmPassword" 
+                                aria-label="Mostrar/ocultar senha">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="error-message" id="error-registerConfirmPassword"></span>
                     </div>
+
+                    <!-- Terms & Conditions -->
                     <div class="form-group">
                         <label class="checkbox">
                             <input type="checkbox" id="acceptTerms" required>
@@ -266,7 +387,14 @@
                             Concordo com os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
                         </label>
                     </div>
-                    <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Criar Conta</button>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-login" id="registerSubmitBtn" style="margin-top: 12px;">
+                        <span class="btn-text">Criar Conta</span>
+                        <span class="btn-loader" style="display: none;">
+                            <span class="spinner-border spinner-border-sm"></span>
+                        </span>
+                    </button>
                 </form>
                 <div class="auth-divider">
                     <span>ou</span>

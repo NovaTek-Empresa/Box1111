@@ -433,20 +433,42 @@
                         <!-- Seção de Localização -->
                         <div class="form-section">
                             <h3>Localização</h3>
-                            <div class="form-group">
-                                <label for="propertyLocation">Endereço Completo *</label>
-                                <input type="text" id="propertyLocation" name="location" required placeholder="Rua, número, bairro, cidade, estado">
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="propertyCidade">Cidade *</label>
-                                    <input type="text" id="propertyCidade" name="city" required placeholder="São Paulo">
+                                <div class="form-row cep-component">
+                                    <div class="form-group" style="max-width:160px">
+                                        <label for="propertyCep">CEP *</label>
+                                        <input id="propertyCep" name="cep" type="text" required placeholder="00000-000">
+                                    </div>
+                                    <div class="form-group" style="flex:2">
+                                        <label for="propertyStreet">Rua / Logradouro *</label>
+                                        <input id="propertyStreet" name="street" type="text" required placeholder="Rua exemplo">
+                                    </div>
+                                    <div class="form-group" style="max-width:120px">
+                                        <label for="propertyNumber">Número *</label>
+                                        <input id="propertyNumber" name="number" type="text" required placeholder="123">
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="propertyEstado">Estado *</label>
-                                    <input type="text" id="propertyEstado" name="state" required placeholder="SP">
+
+                                <div class="form-row">
+                                    <div class="form-group" style="flex:1">
+                                        <label for="propertyComplement">Complemento</label>
+                                        <input id="propertyComplement" name="complement" type="text" placeholder="Apto, bloco">
+                                    </div>
+                                    <div class="form-group" style="flex:1">
+                                        <label for="propertyNeighborhood">Bairro</label>
+                                        <input id="propertyNeighborhood" name="neighborhood" type="text" placeholder="Bairro">
+                                    </div>
                                 </div>
-                            </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="propertyCity">Cidade *</label>
+                                        <input id="propertyCity" name="city" type="text" required placeholder="São Paulo">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="propertyState">Estado *</label>
+                                        <input id="propertyState" name="state" type="text" required placeholder="SP">
+                                    </div>
+                                </div>
                         </div>
 
                         <!-- Seção de Descrição -->
@@ -674,6 +696,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <script src="../js/address.js"></script>
     <script src="../js/vendor.js"></script>
 </body>
 </html>

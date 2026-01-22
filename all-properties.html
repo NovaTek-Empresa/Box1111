@@ -6,71 +6,217 @@
     <title>Todos os Imóveis — BOX1111</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/all-properties.css">
 </head>
 <body>
+    <!-- Header -->
     <header id="header">
         <div class="container header-container">
             <a href="index.html" class="brand">
                 <div class="logo">BOX</div>
                 <div class="brand-text">
                     <h1>BOX 11 11</h1>
-                    <p> Anuncie • Alugue</p>
+                    <p>Anuncie • Alugue</p>
                 </div>
             </a>
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.html#home">Home</a></li>
                 <li><a href="index.html#properties">Imóveis</a></li>
                 <li><a href="Sobre Nós/">Sobre</a></li>
                 <li><a href="#contact">Contato</a></li>
+                <li><a href="vendor/index.html" class="btn-vendor">Área do Anfitrião</a></li>
+                <li><a href="admin/index.html" class="btn-admin">Administração</a></li>
             </ul>
             <div class="auth-buttons">
-                <a href="index.html" class="btn btn-outline">Voltar</a>
+                <a href="#" class="btn btn-outline" id="loginBtn">Entrar</a>
+                <a href="#" class="btn" id="registerBtn">Cadastrar</a>
             </div>
         </div>
     </header>
 
-    <main style="margin-top: var(--header-height); padding: 40px 0;">
-        <div class="container">
-            <h2 class="section-title">Todos os Imóveis</h2>
-
-            <div class="properties-filters" style="margin-bottom:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <label style="font-weight:700; margin-right:6px;">Tipo:</label>
-                    <label><input type="checkbox" id="filterCasa" checked> Casa</label>
-                    <label><input type="checkbox" id="filterApartamento"> Apartamento</label>
+    <main style="margin-top: var(--header-height);">
+        <div class="all-properties-wrapper">
+            <!-- Sidebar Filtros (Desktop) -->
+            <aside class="filters-sidebar" id="filtersSidebar">
+                <div class="filters-header">
+                    <h3>Filtros</h3>
+                    <button class="filters-close" id="closeFilters">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <label style="font-weight:700; margin-right:6px;">Quartos:</label>
-                    <select id="filterBedrooms">
-                        <option value="any">Qualquer</option>
-                        <option value="1">1+</option>
-                        <option value="2">2+</option>
-                        <option value="3">3+</option>
-                        <option value="4">4+</option>
-                    </select>
+                <div class="filters-content">
+                    <!-- Tipo de Imóvel -->
+                    <div class="filter-group">
+                        <label class="filter-title">Tipo de Imóvel</label>
+                        <div class="filter-chips">
+                            <label class="chip">
+                                <input type="checkbox" value="casa" class="property-type-filter"> Casa
+                            </label>
+                            <label class="chip">
+                                <input type="checkbox" value="apartamento" class="property-type-filter"> Apartamento
+                            </label>
+                            <label class="chip">
+                                <input type="checkbox" value="comercial" class="property-type-filter"> Comercial
+                            </label>
+                            <label class="chip">
+                                <input type="checkbox" value="terreno" class="property-type-filter"> Terreno
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Faixa de Preço -->
+                    <div class="filter-group">
+                        <label class="filter-title">Faixa de Preço</label>
+                        <div class="price-inputs">
+                            <input type="number" id="priceMin" placeholder="Mínimo" class="price-input">
+                            <span class="price-separator">-</span>
+                            <input type="number" id="priceMax" placeholder="Máximo" class="price-input">
+                        </div>
+                        <input type="range" id="priceSlider" class="price-slider" min="0" max="10000000" step="50000">
+                        <div class="price-display">
+                            R$ <span id="priceMinDisplay">0</span> - R$ <span id="priceMaxDisplay">10.000.000</span>
+                        </div>
+                    </div>
+
+                    <!-- Quartos -->
+                    <div class="filter-group">
+                        <label class="filter-title">Quartos</label>
+                        <div class="filter-chips">
+                            <label class="chip">
+                                <input type="checkbox" value="1" class="bedrooms-filter"> 1+
+                            </label>
+                            <label class="chip">
+                                <input type="checkbox" value="2" class="bedrooms-filter"> 2+
+                            </label>
+                            <label class="chip">
+                                <input type="checkbox" value="3" class="bedrooms-filter"> 3+
+                            </label>
+                            <label class="chip">
+                                <input type="checkbox" value="4" class="bedrooms-filter"> 4+
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Localização -->
+                    <div class="filter-group">
+                        <label class="filter-title">Localização</label>
+                        <input type="text" id="locationFilter" placeholder="Bairro ou cidade..." class="filter-input">
+                    </div>
                 </div>
 
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <label style="font-weight:700; margin-right:6px;">Preço (até):</label>
-                    <input type="number" id="filterPriceMax" placeholder="R$" style="padding:8px; width:120px; border-radius:8px; border:1px solid var(--border);">
+                <div class="filters-actions">
+                    <button class="btn btn-primary" id="applyFiltersBtn">
+                        <i class="fas fa-check"></i> Aplicar Filtros
+                    </button>
+                    <button class="btn btn-outline" id="clearFiltersBtn">
+                        <i class="fas fa-redo"></i> Limpar
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="properties-main">
+                <!-- Mobile Filter Button -->
+                <button class="mobile-filter-btn" id="openFilters">
+                    <i class="fas fa-sliders-h"></i> Filtros
+                </button>
+
+                <!-- Context Bar -->
+                <div class="context-bar">
+                    <div class="results-info">
+                        <span class="results-count" id="resultsCount">0 imóveis encontrados</span>
+                    </div>
+                    <div class="sort-options">
+                        <select id="sortSelect" class="sort-select">
+                            <option value="recent">Mais recentes</option>
+                            <option value="price-low">Menor preço</option>
+                            <option value="price-high">Maior preço</option>
+                            <option value="rating">Melhor avaliado</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div style="margin-left:auto; display:flex; gap:8px;">
-                    <button class="btn btn-outline" id="clearFiltersBtn">Limpar filtros</button>
+                <!-- Properties Grid -->
+                <div class="properties-grid" id="allPropertiesGrid">
+                    <!-- Skeleton Loading -->
+                    <div class="property-card skeleton"></div>
+                    <div class="property-card skeleton"></div>
+                    <div class="property-card skeleton"></div>
+                    <div class="property-card skeleton"></div>
+                    <div class="property-card skeleton"></div>
+                    <div class="property-card skeleton"></div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-illustration">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <h3>Nenhum imóvel encontrado</h3>
+                    <p>Tente ajustar seus filtros ou pesquisar por outra localização</p>
+                    <button class="btn btn-primary" id="clearFiltersEmptyBtn">
+                        <i class="fas fa-redo"></i> Limpar Filtros
+                    </button>
                 </div>
             </div>
-
-            <div class="properties-grid" id="allPropertiesGrid"></div>
         </div>
     </main>
 
-    <footer style="margin-top:40px; padding:40px 0; background:transparent;">
+    <!-- Filters Modal (Mobile) -->
+    <div class="filters-modal" id="filtersModal">
+        <div class="modal-backdrop" id="filtersBackdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Filtros</h2>
+                <button class="modal-close" id="closeFiltersModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="mobileFiltersContent"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="mobileCloseBtn">Fechar</button>
+                <button class="btn btn-primary" id="mobileApplyBtn">Aplicar Filtros</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
         <div class="container">
-            <p style="text-align:center; color:var(--muted);">&copy; 2025 BOX1111</p>
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>BOX 11 11</h4>
+                    <p>Plataforma imobiliária moderna e segura para anfitriões e hóspedes.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Links Úteis</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#">Imóveis</a></li>
+                        <li><a href="#">Sobre Nós</a></li>
+                        <li><a href="#">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Redes Sociais</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BOX 11 11. Todos os direitos reservados.</p>
+            </div>
         </div>
     </footer>
 
+    <script src="js/main.js"></script>
     <script src="js/all-properties.js"></script>
 </body>
 </html>
