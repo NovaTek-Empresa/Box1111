@@ -1,4 +1,4 @@
-/**
+/*
  * ===============================================
  * ALL PROPERTIES PAGE - JavaScript
  * ===============================================
@@ -126,12 +126,18 @@ function getFilterValues() {
         .map(input => input.value);
     const bedrooms = Array.from(document.querySelectorAll('.bedrooms-filter:checked'))
         .map(input => parseInt(input.value));
+    
+    // Pega o valor do slider de forma garantida
+    const slider = document.getElementById('priceSlider');
+    const priceMax = slider ? parseInt(slider.value) : 10000000;
     const priceMin = parseInt(document.getElementById('priceMin')?.value || 0);
-    const priceMax = parseInt(document.getElementById('priceMax')?.value || 10000000);
+    
     const location = document.getElementById('locationFilter')?.value.toLowerCase().trim() || '';
     
     return { types, bedrooms, priceMin, priceMax, location };
 }
+
+
 
 function applyFilters() {
     const { types, bedrooms, priceMin, priceMax, location } = getFilterValues();
@@ -412,16 +418,23 @@ function setupFilterControls() {
         });
     }
     
+
     if (priceSlider) {
+        // 'input' atualiza enquanto arrasta, 'change' atualiza ao soltar
         priceSlider.addEventListener('input', (e) => {
             const value = parseInt(e.target.value);
+            
+            // Atualiza o texto na tela (R$ 10.000.000)
             if (priceMaxDisplay) {
                 priceMaxDisplay.textContent = value.toLocaleString('pt-BR');
             }
-            if (priceMax) priceMax.value = value;
+            
+            // Chama a função que filtra a lista
             applyFilters();
         });
     }
+
+
     
     // Location filter
     const locationFilter = document.getElementById('locationFilter');

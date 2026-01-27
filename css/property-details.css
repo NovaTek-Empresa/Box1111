@@ -513,7 +513,7 @@
 .price-value {
     font-size: clamp(1.8rem, 4vw, 2.5rem);
     font-weight: 900;
-    color: var(--accent);
+    color: black;
     line-height: 1.1;
 }
 
@@ -580,6 +580,11 @@
     letter-spacing: 0.3px;
     font-weight: 600;
     margin-bottom: 2px;
+}
+
+.summary-div {
+    display: block;
+    
 }
 
 .summary-value {
