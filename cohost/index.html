@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Coanfitrião — BOX 11 11</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/cohost.css">
+</head>
+<body>
+    <div class="cohost-container">
+        <!-- Sidebar -->
+        <aside class="cohost-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">BOX</div>
+                <div class="brand-text">
+                    <h2>11 11</h2>
+                    <p>Painel do Coanfitrião</p>
+                </div>
+                <button class="collapse-btn" id="cohostSidebarCollapse" title="Abrir/Fechar menu" aria-label="Abrir ou fechar menu">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-section="dashboard">
+                        <a href="#dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="reservas">
+                        <a href="#reservas">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Reservas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="calendario">
+                        <a href="#calendario">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Calendário</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-section="mensagens">
+                        <a href="#mensagens">
+                            <i class="fas fa-envelope"></i>
+                            <span>Mensagens</span>
+                            <span class="badge-on" id="count-notification">2</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="../index.html" class="btn-home-footer">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar para Home
+                </a>
+            </div>
+        </aside>
+
+        <!-- Sidebar Backdrop -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Main Content -->
+        <main class="cohost-main">
+            <!-- Header -->
+            <header class="cohost-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="cohost-search">
+                    <input type="text" placeholder="Pesquisar...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-right">
+                    <div class="cohost-notifications">
+                        <button class="notification-btn" id="notificationBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">2</span>
+                        </button>
+                        <div class="notifications-dropdown" id="notificationsDropdown">
+                            <div class="notification-header">
+                                <h3>Notificações</h3>
+                                <button class="mark-all-read">Marcar todas como lidas</button>
+                            </div>
+                            <div class="notification-list">
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p>Nova reserva: João Silva reservou o imóvel "Casa com Piscina" para 15-20 de fevereiro</p>
+                                        <span class="notification-time">Há 2 horas</span>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p>Você recebeu uma mensagem do anfitrião sobre a limpeza do imóvel</p>
+                                        <span class="notification-time">Há 4 horas</span>
+                                    </div>
+                                </div>
+                                <div class="notification-item">
+                                    <div class="notification-icon">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p>Lembrete: Manutenção preventiva do imóvel "Apartamento Centro" vence em 3 dias</p>
+                                        <span class="notification-time">Ontem</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cohost-profile">
+                        <div class="profile-dropdown">
+                            <button class="profile-btn">
+                                <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Coanfitrião">
+                                <span>Maria Santos</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="profile-menu">
+                                <a href="#profile" class="menu-item">
+                                    <i class="fas fa-user"></i>
+                                    Meu Perfil
+                                </a>
+                                <div class="menu-divider"></div>
+                                <a href="../index.html" class="menu-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Sair
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="cohost-content">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="content-section active" data-page="dashboard">
+                    <!-- Dashboard Header -->
+                    <div class="dashboard-header">
+                        <div>
+                            <h2>Bem-vindo de volta, Maria!</h2>
+                            <p>Aqui está um resumo do desempenho dos imóveis sob sua supervisão.</p>
+                        </div>
+                        <div class="dashboard-actions">
+                            <button class="btn btn-accent">
+                                <i class="fas fa-calendar-alt"></i>
+                                Esta Semana
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>8</h3>
+                                <p>Reservas Ativas</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>5%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>5</h3>
+                                <p>Mensagens Não Lidas</p>
+                            </div>
+                            <div class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerts Section -->
+                    <div class="alerts-section">
+                        <h3>Alertas Importantes</h3>
+                        <div class="alerts-grid">
+                            <div class="alert alert-warning">
+                                <div class="alert-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h4>Check-in do Hóspede</h4>
+                                    <p>João Silva fará check-in em "Casa com Piscina" em 2 horas. Certifique-se de que tudo está pronto.</p>
+                                </div>
+                            </div>
+                            <div class="alert alert-info">
+                                <div class="alert-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h4>Checkout Agendado</h4>
+                                    <p>Marina Costa fará checkout em "Apartamento Centro" hoje às 11:00. Limpeza agendada para 12:00.</p>
+                                </div>
+                            </div>
+                            <div class="alert alert-info">
+                                <div class="alert-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h4>Manutenção Preventiva</h4>
+                                    <p>Limpeza semanal do "Sobrado Moderno" agendada para amanhã às 14:00.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h3>Atividade Recente</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Reserva Confirmada</h4>
+                                    <p>João Silva reservou "Casa com Piscina" para 15-20 de fevereiro</p>
+                                    <span class="activity-time">2 horas atrás</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Check-in Realizado</h4>
+                                    <p>Pedro Oliveira fez check-in em "Apartamento Centro"</p>
+                                    <span class="activity-time">6 horas atrás</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Mensagem Recebida</h4>
+                                    <p>Anfitrião enviou mensagem sobre manutenção emergencial</p>
+                                    <span class="activity-time">1 dia atrás</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reservas Section -->
+                <section id="reservas-section" class="content-section" data-page="reservas">
+                    <div class="section-header">
+                        <h2>Reservas</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-outline">
+                                <i class="fas fa-filter"></i>
+                                Filtrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="reservas-container">
+                        <div class="reserva-card">
+                            <div class="reserva-header">
+                                <h3>Casa com Piscina</h3>
+                                <span class="status-badge status-confirmed">Confirmada</span>
+                            </div>
+                            <div class="reserva-info">
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span><strong>Hóspede:</strong> João Silva</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span><strong>Período:</strong> 15-20 de fevereiro, 2026</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span><strong>Contato:</strong> +55 11 99999-1234</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-users"></i>
+                                    <span><strong>Hóspedes:</strong> 4 pessoas</span>
+                                </div>
+                            </div>
+                            <div class="reserva-actions">
+                                <button class="btn btn-sm btn-outline">
+                                    <i class="fas fa-eye"></i>
+                                    Ver Detalhes
+                                </button>
+                                <button class="btn btn-sm btn-accent">
+                                    <i class="fas fa-envelope"></i>
+                                    Mensagem
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="reserva-card">
+                            <div class="reserva-header">
+                                <h3>Apartamento Centro</h3>
+                                <span class="status-badge status-active">Check-in Realizado</span>
+                            </div>
+                            <div class="reserva-info">
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span><strong>Hóspede:</strong> Pedro Oliveira</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span><strong>Período:</strong> 10-12 de fevereiro, 2026</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span><strong>Contato:</strong> +55 11 98888-5678</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-users"></i>
+                                    <span><strong>Hóspedes:</strong> 2 pessoas</span>
+                                </div>
+                            </div>
+                            <div class="reserva-actions">
+                                <button class="btn btn-sm btn-outline">
+                                    <i class="fas fa-eye"></i>
+                                    Ver Detalhes
+                                </button>
+                                <button class="btn btn-sm btn-accent">
+                                    <i class="fas fa-envelope"></i>
+                                    Mensagem
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="reserva-card">
+                            <div class="reserva-header">
+                                <h3>Sobrado Moderno</h3>
+                                <span class="status-badge status-completed">Checkout Realizado</span>
+                            </div>
+                            <div class="reserva-info">
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span><strong>Hóspede:</strong> Marina Costa</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span><strong>Período:</strong> 08-10 de fevereiro, 2026</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span><strong>Contato:</strong> +55 11 97777-9012</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-users"></i>
+                                    <span><strong>Hóspedes:</strong> 5 pessoas</span>
+                                </div>
+                            </div>
+                            <div class="reserva-actions">
+                                <button class="btn btn-sm btn-outline">
+                                    <i class="fas fa-eye"></i>
+                                    Ver Detalhes
+                                </button>
+                                <button class="btn btn-sm btn-accent">
+                                    <i class="fas fa-envelope"></i>
+                                    Mensagem
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="reserva-card">
+                            <div class="reserva-header">
+                                <h3>Casa Alto Padrão</h3>
+                                <span class="status-badge status-confirmed">Confirmada</span>
+                            </div>
+                            <div class="reserva-info">
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span><strong>Hóspede:</strong> Ana Martins</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span><strong>Período:</strong> 25 fev - 05 mar, 2026</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span><strong>Contato:</strong> +55 11 96666-3456</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-users"></i>
+                                    <span><strong>Hóspedes:</strong> 8 pessoas</span>
+                                </div>
+                            </div>
+                            <div class="reserva-actions">
+                                <button class="btn btn-sm btn-outline">
+                                    <i class="fas fa-eye"></i>
+                                    Ver Detalhes
+                                </button>
+                                <button class="btn btn-sm btn-accent">
+                                    <i class="fas fa-envelope"></i>
+                                    Mensagem
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Calendário Section -->
+                <section id="calendario-section" class="content-section" data-page="calendario">
+                    <div class="section-header">
+                        <h2>Calendário de Ocupação</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="calendario-container">
+                        <div class="calendar-info">
+                            <p>Visualização somente leitura. Consulte o calendário de ocupação dos imóveis supervisionados.</p>
+                        </div>
+
+                        <div class="properties-calendar">
+                            <div class="property-calendar">
+                                <h3>Casa com Piscina</h3>
+                                <div class="calendar">
+                                    <div class="calendar-header">
+                                        <button><i class="fas fa-chevron-left"></i></button>
+                                        <h4>Fevereiro 2026</h4>
+                                        <button><i class="fas fa-chevron-right"></i></button>
+                                    </div>
+                                    <div class="calendar-days">
+                                        <div class="day-header">Dom</div>
+                                        <div class="day-header">Seg</div>
+                                        <div class="day-header">Ter</div>
+                                        <div class="day-header">Qua</div>
+                                        <div class="day-header">Qui</div>
+                                        <div class="day-header">Sex</div>
+                                        <div class="day-header">Sab</div>
+                                        
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day">1</div>
+                                        <div class="day">2</div>
+                                        <div class="day">3</div>
+                                        <div class="day">4</div>
+                                        <div class="day">5</div>
+                                        <div class="day">6</div>
+                                        <div class="day">7</div>
+                                        <div class="day">8</div>
+                                        <div class="day">9</div>
+                                        <div class="day">10</div>
+                                        <div class="day">11</div>
+                                        <div class="day">12</div>
+                                        <div class="day">13</div>
+                                        <div class="day">14</div>
+                                        <div class="day occupied">15</div>
+                                        <div class="day occupied">16</div>
+                                        <div class="day occupied">17</div>
+                                        <div class="day occupied">18</div>
+                                        <div class="day occupied">19</div>
+                                        <div class="day occupied">20</div>
+                                        <div class="day">21</div>
+                                        <div class="day">22</div>
+                                        <div class="day">23</div>
+                                        <div class="day">24</div>
+                                        <div class="day">25</div>
+                                        <div class="day">26</div>
+                                        <div class="day">27</div>
+                                        <div class="day">28</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color occupied"></div>
+                                        <span>Ocupado</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color"></div>
+                                        <span>Disponível</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="property-calendar">
+                                <h3>Apartamento Centro</h3>
+                                <div class="calendar">
+                                    <div class="calendar-header">
+                                        <button><i class="fas fa-chevron-left"></i></button>
+                                        <h4>Fevereiro 2026</h4>
+                                        <button><i class="fas fa-chevron-right"></i></button>
+                                    </div>
+                                    <div class="calendar-days">
+                                        <div class="day-header">Dom</div>
+                                        <div class="day-header">Seg</div>
+                                        <div class="day-header">Ter</div>
+                                        <div class="day-header">Qua</div>
+                                        <div class="day-header">Qui</div>
+                                        <div class="day-header">Sex</div>
+                                        <div class="day-header">Sab</div>
+                                        
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day empty"></div>
+                                        <div class="day">1</div>
+                                        <div class="day">2</div>
+                                        <div class="day">3</div>
+                                        <div class="day">4</div>
+                                        <div class="day">5</div>
+                                        <div class="day">6</div>
+                                        <div class="day">7</div>
+                                        <div class="day">8</div>
+                                        <div class="day occupied">9</div>
+                                        <div class="day occupied">10</div>
+                                        <div class="day occupied">11</div>
+                                        <div class="day">12</div>
+                                        <div class="day">13</div>
+                                        <div class="day">14</div>
+                                        <div class="day">15</div>
+                                        <div class="day">16</div>
+                                        <div class="day">17</div>
+                                        <div class="day">18</div>
+                                        <div class="day">19</div>
+                                        <div class="day">20</div>
+                                        <div class="day">21</div>
+                                        <div class="day">22</div>
+                                        <div class="day">23</div>
+                                        <div class="day">24</div>
+                                        <div class="day">25</div>
+                                        <div class="day">26</div>
+                                        <div class="day">27</div>
+                                        <div class="day">28</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color occupied"></div>
+                                        <span>Ocupado</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color"></div>
+                                        <span>Disponível</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Mensagens Section -->
+                <section id="mensagens-section" class="content-section" data-page="mensagens">
+                    <div class="section-header">
+                        <h2>Mensagens</h2>
+                        <div class="section-actions">
+                            <input type="text" class="search-box" placeholder="Buscar conversas...">
+                        </div>
+                    </div>
+
+                    <div class="mensagens-container">
+                        <div class="mensagens-list">
+                            <div class="mensagem-item unread">
+                                <div class="mensagem-avatar">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Carlos Silva">
+                                    <div class="unread-badge"></div>
+                                </div>
+                                <div class="mensagem-preview">
+                                    <h4>Carlos Silva (Anfitrião)</h4>
+                                    <p>Pode confirmar se a limpeza foi feita corretamente?</p>
+                                    <span class="mensagem-time">Há 30 minutos</span>
+                                </div>
+                            </div>
+
+                            <div class="mensagem-item unread">
+                                <div class="mensagem-avatar">
+                                    <img src="https://randomuser.me/api/portraits/men/46.jpg" alt="João Silva">
+                                </div>
+                                <div class="mensagem-preview">
+                                    <h4>João Silva (Hóspede)</h4>
+                                    <p>Qual é o código da porta? Cheguei antes do previsto.</p>
+                                    <span class="mensagem-time">Há 2 horas</span>
+                                </div>
+                            </div>
+
+                            <div class="mensagem-item">
+                                <div class="mensagem-avatar">
+                                    <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Marina Costa">
+                                </div>
+                                <div class="mensagem-preview">
+                                    <h4>Marina Costa (Hóspede)</h4>
+                                    <p>Tudo bem, saio às 11:00 da manhã. Obrigada pela hospedagem!</p>
+                                    <span class="mensagem-time">Ontem</span>
+                                </div>
+                            </div>
+
+                            <div class="mensagem-item">
+                                <div class="mensagem-avatar">
+                                    <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Pedro Oliveira">
+                                </div>
+                                <div class="mensagem-preview">
+                                    <h4>Pedro Oliveira (Hóspede)</h4>
+                                    <p>O Wi-Fi da sala não está funcionando. Podem resolver?</p>
+                                    <span class="mensagem-time">2 dias atrás</span>
+                                </div>
+                            </div>
+
+                            <div class="mensagem-item">
+                                <div class="mensagem-avatar">
+                                    <img src="https://randomuser.me/api/portraits/women/75.jpg" alt="Ana Martins">
+                                </div>
+                                <div class="mensagem-preview">
+                                    <h4>Ana Martins (Hóspede)</h4>
+                                    <p>Gostaria de confirmar a reserva para 25 de fevereiro</p>
+                                    <span class="mensagem-time">3 dias atrás</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mensagem-detail">
+                            <div class="mensagem-header">
+                                <div class="mensagem-info">
+                                    <h3>Carlos Silva</h3>
+                                    <p class="mensagem-tipo">Anfitrião</p>
+                                </div>
+                                <button class="btn-close">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <div class="mensagem-corpo">
+                                <div class="msg msg-received">
+                                    <p>Oi Maria, tudo bem?</p>
+                                    <span class="msg-time">Hoje 09:30</span>
+                                </div>
+
+                                <div class="msg msg-sent">
+                                    <p>Oi Carlos! Tudo bem sim. Em que posso ajudar?</p>
+                                    <span class="msg-time">Hoje 09:45</span>
+                                </div>
+
+                                <div class="msg msg-received">
+                                    <p>Pode confirmar se a limpeza foi feita corretamente?</p>
+                                    <span class="msg-time">Hoje 14:15</span>
+                                </div>
+
+                                <div class="msg msg-sent">
+                                    <p>Sim, a limpeza foi feita perfeitamente. Todos os itens do checklist foram verificados.</p>
+                                    <span class="msg-time">Hoje 14:30</span>
+                                </div>
+                            </div>
+
+                            <div class="mensagem-input">
+                                <input type="text" placeholder="Escreva sua mensagem...">
+                                <button class="btn-send">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/cohost.js"></script>
+</body>
+</html>

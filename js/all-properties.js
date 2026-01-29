@@ -457,6 +457,8 @@ function setupApplyClearButtons() {
     
     if (mobileApplyBtn) {
         mobileApplyBtn.addEventListener('click', () => {
+            // copy values from mobile modal back to main filters
+            syncMobileToMain();
             applyFilters();
             closeMobileFilters();
         });
@@ -533,6 +535,9 @@ function setupMobileFilters() {
 function openMobileFilters() {
     const modal = document.getElementById('filtersModal');
     if (modal) {
+        // populate mobile filters with current desktop filters
+        populateMobileFilters();
+        syncMainToMobile();
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -546,6 +551,88 @@ function closeMobileFilters() {
     }
 }
 
+// ============= Accordions & Mobile Sync =============
+function setupAccordions() {
+    document.querySelectorAll('.filter-card').forEach(card => {
+        const header = card.querySelector('.filter-card-header');
+        if (header) {
+            header.addEventListener('click', () => {
+                card.classList.toggle('collapsed');
+            });
+        }
+    });
+}
+
+function populateMobileFilters() {
+    const mobileContent = document.getElementById('mobileFiltersContent');
+    const desktopContent = document.querySelector('.filters-content');
+    if (mobileContent && desktopContent) {
+        mobileContent.innerHTML = desktopContent.innerHTML;
+    }
+}
+
+function syncMainToMobile() {
+    const mobileContent = document.getElementById('mobileFiltersContent');
+    if (!mobileContent) return;
+
+    // Sync inputs: checkboxes and text/number inputs
+    const mainInputs = document.querySelectorAll('.filters-content input');
+    mainInputs.forEach(input => {
+        const selector = getSelectorForInput(input);
+        if (!selector) return;
+        const mobileInput = mobileContent.querySelector(selector);
+        if (!mobileInput) return;
+        if (input.type === 'checkbox') mobileInput.checked = input.checked;
+        else mobileInput.value = input.value;
+    });
+}
+
+function syncMobileToMain() {
+    const mobileContent = document.getElementById('mobileFiltersContent');
+    if (!mobileContent) return;
+
+    const mobileInputs = mobileContent.querySelectorAll('input');
+    mobileInputs.forEach(input => {
+        const selector = getSelectorForInput(input);
+        if (!selector) return;
+        const mainInput = document.querySelector('.filters-content ' + selector);
+        if (!mainInput) return;
+        if (input.type === 'checkbox') mainInput.checked = input.checked;
+        else mainInput.value = input.value;
+    });
+}
+
+function getSelectorForInput(input) {
+    if (!input) return null;
+    if (input.id) return `#${input.id}`;
+    if (input.name) return `[name="${input.name}"]`;
+    if (input.type === 'checkbox' && input.className) {
+        // try by class
+        const cls = input.className.split(' ').join('.');
+        return `.${cls}`;
+    }
+    return null;
+}
+
+// ============= Mock Data Generation =============
+function generateMockProperties(targetCount = 30) {
+    const base = properties.slice();
+    let nextId = properties.length ? Math.max(...properties.map(p => p.id)) + 1 : 1;
+
+    while (properties.length < targetCount) {
+        const src = base[Math.floor(Math.random() * base.length)];
+        const clone = JSON.parse(JSON.stringify(src));
+        clone.id = nextId++;
+        // Slight variations
+        clone.price = Math.max(50000, Math.round((clone.price || 100000) * (0.8 + Math.random() * 0.8)));
+        clone.title = `${clone.title.split(' — ')[0]} — Unidade ${clone.id}`;
+        clone.neighborhood = clone.neighborhood || (clone.location || '').split(',')[0] || 'Bairro';
+        clone.createdAt = new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000);
+        clone.badge = Math.random() > 0.85 ? 'destaque' : (Math.random() > 0.9 ? 'novo' : null);
+        properties.push(clone);
+    }
+}
+
 // ============= Initialization =============
 document.addEventListener('DOMContentLoaded', () => {
     // Initial render with skeleton loading
@@ -553,6 +640,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSortControl();
     setupApplyClearButtons();
     setupMobileFilters();
+    setupAccordions();
+
+    // Ensure there are ~30 properties for realistic preview
+    generateMockProperties(30);
     
     // Load initial data
     setTimeout(() => {

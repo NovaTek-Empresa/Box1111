@@ -49,62 +49,82 @@
                 </div>
 
                 <div class="filters-content">
-                    <!-- Tipo de Imóvel -->
-                    <div class="filter-group">
-                        <label class="filter-title">Tipo de Imóvel</label>
-                        <div class="filter-chips">
-                            <label class="chip">
-                                <input type="checkbox" value="casa" class="property-type-filter"> Casa
-                            </label>
-                            <label class="chip">
-                                <input type="checkbox" value="apartamento" class="property-type-filter"> Apartamento
-                            </label>
-                            <label class="chip">
-                                <input type="checkbox" value="comercial" class="property-type-filter"> Comercial
-                            </label>
-                            <label class="chip">
-                                <input type="checkbox" value="terreno" class="property-type-filter"> Terreno
-                            </label>
+                    <!-- Filter Card: Tipo de Imóvel -->
+                    <div class="filter-card">
+                        <button class="filter-card-header" type="button">
+                            <span>Tipo de Imóvel</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="filter-card-body">
+                            <div class="filter-chips">
+                                <label class="chip">
+                                    <input type="checkbox" value="casa" class="property-type-filter"> Casa
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" value="apartamento" class="property-type-filter"> Apartamento
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" value="comercial" class="property-type-filter"> Comercial
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" value="terreno" class="property-type-filter"> Terreno
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Faixa de Preço -->
-                    <div class="filter-group">
-                        <label class="filter-title">Faixa de Preço</label>
-                        <div class="price-inputs">
-                            <input type="number" id="priceMin" placeholder="Mínimo" class="price-input">
-                            <span class="price-separator">-</span>
-                            <input type="number" id="priceMax" placeholder="Máximo" class="price-input">
-                        </div>
-                        <input type="range" id="priceSlider" class="price-slider" min="0" max="10000000" step="50000">
-                        <div class="price-display">
-                            R$ <span id="priceMinDisplay">0</span> - R$ <span id="priceMaxDisplay">10.000.000</span>
-                        </div>
-                    </div>
-
-                    <!-- Quartos -->
-                    <div class="filter-group">
-                        <label class="filter-title">Quartos</label>
-                        <div class="filter-chips">
-                            <label class="chip">
-                                <input type="checkbox" value="1" class="bedrooms-filter"> 1+
-                            </label>
-                            <label class="chip">
-                                <input type="checkbox" value="2" class="bedrooms-filter"> 2+
-                            </label>
-                            <label class="chip">
-                                <input type="checkbox" value="3" class="bedrooms-filter"> 3+
-                            </label>
-                            <label class="chip">
-                                <input type="checkbox" value="4" class="bedrooms-filter"> 4+
-                            </label>
+                    <!-- Filter Card: Faixa de Preço -->
+                    <div class="filter-card">
+                        <button class="filter-card-header" type="button">
+                            <span>Faixa de Preço</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="filter-card-body">
+                            <div class="price-inputs">
+                                <input type="number" id="priceMin" placeholder="Mínimo" class="price-input">
+                                <span class="price-separator">-</span>
+                                <input type="number" id="priceMax" placeholder="Máximo" class="price-input">
+                            </div>
+                            <input type="range" id="priceSlider" class="price-slider" min="0" max="10000000" step="50000">
+                            <div class="price-display">
+                                R$ <span id="priceMinDisplay">0</span> - R$ <span id="priceMaxDisplay">10.000.000</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Localização -->
-                    <div class="filter-group">
-                        <label class="filter-title">Localização</label>
-                        <input type="text" id="locationFilter" placeholder="Bairro ou cidade..." class="filter-input">
+                    <!-- Filter Card: Quartos -->
+                    <div class="filter-card">
+                        <button class="filter-card-header" type="button">
+                            <span>Quartos</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="filter-card-body">
+                            <div class="filter-chips">
+                                <label class="chip">
+                                    <input type="checkbox" value="1" class="bedrooms-filter"> 1+
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" value="2" class="bedrooms-filter"> 2+
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" value="3" class="bedrooms-filter"> 3+
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" value="4" class="bedrooms-filter"> 4+
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Card: Localização -->
+                    <div class="filter-card">
+                        <button class="filter-card-header" type="button">
+                            <span>Localização</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="filter-card-body">
+                            <input type="text" id="locationFilter" placeholder="Bairro ou cidade..." class="filter-input">
+                        </div>
                     </div>
                 </div>
 

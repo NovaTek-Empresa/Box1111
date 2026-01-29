@@ -138,6 +138,17 @@ section {
     box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
+.btn-cohost {
+    background-color: #8b5cf6;
+    color: #fff;
+    font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+    padding: clamp(6px, 1vh, 10px) clamp(8px, 1.5vw, 16px);
+}
+
+.btn-cohost:hover {
+    background-color: #7c3aed;
+}
+
 .btn-vendor {
     background-color: var(--success);
     color: #000;
@@ -2072,6 +2083,7 @@ textarea.form-control {
     }
 
     .nav-menu .btn-host,
+    .nav-menu .btn-cohost,
     .nav-menu .btn-vendor,
     .nav-menu .btn-admin {
         border: none;

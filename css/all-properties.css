@@ -101,6 +101,48 @@
     margin-bottom: var(--spacing-xl);
 }
 
+/* Filter Card (Accordion style) */
+.filter-card {
+    background: #ffffff;
+    border: 1px solid #eef2f1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.03);
+}
+
+.filter-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #000000;
+}
+
+.filter-card-header i {
+    transition: transform 0.22s ease;
+    color: var(--text-secondary);
+}
+
+.filter-card-body {
+    padding: 12px 16px 18px 16px;
+    display: block;
+    border-top: 1px solid #f3f4f6;
+}
+
+.filter-card.collapsed .filter-card-body {
+    display: none;
+}
+
+.filter-card.collapsed .filter-card-header i {
+    transform: rotate(-90deg);
+}
+
 /* Filter Group */
 .filter-group {
     display: flex;
@@ -572,6 +614,12 @@
     grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
+}
+
+@media (min-width: 1200px) {
+    .properties-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .property-card {
