@@ -160,6 +160,41 @@ let appState = {
     visibleProperties: 6
 };
 
+// ============= Favorites API (global) =============
+function saveFavorite(propertyId) {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    if (!favorites.includes(propertyId)) {
+        favorites.push(propertyId);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    }
+}
+
+function removeFavorite(propertyId) {
+    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    favorites = favorites.filter(id => id !== propertyId);
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+function isFavorited(propertyId) {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    return favorites.includes(propertyId);
+}
+
+function toggleFavorite(propertyId) {
+    if (isFavorited(propertyId)) {
+        removeFavorite(propertyId);
+    } else {
+        saveFavorite(propertyId);
+    }
+}
+
+// Backwards compatibility aliases used by other scripts
+window.saveFavorite = saveFavorite;
+window.removeFavorite = removeFavorite;
+window.isFavorited = isFavorited;
+window.toggleFavorite = toggleFavorite;
+window.isFavorite = isFavorited;
+
 // Menu Mobile
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
@@ -836,46 +871,94 @@ function loadProperties() {
     propertiesGrid.innerHTML = '';
     
     const propertiesToShow = appState.filteredProperties.slice(0, appState.visibleProperties);
-    
+
     propertiesToShow.forEach(property => {
         const propertyCard = document.createElement('div');
         propertyCard.classList.add('property-card', 'fade-up');
         propertyCard.dataset.id = property.id;
-        
-        propertyCard.innerHTML = `
-            <div class="property-image">
-                <img src="${property.images[0]}" alt="${property.title}">
-                <div class="property-badge">${property.transaction === 'aluguel' ? 'Aluguel' : 'aluguel'}</div>
+
+        // badge a partir de transaction ou vazio
+        const badgeText = property.transaction === 'aluguel' ? 'Aluguel' : '';
+        const badgeClass = badgeText ? '' : '';
+
+        // features HTML
+        const featuresHTML = (property.features || []).slice(0,4).map(f => `
+            <div class="feature-item">
+                <i class="fas fa-check"></i>
+                <span>${f}</span>
             </div>
-            <div class="property-content">
-                <div class="property-header">
-                    <div class="property-price">${property.price}</div>
-                    <div class="property-rating">
-                        <i class="fas fa-star"></i>
-                        <span>${property.seller.rating}</span>
-                    </div>
+        `).join('');
+
+        propertyCard.innerHTML = `
+            <div class="card-image-wrapper">
+                ${badgeText ? `<div class="card-badge">${badgeText}</div>` : ''}
+                <button class="card-favorite" data-id="${property.id}">
+                    <i class="far fa-heart"></i>
+                </button>
+                <img class="card-image loaded" src="${property.images[0]}" alt="${property.title}">
+            </div>
+            <div class="card-content">
+                <div class="card-price">${property.price}</div>
+                <h3 class="card-title">${property.title}</h3>
+                <div class="card-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${property.location.split(',')[0] || property.location}</span>
                 </div>
-                <h3 class="property-title">${property.title}</h3>
-                <p class="property-description">${property.location}</p>
-                <div class="property-features">
-                    ${property.features.slice(0, 3).map(feature => `<span class="property-feature">${feature}</span>`).join('')}
+                <div class="card-features">
+                    ${featuresHTML}
                 </div>
-                <button class="btn btn-outline view-details-btn" style="width: 100%;">Ver Detalhes</button>
+                <div class="card-cta">
+                    <button class="card-cta-btn" data-id="${property.id}">Ver Detalhes</button>
+                </div>
             </div>
         `;
-        
+
         propertiesGrid.appendChild(propertyCard);
-        
-        // Adicionar evento de clique no botão de detalhes para ir para página premium
-        const viewDetailsBtn = propertyCard.querySelector('.view-details-btn');
-        if (viewDetailsBtn) {
-            viewDetailsBtn.addEventListener('click', (e) => {
+
+        // Favoritar (usa funções globais em property-details.js)
+        const favBtn = propertyCard.querySelector('.card-favorite');
+        if (favBtn) {
+            // Verificar se já está favoritado e adicionar classe e ícone correto
+            if (typeof isFavorited === 'function' && isFavorited(property.id)) {
+                favBtn.classList.add('active');
+                const icon = favBtn.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                }
+            }
+            
+            favBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (typeof isFavorited === 'function' && isFavorited(property.id)) {
+                    if (typeof removeFavorite === 'function') removeFavorite(property.id);
+                    favBtn.classList.remove('active');
+                    const icon = favBtn.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                    }
+                } else {
+                    if (typeof saveFavorite === 'function') saveFavorite(property.id);
+                    favBtn.classList.add('active');
+                    const icon = favBtn.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                    }
+                }
+            });
+        }
+
+        // Detalhes
+        const ctaBtn = propertyCard.querySelector('.card-cta-btn');
+        if (ctaBtn) {
+            ctaBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 window.location.href = `property-details.html?id=${property.id}`;
             });
         }
-        
-        // Adicionar evento de clique no card para ir para página premium também
+
         propertyCard.addEventListener('click', () => {
             window.location.href = `property-details.html?id=${property.id}`;
         });

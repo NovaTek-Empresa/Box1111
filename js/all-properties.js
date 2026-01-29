@@ -5,7 +5,7 @@
  */
 
 // ============= Data Structure =============
-const properties = [
+const allPropertiesData = [
     { 
         id: 1, 
         title: "Casa Alto Padrão — Condomínio Fechado", 
@@ -127,13 +127,20 @@ function getFilterValues() {
     const bedrooms = Array.from(document.querySelectorAll('.bedrooms-filter:checked'))
         .map(input => parseInt(input.value));
     
-    // Pega o valor do slider de forma garantida
+    // Ler valores de preço de forma robusta
     const slider = document.getElementById('priceSlider');
-    const priceMax = slider ? parseInt(slider.value) : 10000000;
-    const priceMin = parseInt(document.getElementById('priceMin')?.value || 0);
-    
-    const location = document.getElementById('locationFilter')?.value.toLowerCase().trim() || '';
-    
+    let priceMax = slider ? parseInt(slider.value) : NaN;
+    let priceMin = parseInt(document.getElementById('priceMin')?.value);
+    if (isNaN(priceMin)) priceMin = 0;
+    if (isNaN(priceMax)) {
+        // tentar pelo input max e fallback genérico
+        const rawMax = document.getElementById('priceMax')?.value;
+        priceMax = rawMax ? parseInt(rawMax) : 10000000;
+        if (isNaN(priceMax)) priceMax = 10000000;
+    }
+
+    const location = (document.getElementById('locationFilter')?.value || '').toLowerCase().trim();
+
     return { types, bedrooms, priceMin, priceMax, location };
 }
 
@@ -142,7 +149,7 @@ function getFilterValues() {
 function applyFilters() {
     const { types, bedrooms, priceMin, priceMax, location } = getFilterValues();
     
-    let filtered = properties.filter(p => {
+    let filtered = allPropertiesData.filter(p => {
         // Type filter (show all if none selected)
         if (types.length > 0 && !types.includes(p.type)) return false;
         
@@ -159,6 +166,15 @@ function applyFilters() {
         return true;
     });
     
+    // Se nenhum filtro está ativo e o resultado ficou vazio, usar fallback para mostrar todos os imóveis
+    const noFiltersActive = types.length === 0 && bedrooms.length === 0 && !location &&
+        (document.getElementById('priceMin')?.value === '' || document.getElementById('priceMin') == null) &&
+        (document.getElementById('priceMax')?.value === '' || document.getElementById('priceMax') == null || document.getElementById('priceSlider') == null);
+
+    if (filtered.length === 0 && noFiltersActive && allPropertiesData.length > 0) {
+        filtered = allPropertiesData.slice();
+    }
+
     updateResultsCount(filtered.length);
     sortProperties(filtered);
     renderProperties(filtered);
@@ -309,7 +325,7 @@ function createPropertyCard(property) {
         <div class="card-image-wrapper">
             ${badgeHTML}
             <button class="card-favorite ${isFavorited ? 'active' : ''}" data-id="${property.id}">
-                <i class="fas fa-heart"></i>
+                <i class="${isFavorited ? 'fas' : 'far'} fa-heart"></i>
             </button>
             <img class="card-image loaded" src="${property.images[0]}" alt="${property.title}">
         </div>
@@ -340,6 +356,18 @@ function createPropertyCard(property) {
             e.stopPropagation();
             toggleFavorite(property.id);
             favoriteBtn.classList.toggle('active');
+            
+            // Toggle icon between fas (filled) and far (outline)
+            const icon = favoriteBtn.querySelector('i');
+            if (icon) {
+                if (favoriteBtn.classList.contains('active')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
+            }
         });
     }
     
@@ -628,11 +656,11 @@ function getSelectorForInput(input) {
 }
 
 // ============= Mock Data Generation =============
-function generateMockProperties(targetCount = 30) {
-    const base = properties.slice();
-    let nextId = properties.length ? Math.max(...properties.map(p => p.id)) + 1 : 1;
+function generateMockProperties(targetCount = 20) {
+    const base = allPropertiesData.slice();
+    let nextId = allPropertiesData.length ? Math.max(...allPropertiesData.map(p => p.id)) + 1 : 1;
 
-    while (properties.length < targetCount) {
+    while (allPropertiesData.length < targetCount) {
         const src = base[Math.floor(Math.random() * base.length)];
         const clone = JSON.parse(JSON.stringify(src));
         clone.id = nextId++;
@@ -642,7 +670,7 @@ function generateMockProperties(targetCount = 30) {
         clone.neighborhood = clone.neighborhood || (clone.location || '').split(',')[0] || 'Bairro';
         clone.createdAt = new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000);
         clone.badge = Math.random() > 0.85 ? 'destaque' : (Math.random() > 0.9 ? 'novo' : null);
-        properties.push(clone);
+        allPropertiesData.push(clone);
     }
 }
 
@@ -655,9 +683,28 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMobileFilters();
     setupAccordions();
 
-    // Ensure there are ~30 properties for realistic preview
-    generateMockProperties(30);
-    
+    // Ensure there are 20 properties for realistic preview
+    generateMockProperties(20);
+    // Merge generated mocks into the global `properties` array (if present)
+    try {
+        if (typeof properties !== 'undefined' && Array.isArray(properties)) {
+            const existingIds = new Set(properties.map(p => p.id));
+            allPropertiesData.forEach(p => {
+                if (!existingIds.has(p.id)) properties.push(p);
+            });
+            // update appState filteredProperties if available
+            if (typeof appState !== 'undefined' && appState.filteredProperties) {
+                appState.filteredProperties = [...properties];
+            }
+        } else {
+            // expose as window.properties as fallback
+            window.properties = allPropertiesData.slice();
+        }
+    } catch (e) {
+        // silently ignore merge errors
+        console.warn('Merge properties failed', e);
+    }
+
     // Load initial data
     setTimeout(() => {
         applyFilters();
