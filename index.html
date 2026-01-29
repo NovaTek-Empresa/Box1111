@@ -56,7 +56,96 @@
         </div>
     </section>
 
-    <!-- Categories -->
+    <!-- Categories (moved below properties) -->
+
+    <!-- Properties -->
+    <section id="properties">
+        <div class="container">
+            <h2 class="section-title">Imóveis em Destaque</h2>
+            <div class="filters">
+                <div class="filter-chip active">Todos</div>
+                <div class="filter-chip">Aluguel</div>
+                <div class="filter-chip">Casas</div>
+                <div class="filter-chip">Apartamentos</div>
+            </div>
+            <div class="properties-grid" id="propertiesGrid">
+                <!-- Os imóveis serão carregados via JavaScript -->
+            </div>
+            <div style="display:flex; gap:12px; align-items:center; justify-content:flex-end; margin-top:18px;">
+                <div class="view-all-container">
+                    <a href="all-properties.html" class="btn btn-outline">Ver todos os imóveis</a>
+                </div>
+                <div class="load-more-container">
+                    <button class="btn btn-outline" id="loadMoreBtn">Carregar Mais Imóveis</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title">Perguntas Frequentes</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Como funciona o aluguel de imóveis pela plataforma?
+                        <span class="faq-toggle">+</span>
+                    </button>
+                    <div class="faq-answer" hidden>
+                        Você busca o imóvel, realiza a reserva e faz o pagamento diretamente pela plataforma. Após a confirmação, o valor é repassado ao anfitrião e coanfitrião.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Os imóveis anunciados são verificados?
+                        <span class="faq-toggle">+</span>
+                    </button>
+                    <div class="faq-answer" hidden>
+                        Sim. Todos os imóveis passam por uma análise antes de serem publicados, garantindo mais segurança e confiabilidade.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Preciso criar uma conta para alugar um imóvel?
+                        <span class="faq-toggle">+</span>
+                    </button>
+                    <div class="faq-answer" hidden>
+                        Você pode navegar livremente, mas é necessário criar uma conta para reservar imóveis e realizar pagamentos.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Como faço para anunciar meu imóvel para aluguel?
+                        <span class="faq-toggle">+</span>
+                    </button>
+                    <div class="faq-answer" hidden>
+                        Crie uma conta, acesse a Área do Anfitrião e cadastre seu imóvel com fotos, descrição e valor do aluguel.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Como funciona o pagamento do aluguel?
+                        <span class="faq-toggle">+</span>
+                    </button>
+                    <div class="faq-answer" hidden>
+                        O pagamento é feito pela plataforma, que processa a transação e realiza o repasse ao anfitrião e coanfitrião conforme definido.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Qual a diferença entre anfitrião e coanfitrião?
+                        <span class="faq-toggle">+</span>
+                    </button>
+                    <div class="faq-answer" hidden>
+                        O anfitrião é o responsável principal pelo imóvel. O coanfitrião auxilia na gestão e comunicação, com permissões limitadas.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories (moved below properties) -->
     <section class="categories">
         <div class="container">
             <h2 class="section-title">Categorias</h2>
@@ -88,54 +177,6 @@
                     </div>
                     <h3>Terrenos</h3>
                     <p>Terrenos para construção ou investimento</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Properties -->
-    <section id="properties">
-        <div class="container">
-            <h2 class="section-title">Imóveis em Destaque</h2>
-            <div class="filters">
-                <div class="filter-chip active">Todos</div>
-                <div class="filter-chip">Aluguel</div>
-                <div class="filter-chip">Casas</div>
-                <div class="filter-chip">Apartamentos</div>
-            </div>
-            <div class="properties-grid" id="propertiesGrid">
-                <!-- Os imóveis serão carregados via JavaScript -->
-            </div>
-            <div style="display:flex; gap:12px; align-items:center; justify-content:flex-end; margin-top:18px;">
-                <div class="view-all-container">
-                    <a href="all-properties.html" class="btn btn-outline">Ver todos os imóveis</a>
-                </div>
-                <div class="load-more-container">
-                    <button class="btn btn-outline" id="loadMoreBtn">Carregar Mais Imóveis</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How it Works -->
-    <section class="how-it-works">
-        <div class="container">
-            <h2 class="section-title">Como Funciona</h2>
-            <div class="steps-grid">
-                <div class="step-card fade-up">
-                    <div class="step-number">1</div>
-                    <h3>Encontre ou Anuncie</h3>
-                    <p>Procure pelo imóvel ideal ou anuncie o seu para aluguel</p>
-                </div>
-                <div class="step-card fade-up">
-                    <div class="step-number">2</div>
-                    <h3>Entre em Contato</h3>
-                    <p>Use nosso chat ou WhatsApp para conversar com anfitriões</p>
-                </div>
-                <div class="step-card fade-up">
-                    <div class="step-number">3</div>
-                    <h3>Negocie e Feche</h3>
-                    <p>Combine os detalhes e feche o negócio com segurança</p>
                 </div>
             </div>
         </div>
@@ -177,6 +218,17 @@
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2025 BOX1111 — Todos os direitos reservados.</p>
+                <div class="footer-social" aria-label="Redes sociais">
+                    <a href="https://www.instagram.com" target="_blank" rel="noopener" aria-label="Instagram" class="social-link">
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
+                    </a>
+                    <a href="https://www.facebook.com" target="_blank" rel="noopener" aria-label="Facebook" class="social-link">
+                        <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                    </a>
+                    <a href="https://www.linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn" class="social-link">
+                        <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+                    </a>
+                </div>
                 <div class="developer-credit">
                     Desenvolvido por <a href="https://novateksiteoficial.netlify.app/" target="_blank">NOVATEK</a>
                 </div>

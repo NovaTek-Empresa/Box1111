@@ -1211,6 +1211,72 @@ function setupSmoothScrolling() {
     });
 }
 
+// FAQ Accordion setup
+function setupFAQ() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    if (!faqItems || faqItems.length === 0) return;
+
+    faqItems.forEach(item => {
+        const btn = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        const toggle = btn.querySelector('.faq-toggle');
+
+        // Ensure correct initial state
+        if (btn.getAttribute('aria-expanded') === 'true') {
+            answer.hidden = false;
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+            item.classList.add('open');
+            if (toggle) toggle.textContent = '−';
+        } else {
+            answer.hidden = true;
+            answer.style.maxHeight = null;
+            item.classList.remove('open');
+            if (toggle) toggle.textContent = '+';
+        }
+
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            if (expanded) {
+                btn.setAttribute('aria-expanded', 'false');
+                answer.style.maxHeight = null;
+                // wait for transition to finish then hide for accessibility
+                window.setTimeout(() => { answer.hidden = true; }, 300);
+                item.classList.remove('open');
+                if (toggle) toggle.textContent = '+';
+            } else {
+                // close other open items (accordion behavior)
+                faqItems.forEach(other => {
+                    if (other === item) return;
+                    const otherBtn = other.querySelector('.faq-question');
+                    const otherAnswer = other.querySelector('.faq-answer');
+                    const otherToggle = other.querySelector('.faq-toggle');
+                    if (otherBtn && otherBtn.getAttribute('aria-expanded') === 'true') {
+                        otherBtn.setAttribute('aria-expanded', 'false');
+                        otherAnswer.style.maxHeight = null;
+                        window.setTimeout(() => { otherAnswer.hidden = true; }, 300);
+                        other.classList.remove('open');
+                        if (otherToggle) otherToggle.textContent = '+';
+                    }
+                });
+
+                btn.setAttribute('aria-expanded', 'true');
+                answer.hidden = false;
+                // set to scrollHeight to animate
+                answer.style.maxHeight = answer.scrollHeight + 'px';
+                item.classList.add('open');
+                if (toggle) toggle.textContent = '−';
+                // scroll into view slightly for smaller screens
+                if (window.innerWidth < 768) {
+                    setTimeout(() => {
+                        const top = item.getBoundingClientRect().top + window.pageYOffset - 80;
+                        window.scrollTo({ top, behavior: 'smooth' });
+                    }, 260);
+                }
+            }
+        });
+    });
+}
+
 // Inicialização da aplicação
 document.addEventListener('DOMContentLoaded', () => {
     loadProperties();
@@ -1218,6 +1284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLoadMore();
     setupSearch();
     setupSmoothScrolling();
+    setupFAQ();
     
     // Verificar se há usuário logado no localStorage (simulação)
     const savedUser = localStorage.getItem('currentUser');
