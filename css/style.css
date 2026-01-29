@@ -684,7 +684,7 @@ header.scrolled {
 }
 .gallery-main img {
     width: 100%;
-    height: 420px;
+    height: 100%;
     object-fit: cover;
     border-radius: 12px;
     box-shadow: var(--shadow);
@@ -1207,7 +1207,6 @@ footer {
     width: 100%;
     max-width: 1200px;
     background: white;
-    border-radius: var(--radius);
     overflow: hidden;
     display: flex;
     flex-direction: column;

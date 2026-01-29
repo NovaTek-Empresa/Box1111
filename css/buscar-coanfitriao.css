@@ -447,25 +447,27 @@ body.modal-open {
     max-width: 400px;
 }
 
-/* Modal */
 .modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
+    right: 0;
+    bottom: 0;
+    width: 100vh;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
+    min-width: 100%;
+    min-height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);  
     z-index: 1000;
     padding: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
+
 
 .modal.active {
     display: flex !important;
     flex-direction: column;
-    align-items: center;
+    align-items: center !important;
     justify-content: center;
 }
 
@@ -481,6 +483,7 @@ body.modal-open {
     animation: slideUp 0.3s ease-out;
     box-sizing: border-box;
     flex-shrink: 0;
+    align-items: center !important;
 }
 
 @keyframes slideUp {

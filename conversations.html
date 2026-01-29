@@ -31,7 +31,7 @@
             max-width: 1400px;
             margin: 0 auto;
             display: flex;
-            align-items: center;
+            margin-left: 0px;
             gap: 16px;
         }
 
@@ -55,7 +55,10 @@
         .conversations-wrapper {
             display: flex;
             flex: 1;
+            position: relative;
             margin-top: 60px;
+            height: 93vh;
+            max-height: 100vh;
         }
 
         /* Sidebar - Lista de Conversas */
@@ -630,10 +633,7 @@
                             <p>Online</p>
                         </div>
                     </div>
-                    <div class="chat-header-actions">
-                        <button title="Chamar"><i class="fas fa-phone"></i></button>
-                        <button title="Mais opções"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
+
                 </div>
 
                 <div class="messages-container" id="messagesContainer">
