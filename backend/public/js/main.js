@@ -152,6 +152,14 @@ let properties = [
     }
 ];
 
+async function initCSRF() {
+    const resp = await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', {
+        credentials: 'include'
+    });
+}
+
+initCSRF();
+
 // Estado da aplicação
 let appState = {
     currentUser: null,
@@ -638,15 +646,25 @@ if (registerForm) {
         submitBtn.disabled = true;
         btnText.style.display = 'none';
         btnLoader.style.display = 'inline-block';
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
         try {
+            await initCSRF();
+
             const resp = await fetch('http://127.0.0.1:8000/api/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 credentials: 'include',
                 body: JSON.stringify({ name, email, password })
             });
-            const data = await resp.json();
+
+            const text = await resp.text();
+            const data = text ? JSON.parse(text) : {};
+
             if (!resp.ok) {
                 // mostrar mensagens de validação retornadas
                 if (data.errors) {
