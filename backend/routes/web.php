@@ -1,39 +1,47 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+/*
+|--------------------------------------------------------------------------
+| Teste da API
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/teste', function () {
+Route::get('/api/teste', function () {
     return response()->json([
         'status' => 'ok',
         'mensagem' => 'API funcionando'
     ]);
 });
 
-use App\Models\User;
-use App\Http\Controllers\AuthController;
+/*
+|--------------------------------------------------------------------------
+| Autenticação
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/criar-user', function () {
-    $user = User::create([
-        'name' => 'Matheus',
-        'email' => 'teste@email.com',
-        'password' => bcrypt('123456')
-    ]);
+Route::prefix('api')->group(function () {
 
-    return $user;
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/user', [AuthController::class, 'me']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
+
 });
 
-// rotas de autenticação JSON (frontend consumirá via fetch)
-Route::prefix('api')
-    // o grupo "web" aplica CSRF por padrão, então removemos o middleware
-    // para evitar retornos HTML (419) quando o frontend não envia token.
-    ->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class)
-    ->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login',    [AuthController::class, 'login']);
-        Route::post('logout',   [AuthController::class, 'logout'])->middleware('auth');
-        Route::get('user',      [AuthController::class, 'me'])->middleware('auth');
-});
+/*
+|--------------------------------------------------------------------------
+| Resposta padrão quando não autenticado
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/login', function () {
+    return response()->json([
+        'message' => 'Unauthenticated'
+    ], 401);
+})->name('login');

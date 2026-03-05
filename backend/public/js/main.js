@@ -640,7 +640,7 @@ if (registerForm) {
         btnLoader.style.display = 'inline-block';
         
         try {
-            const resp = await fetch('/api/register', {
+            const resp = await fetch('http://127.0.0.1:8000/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
