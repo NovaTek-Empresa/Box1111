@@ -152,14 +152,6 @@ let properties = [
     }
 ];
 
-async function initCSRF() {
-    const resp = await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', {
-        credentials: 'include'
-    });
-}
-
-initCSRF();
-
 // Estado da aplicação
 let appState = {
     currentUser: null,
@@ -646,50 +638,55 @@ if (registerForm) {
         submitBtn.disabled = true;
         btnText.style.display = 'none';
         btnLoader.style.display = 'inline-block';
-
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
+        async function initCSRF() {
+            await fetch('/sanctum/csrf-cookie', {
+            credentials: 'include'
+            });
+        }
+
         try {
+
             await initCSRF();
 
-            const resp = await fetch('http://127.0.0.1:8000/api/register', {
+            const resp = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 credentials: 'include',
                 body: JSON.stringify({ name, email, password })
             });
 
-            const text = await resp.text();
-            const data = text ? JSON.parse(text) : {};
+            const data = await resp.json();
 
-            if (!resp.ok) {
-                // mostrar mensagens de validação retornadas
-                if (data.errors) {
-                    Object.entries(data.errors).forEach(([field, msgs]) => {
-                        showRegisterError(`register${field.charAt(0).toUpperCase() + field.slice(1)}`, msgs[0]);
-                    });
+                if (!resp.ok) {
+                    // mostrar mensagens de validação retornadas
+                    if (data.errors) {
+                        Object.entries(data.errors).forEach(([field, msgs]) => {
+                            showRegisterError(`register${field.charAt(0).toUpperCase() + field.slice(1)}`, msgs[0]);
+                        });
+                    } else {
+                        showNotification(data.message || 'Falha no registro', 'error');
+                    }
                 } else {
-                    showNotification(data.message || 'Falha no registro', 'error');
+                    appState.currentUser = data.user;
+                    showNotification('✓ Conta criada com sucesso!', 'success');
+                    registerModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    registerForm.reset();
+                    updateUIForLoggedUser();
                 }
-            } else {
-                appState.currentUser = data.user;
-                showNotification('✓ Conta criada com sucesso!', 'success');
-                registerModal.style.display = 'none';
-                document.body.style.overflow = '';
-                registerForm.reset();
-                updateUIForLoggedUser();
+            } catch (err) {
+                console.error(err);
+                showNotification('Erro de rede. Tente novamente.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline-block';
+                btnLoader.style.display = 'none';
             }
-        } catch (err) {
-            console.error(err);
-            showNotification('Erro de rede. Tente novamente.', 'error');
-        } finally {
-            submitBtn.disabled = false;
-            btnText.style.display = 'inline-block';
-            btnLoader.style.display = 'none';
-        }
     });
     
     // Validação em tempo real para registro
