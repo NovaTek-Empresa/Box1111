@@ -15,7 +15,14 @@ function daysBetween(a, b) {
     return Math.max(0, Math.floor((utc2 - utc1) / _MS_PER_DAY));
 }
 
+function clearLocalData() {
+    ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    clearLocalData();
     const propertyId = qs('propertyId') || '';
     const propertyTitle = qs('title') ? decodeURIComponent(qs('title')) : 'Imóvel';
     const nightlyParam = Number(qs('nightly')) || 0;

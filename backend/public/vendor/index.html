@@ -106,18 +106,18 @@
                     </div>
                     <div class="vendor-profile">
                         <div class="profile-dropdown">
-                            <button class="profile-btn">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Anfitrião">
-                                <span>Carlos Silva</span>
+                            <button class="profile-btn" id="vendorProfileBtn">
+                                <img id="vendorUserAvatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Anfitrião">
+                                <span id="vendorUserName">Carlos Silva</span>
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                             <div class="profile-menu">
-                                <a href="#profile" class="menu-item">
+                                <a href="#profile" class="menu-item" id="vendorOpenProfile">
                                     <i class="fas fa-user"></i>
                                     Meu Perfil
                                 </a>
                                 <div class="menu-divider"></div>
-                                <a href="../index.html" class="menu-item">
+                                <a href="#" class="menu-item" id="vendorLogoutBtn">
                                     <i class="fas fa-sign-out-alt"></i>
                                     Sair
                                 </a>
@@ -132,7 +132,7 @@
                 <!-- Dashboard Header -->
                 <div class="dashboard-header">
                     <div>
-                        <h2>Bem-vindo de volta, Carlos!</h2>
+                        <h2 id="vendorWelcome">Bem-vindo de volta, Carlos!</h2>
                         <p>Aqui está um resumo do desempenho dos seus imóveis.</p>
                     </div>
                     <div class="dashboard-actions">

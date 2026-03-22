@@ -6,10 +6,7 @@ class HostSignupForm {
   constructor() {
     this.currentStep = 1;
     this.totalSteps = 5;
-    this.formData = this.loadFormData() || {
-      fullName: '',
-      cpf: '',
-      email: '',
+    this.formData = {
       phone: '',
       document: null,
       selfie: null,
@@ -48,27 +45,26 @@ class HostSignupForm {
     document.getElementById('fullName')?.addEventListener('input', (e) => {
       this.formData.fullName = e.target.value;
       this.clearError('fullName');
-      this.saveFormData();
     });
 
     document.getElementById('cpf')?.addEventListener('input', (e) => {
       e.target.value = this.formatCPF(e.target.value);
       this.formData.cpf = e.target.value;
       this.clearError('cpf');
-      this.saveFormData();
+
     });
 
     document.getElementById('email')?.addEventListener('input', (e) => {
       this.formData.email = e.target.value;
       this.clearError('email');
-      this.saveFormData();
+
     });
 
     document.getElementById('phone')?.addEventListener('input', (e) => {
       e.target.value = this.formatPhone(e.target.value);
       this.formData.phone = e.target.value;
       this.clearError('phone');
-      this.saveFormData();
+
     });
 
     // Step 2: Documents
@@ -142,7 +138,7 @@ class HostSignupForm {
       radio.addEventListener('change', (e) => {
         this.formData.paymentMethod = e.target.value;
         this.togglePaymentFields(e.target.value);
-        this.saveFormData();
+
       });
     });
 
@@ -150,44 +146,44 @@ class HostSignupForm {
     document.getElementById('pixKey')?.addEventListener('input', (e) => {
       this.formData.pixKey = e.target.value;
       this.clearError('pixKey');
-      this.saveFormData();
+
     });
 
     document.getElementById('pixKeyType')?.addEventListener('change', (e) => {
       this.formData.pixKeyType = e.target.value;
       this.clearError('pixKeyType');
-      this.saveFormData();
+
     });
 
     // Step 4: Bank Fields
     document.getElementById('bank')?.addEventListener('input', (e) => {
       this.formData.bank = e.target.value;
       this.clearError('bank');
-      this.saveFormData();
+
     });
 
     document.getElementById('accountType')?.addEventListener('change', (e) => {
       this.formData.accountType = e.target.value;
       this.clearError('accountType');
-      this.saveFormData();
+
     });
 
     document.getElementById('agency')?.addEventListener('input', (e) => {
       this.formData.agency = e.target.value;
       this.clearError('agency');
-      this.saveFormData();
+
     });
 
     document.getElementById('accountNumber')?.addEventListener('input', (e) => {
       this.formData.accountNumber = e.target.value;
       this.clearError('accountNumber');
-      this.saveFormData();
+
     });
 
     document.getElementById('accountHolder')?.addEventListener('input', (e) => {
       this.formData.accountHolder = e.target.value;
       this.clearError('accountHolder');
-      this.saveFormData();
+
     });
   }
 
@@ -198,7 +194,7 @@ class HostSignupForm {
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
         this.showStep(this.currentStep);
-        this.saveFormData();
+
         window.scrollTo(0, 0);
       } else if (this.currentStep === this.totalSteps) {
         this.submitForm();
@@ -440,7 +436,7 @@ class HostSignupForm {
 
   submitForm() {
     // Save all data
-    this.saveFormData();
+
 
     // Simulate submission to backend
     console.log('Dados do formulário:', this.formData);
@@ -467,7 +463,7 @@ class HostSignupForm {
         };
         fileNameEl.textContent = file.name;
         errorEl.textContent = '';
-        this.saveFormData();
+
       } else {
         this.showError(type, 'Arquivo inválido');
         e.target.value = '';
@@ -515,7 +511,7 @@ class HostSignupForm {
 
     setTimeout(() => {
       this.formData.emailVerified = true;
-      this.saveFormData();
+
       codeEl.disabled = true;
       codeEl.classList.add('success');
       verifyBtn.textContent = '✓ E-mail Verificado';
@@ -542,7 +538,7 @@ class HostSignupForm {
 
     setTimeout(() => {
       this.formData.phoneVerified = true;
-      this.saveFormData();
+
       codeEl.disabled = true;
       codeEl.classList.add('success');
       verifyBtn.textContent = '✓ Telefone Verificado';
@@ -636,15 +632,6 @@ class HostSignupForm {
 
   isNumeric(value) {
     return /^\d+$/.test(value);
-  }
-
-  saveFormData() {
-    localStorage.setItem('hostSignupFormData', JSON.stringify(this.formData));
-  }
-
-  loadFormData() {
-    const data = localStorage.getItem('hostSignupFormData');
-    return data ? JSON.parse(data) : null;
   }
 }
 

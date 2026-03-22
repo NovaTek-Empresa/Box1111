@@ -328,6 +328,120 @@ let appState = {
     reportFilters: {}
 };
 
+// Autenticação
+let currentUser = null;
+
+function getAuthToken() {
+    return localStorage.getItem('authToken');
+}
+
+function clearAuthToken() {
+    localStorage.removeItem('authToken');
+}
+
+function getInitialsFromName(name) {
+    if (!name || typeof name !== 'string') return '';
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0] ? parts[0][0] : '';
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    return (first + last).toUpperCase();
+}
+
+function createInitialsAvatar(name, size = 64) {
+    const initials = getInitialsFromName(name) || 'AD';
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(0, 0, size, size);
+    ctx.font = `${Math.floor(size * 0.45)}px Arial`;
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(initials, size / 2, size / 2);
+    return canvas.toDataURL('image/png');
+}
+
+async function fetchCurrentUser() {
+    const token = getAuthToken();
+    if (!token) return null;
+
+    try {
+        const resp = await fetch('/api/user', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (resp.ok) {
+            const data = await resp.json();
+            return data?.user || null;
+        }
+    } catch (error) {
+        console.error('fetchCurrentUser error', error);
+    }
+    return null;
+}
+
+function applyAdminProfileUI(user) {
+    if (!user) return;
+    const nameEl = document.getElementById('adminUserName');
+    const avatarEl = document.getElementById('adminUserAvatar');
+    const welcomeHeading = document.querySelector('.admin-header .header-left h1');
+
+    if (nameEl) nameEl.textContent = user.name || 'Administrador';
+    if (avatarEl) avatarEl.src = user.avatar || createInitialsAvatar(user.name);
+    if (welcomeHeading) welcomeHeading.textContent = `Dashboard - ${user.name}`;
+
+    const profileLink = document.getElementById('adminOpenProfile');
+    if (profileLink) profileLink.href = '../account-settings.html';
+}
+
+async function logoutAdmin() {
+    try {
+        const token = getAuthToken();
+        if (token) {
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({})
+            });
+        }
+    } catch (error) {
+        console.error('logoutAdmin error', error);
+    }
+    clearAuthToken();
+    window.location.href = '../index.html';
+}
+
+function clearLocalData() {
+    ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
+async function initAdminAuth() {
+    clearLocalData();
+    const user = await fetchCurrentUser();
+    if (user) {
+        currentUser = user;
+        applyAdminProfileUI(user);
+    }
+    const logoutBtn = document.getElementById('adminLogoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            await logoutAdmin();
+        });
+    }
+}
+
+
 // Inicialização do painel administrativo
 document.addEventListener('DOMContentLoaded', () => {
     // Toggle da sidebar em dispositivos móveis
@@ -413,6 +527,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Iniciar autenticação e UI do usuário
+    initAdminAuth();
+
     // Navegação entre seções
     setupNavigation();
     

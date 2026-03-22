@@ -21,68 +21,77 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', Password::defaults()],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:30'],
         ]);
+
+        $apiToken = bin2hex(random_bytes(40));
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
             'password' => Hash::make($data['password']),
+            'api_token' => hash('sha256', $apiToken),
         ]);
 
-        // loga o usuário imediatamente após o registro
-        Auth::login($user);
-
-        return response()->json(['user' => $user], 201);
+        return response()->json([
+            'user' => $user,
+            'token' => $apiToken,
+        ], 201);
     }
 
-    /**
-     * Faz login de um usuário existente.
-     *
-     * Recebe `email` e `password`. Em caso de sucesso cria sessão e retorna o
-     * usuário logado. Se falhar retorna 422 com mensagem.
-     */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $data = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'Credenciais inválidas.'
-            ], 422);
+        $user = User::where('email', $data['email'])->first();
+
+        if (! $user || ! Hash::check($data['password'], $user->password)) {
+            return response()->json(['message' => 'Credenciais inválidas.'], 422);
         }
 
-        // Regenera a sessão para evitar fixation
-        $request->session()->regenerate();
+        $token = bin2hex(random_bytes(40));
+        $user->api_token = hash('sha256', $token);
+        $user->save();
 
-        return response()->json(['user' => Auth::user()]);
+        return response()->json(['user' => $user, 'token' => $token]);
     }
 
-    /**
-     * Faz logout do usuário autenticado.
-     *
-     * Remove a sessão e retorna mensagem de confirmação.
-     */
     public function logout(Request $request)
     {
-        Auth::logout();
+        $user = $this->userFromToken($request);
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        if ($user) {
+            $user->api_token = null;
+            $user->save();
+        }
 
         return response()->json(['message' => 'Desconectado com sucesso']);
     }
 
-    /**
-     * Retorna os dados do usuário autenticado.
-     *
-     * Útil para restaurar o estado no frontend após recarregar a página.
-     */
     public function me(Request $request)
     {
-        return response()->json(['user' => Auth::user()]);
+        $user = $this->userFromToken($request);
+
+        if (! $user) {
+            return response()->json(['message' => 'Não autenticado'], 401);
+        }
+
+        return response()->json(['user' => $user]);
+    }
+
+    private function userFromToken(Request $request)
+    {
+        $header = $request->bearerToken();
+
+        if (! $header) {
+            return null;
+        }
+
+        return User::where('api_token', hash('sha256', $header))->first();
     }
 }

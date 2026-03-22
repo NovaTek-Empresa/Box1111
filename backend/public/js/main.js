@@ -160,14 +160,128 @@ let appState = {
     visibleProperties: 6
 };
 
-// verifica se há sessão ativa no backend e ajusta interface
-async function checkAuth() {
+function getAuthToken() {
+    return localStorage.getItem('authToken');
+}
+
+function setAuthToken(token) {
+    localStorage.setItem('authToken', token);
+}
+
+function clearAuthToken() {
+    localStorage.removeItem('authToken');
+}
+
+function clearLocalData() {
+    // Remover dados locais criados em telas atuais
+    ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
+function getInitialsFromName(name) {
+    if (!name || typeof name !== 'string') return '';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 0) return '';
+    const first = parts[0][0] || '';
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    return (first + last).toUpperCase();
+}
+
+function createInitialsAvatar(name, size = 64) {
+    const initials = getInitialsFromName(name) || '??';
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const bg = '#22c55e';
+    const color = '#ffffff';
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, size, size);
+    ctx.font = `${Math.floor(size * 0.45)}px Arial`;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(initials, size / 2, size / 2);
+    return canvas.toDataURL('image/png');
+}
+
+function getCsrfToken() {
+    const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+    const tokenInput = document.querySelector('input[name="_token"]');
+    return tokenMeta?.getAttribute('content') || tokenInput?.value || null;
+}
+
+function setCsrfToken(token) {
+    let tokenMeta = document.querySelector('meta[name="csrf-token"]');
+
+    if (!tokenMeta) {
+        tokenMeta = document.createElement('meta');
+        tokenMeta.setAttribute('name', 'csrf-token');
+        document.head.prepend(tokenMeta);
+    }
+
+    tokenMeta.setAttribute('content', token);
+
+    document.querySelectorAll('form').forEach((form) => {
+        let input = form.querySelector('input[name="_token"]');
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '_token';
+            form.prepend(input);
+        }
+        input.value = token;
+    });
+}
+
+async function initCsrf() {
     try {
-        const resp = await fetch('/api/user', { credentials: 'include' });
+        const resp = await fetch('/csrf-token', {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        if (resp.ok) {
+            const data = await resp.json();
+            if (data.token) {
+                setCsrfToken(data.token);
+            }
+        }
+    } catch (error) {
+        console.warn('Unable to fetch CSRF token', error);
+    }
+}
+
+// verifica se há usuário autenticado (token guardado) e ajusta interface
+async function checkAuth() {
+    clearLocalData();
+
+    try {
+        await initCsrf();
+
+        const token = getAuthToken();
+
+        const headers = {
+            'Accept': 'application/json',
+            ...(getCsrfToken() ? { 'X-CSRF-TOKEN': getCsrfToken() } : {}),
+        };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const resp = await fetch('/api/user', {
+            headers,
+        });
+
         if (resp.ok) {
             const data = await resp.json();
             appState.currentUser = data.user;
             updateUIForLoggedUser();
+        } else {
+            clearAuthToken();
         }
     } catch (e) {
         console.error('checkAuth error', e);
@@ -389,17 +503,27 @@ if (loginForm) {
         btnLoader.style.display = 'flex';
 
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            };
+
+            const csrf = getCsrfToken();
+            if (csrf) {
+                headers['X-CSRF-TOKEN'] = csrf;
+            }
+
             const resp = await fetch('/api/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ email, password })
+                headers,
+                body: JSON.stringify({ email, password, _token: csrf })
             });
             const data = await resp.json();
             if (!resp.ok) {
                 const msg = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Falha no login');
                 showLoginError('loginEmail', msg);
             } else {
+                setAuthToken(data.token);
                 appState.currentUser = data.user;
                 loginModal.style.display = 'none';
                 document.body.style.overflow = '';
@@ -639,25 +763,28 @@ if (registerForm) {
         btnText.style.display = 'none';
         btnLoader.style.display = 'inline-block';
         
-        async function initCSRF() {
-            await fetch('/sanctum/csrf-cookie', {
-            credentials: 'include'
-            });
-        }
-
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
 
-            await initCSRF();
+            const csrf = getCsrfToken();
+            if (csrf) {
+                headers['X-CSRF-TOKEN'] = csrf;
+            }
 
             const resp = await fetch('/api/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ name, email, password })
+                headers,
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password,
+                    password_confirmation: confirmPassword,
+                    phone,
+                    _token: csrf
+                })
             });
 
             const data = await resp.json();
@@ -672,6 +799,7 @@ if (registerForm) {
                         showNotification(data.message || 'Falha no registro', 'error');
                     }
                 } else {
+                    setAuthToken(data.token);
                     appState.currentUser = data.user;
                     showNotification('✓ Conta criada com sucesso!', 'success');
                     registerModal.style.display = 'none';
@@ -752,7 +880,7 @@ function updateUIForLoggedUser() {
             <div class="user-menu">
                 <span class="user-name" id="userNameDisplay" data-action="toggle-dropdown">${appState.currentUser.name}</span>
                 <button class="user-avatar" id="userAvatarBtn" title="${appState.currentUser.name}" data-action="toggle-dropdown">
-                    <img src="${appState.currentUser.avatar || ''}" alt="${appState.currentUser.name}">
+                    <img src="${appState.currentUser.avatar || createInitialsAvatar(appState.currentUser.name)}" alt="${appState.currentUser.name}">
                 </button>
                 <div class="user-dropdown" id="userDropdown">
                     <a href="vendor/index.html" class="dropdown-item" id="menuMyListings">
@@ -835,13 +963,27 @@ function updateUIForLoggedUser() {
             logoutBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 try {
+                    const token = getAuthToken();
+                    const headers = {
+                        'Accept': 'application/json',
+                    };
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+                    const csrf = getCsrfToken();
+                    if (csrf) {
+                        headers['X-CSRF-TOKEN'] = csrf;
+                    }
+
                     await fetch('/api/logout', {
                         method: 'POST',
-                        credentials: 'include'
+                        headers,
+                        body: JSON.stringify({ _token: csrf })
                     });
                 } catch (err) {
                     console.error('logout error', err);
                 }
+                clearAuthToken();
                 appState.currentUser = null;
                 location.reload();
             });

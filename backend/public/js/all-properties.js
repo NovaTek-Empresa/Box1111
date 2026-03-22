@@ -675,7 +675,14 @@ function generateMockProperties(targetCount = 20) {
 }
 
 // ============= Initialization =============
+function clearLocalData() {
+    ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    clearLocalData();
     // Initial render with skeleton loading
     setupFilterControls();
     setupSortControl();

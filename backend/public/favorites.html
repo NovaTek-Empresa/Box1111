@@ -345,6 +345,13 @@
 
     <script src="js/main.js"></script>
     <script>
+        // Limpar dados locais para migração para backend
+        function clearLocalData() {
+            ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
+                localStorage.removeItem(key);
+            });
+        }
+
         // Carregar favoritos do localStorage
         function loadFavorites() {
             const favoritesGrid = document.getElementById('favoritesGrid');
@@ -405,7 +412,10 @@
             window.location.href = `property-details.html?id=${propertyId}`;
         }
 
-        document.addEventListener('DOMContentLoaded', loadFavorites);
+        document.addEventListener('DOMContentLoaded', () => {
+            clearLocalData();
+            loadFavorites();
+        });
     </script>
 </body>
 </html>

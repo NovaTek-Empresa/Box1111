@@ -541,11 +541,14 @@
             appState.currentUser.name = fullName;
             appState.currentUser.phone = phone;
             
-            localStorage.setItem('currentUser', JSON.stringify(appState.currentUser));
+            // Dados persistidos no backend: não armazenamos localmente mais.
             showSuccess();
         });
 
-        document.addEventListener('DOMContentLoaded', loadProfileData);
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            loadProfileData();
+        });
     </script>
 </body>
 </html>

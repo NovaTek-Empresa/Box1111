@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
-    return file_get_contents(public_path('index.html'));
+    $html = file_get_contents(public_path('index.html'));
+    $token = csrf_token();
+    return str_replace('{{ csrf_token() }}', $token, $html);
 });
 
 /*
@@ -26,16 +28,21 @@ Route::get('/api/teste', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('api')->group(function () {
+Route::prefix('api')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
 
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/user', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::middleware('auth')->group(function () {
-        Route::get('/user', [AuthController::class, 'me']);
-        Route::post('/logout', [AuthController::class, 'logout']);
-    });
+});
 
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['message' => 'CSRF cookie simulated']);
+});
+
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()]);
 });
 
 /*

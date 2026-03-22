@@ -48,7 +48,14 @@ let galleryImages = [];
 let currentProperty = null;
 
 // Initialize
+function clearLocalData() {
+    ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    clearLocalData();
     loadProperty();
     setupEventListeners();
 });
