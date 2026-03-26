@@ -32,7 +32,7 @@ class AuthController extends Controller
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'password' => Hash::make($data['password']),
-            'api_token' => hash('sha256', $apiToken),
+            'api_token' => $apiToken,
         ]);
 
         return response()->json([
@@ -51,11 +51,11 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
-            return response()->json(['message' => 'Credenciais inválidas.'], 422);
+            return response()->json(['message' => 'Credenciais inválidas.'], 401);
         }
 
         $token = bin2hex(random_bytes(40));
-        $user->api_token = hash('sha256', $token);
+        $user->api_token = $token;
         $user->save();
 
         return response()->json(['user' => $user, 'token' => $token]);
@@ -92,6 +92,6 @@ class AuthController extends Controller
             return null;
         }
 
-        return User::where('api_token', hash('sha256', $header))->first();
+        return User::where('api_token', $header)->first();
     }
 }

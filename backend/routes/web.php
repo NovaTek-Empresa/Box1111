@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     $html = file_get_contents(public_path('index.html'));
@@ -20,21 +19,6 @@ Route::get('/api/teste', function () {
         'status' => 'ok',
         'mensagem' => 'API funcionando'
     ]);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Autenticação
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('api')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
-
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/user', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-
 });
 
 Route::get('/sanctum/csrf-cookie', function () {

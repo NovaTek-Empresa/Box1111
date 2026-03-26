@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -45,5 +47,66 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // Relationships
+    public function hostProfile(): HasOne
+    {
+        return $this->hasOne(HostProfile::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(UserDocument::class);
+    }
+
+    public function guestReservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class, 'guest_id');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'payer_id');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function conversations1(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'user_1');
+    }
+
+    public function conversations2(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'user_2');
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
+
+    public function promotionUsages(): HasMany
+    {
+        return $this->hasMany(PromotionUsage::class);
+    }
 }
 
