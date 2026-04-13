@@ -5,111 +5,8 @@
  */
 
 // ============= Data Structure =============
-const allPropertiesData = [
-    { 
-        id: 1, 
-        title: "Casa Alto Padrão — Condomínio Fechado", 
-        price: 1250000, 
-        location: "Jardins, São Paulo - SP",
-        neighborhood: "Jardins",
-        type: "casa", 
-        bathrooms: 5,
-        features: ["5 suítes", "Piscina", "Área gourmet", "5 vagas", "980 m²", "Condomínio fechado"], 
-        images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop"],
-        bedrooms: 5,
-        parking: 5,
-        size: 980,
-        badge: "novo",
-        seller: { rating: 4.9 },
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-    },
-    { 
-        id: 2, 
-        title: "Sobrado Moderno — Bairro Tranquilo", 
-        price: 790000, 
-        location: "Vila Mariana, São Paulo - SP",
-        neighborhood: "Vila Mariana",
-        type: "casa", 
-        bathrooms: 2,
-        features: ["3 dormitórios", "2 banheiros", "2 vagas", "180 m²", "Quintal", "Reformado"],
-        images: ["https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=80&auto=format&fit=crop"],
-        bedrooms: 3,
-        parking: 2,
-        size: 180,
-        badge: "destaque",
-        seller: { rating: 4.7 },
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-    },
-    { 
-        id: 3, 
-        title: "Apartamento de 2 Quartos no Centro", 
-        price: 420000, 
-        location: "Centro, São Paulo - SP",
-        neighborhood: "Centro",
-        type: "apartamento", 
-        bathrooms: 2,
-        features: ["2 quartos", "2 banheiros", "1 vaga", "75 m²", "Centro", "Portaria 24h"],
-        images: ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80&auto=format&fit=crop"],
-        bedrooms: 2,
-        parking: 1,
-        size: 75,
-        badge: null,
-        seller: { rating: 4.9 },
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    },
-    { 
-        id: 4, 
-        title: "Casa com Piscina e Churrasqueira", 
-        price: 3500, 
-        location: "Morumbi, São Paulo - SP",
-        neighborhood: "Morumbi",
-        type: "casa",
-        isPriceMonthly: true,
-        bathrooms: 3,
-        features: ["4 quartos", "3 banheiros", "Piscina", "Churrasqueira", "220 m²", "Condomínio"],
-        images: ["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80&auto=format&fit=crop"],
-        bedrooms: 4,
-        parking: 2,
-        size: 220,
-        badge: "novo",
-        seller: { rating: 4.8 },
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
-    },
-    { 
-        id: 5, 
-        title: "Loja Comercial em Localização Privilegiada", 
-        price: 850000, 
-        location: "Moema, São Paulo - SP",
-        neighborhood: "Moema",
-        type: "comercial", 
-        bathrooms: 2,
-        features: ["120 m²", "2 banheiros", "Reformada", "Ponto comercial", "Alto fluxo"],
-        images: ["https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200&q=80&auto=format&fit=crop"],
-        bedrooms: 0,
-        parking: 1,
-        size: 120,
-        badge: null,
-        seller: { rating: 4.6 },
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    },
-    { 
-        id: 6, 
-        title: "Terreno para Construção — 500 m²", 
-        price: 350000, 
-        location: "Interlagos, São Paulo - SP",
-        neighborhood: "Interlagos",
-        type: "terreno", 
-        bathrooms: 0,
-        features: ["500 m²", "Plano", "Regular", "Boa localização", "Infraestrutura"],
-        images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop"],
-        bedrooms: 0,
-        parking: 0,
-        size: 500,
-        badge: "destaque",
-        seller: { rating: 4.5 },
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
-    }
-];
+let allPropertiesData = [];
+const favoritesMap = new Map();
 
 // ============= Utilities =============
 function formatCurrency(value) {
@@ -119,6 +16,19 @@ function formatCurrency(value) {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
     });
+}
+
+function getPropertyPriceValue(property) {
+    if (typeof property.nightlyPrice === 'number') {
+        return property.nightlyPrice;
+    }
+    if (typeof property.price === 'number') {
+        return property.price;
+    }
+    if (typeof property.price === 'string') {
+        return parseInt(property.price.replace(/[^0-9]/g, '')) || 0;
+    }
+    return 0;
 }
 
 function getFilterValues() {
@@ -146,6 +56,62 @@ function getFilterValues() {
 
 
 
+async function loadFavoritesMap() {
+    favoritesMap.clear();
+
+    if (typeof apiGetFavorites !== 'function' || !getAuthToken()) {
+        return;
+    }
+
+    try {
+        const response = await apiGetFavorites();
+        const favorites = Array.isArray(response) ? response : response?.data || [];
+        favorites.forEach((favorite) => {
+            if (favorite?.property?.id) {
+                favoritesMap.set(Number(favorite.property.id), favorite.id);
+            }
+        });
+    } catch (error) {
+        console.warn('Não foi possível carregar favoritos do backend:', error);
+    }
+}
+
+function isFavorite(propertyId) {
+    return favoritesMap.has(Number(propertyId));
+}
+
+async function toggleFavorite(propertyId) {
+    if (!getAuthToken()) {
+        alert('Faça login para usar favoritos.');
+        return;
+    }
+
+    const existingFavoriteId = favoritesMap.get(Number(propertyId));
+
+    if (existingFavoriteId) {
+        try {
+            await apiRemoveFavorite(existingFavoriteId);
+            favoritesMap.delete(Number(propertyId));
+        } catch (error) {
+            console.error('Erro ao remover favorito:', error);
+            alert('Não foi possível remover o favorito. Tente novamente.');
+        }
+    } else {
+        try {
+            const response = await apiAddFavorite(propertyId);
+            const favorite = response?.data || response;
+            if (favorite?.id && favorite?.property?.id) {
+                favoritesMap.set(Number(favorite.property.id), favorite.id);
+            } else if (favorite?.id) {
+                favoritesMap.set(Number(propertyId), favorite.id);
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar favorito:', error);
+            alert('Não foi possível adicionar aos favoritos. Faça login e tente novamente.');
+        }
+    }
+}
+
 function applyFilters() {
     const { types, bedrooms, priceMin, priceMax, location } = getFilterValues();
     
@@ -154,7 +120,8 @@ function applyFilters() {
         if (types.length > 0 && !types.includes(p.type)) return false;
         
         // Price filter
-        if (p.price < priceMin || p.price > priceMax) return false;
+        const priceValue = getPropertyPriceValue(p);
+        if (priceValue < priceMin || priceValue > priceMax) return false;
         
         // Bedrooms filter (show all if none selected)
         if (bedrooms.length > 0 && !bedrooms.some(b => p.bedrooms >= b)) return false;
@@ -189,10 +156,10 @@ function sortProperties(list) {
             list.sort((a, b) => b.createdAt - a.createdAt);
             break;
         case 'price-low':
-            list.sort((a, b) => a.price - b.price);
+            list.sort((a, b) => getPropertyPriceValue(a) - getPropertyPriceValue(b));
             break;
         case 'price-high':
-            list.sort((a, b) => b.price - a.price);
+            list.sort((a, b) => getPropertyPriceValue(b) - getPropertyPriceValue(a));
             break;
         case 'rating':
             list.sort((a, b) => b.seller.rating - a.seller.rating);
@@ -279,9 +246,10 @@ function createPropertyCard(property) {
     const isFavorited = isFavorite(property.id);
     
     // Price display
+    const priceValue = getPropertyPriceValue(property);
     const priceText = property.isPriceMonthly 
-        ? `R$ ${property.price.toLocaleString('pt-BR')}`
-        : formatCurrency(property.price);
+        ? `R$ ${priceValue.toLocaleString('pt-BR')}`
+        : (typeof property.price === 'string' ? property.price : formatCurrency(priceValue));
     const periodText = property.isPriceMonthly ? '/mês' : '';
     
     // Features display (4-6 icons)
@@ -352,18 +320,20 @@ function createPropertyCard(property) {
     // Event Listeners
     const favoriteBtn = card.querySelector('.card-favorite');
     if (favoriteBtn) {
-        favoriteBtn.addEventListener('click', (e) => {
+        favoriteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            toggleFavorite(property.id);
-            favoriteBtn.classList.toggle('active');
-            
-            // Toggle icon between fas (filled) and far (outline)
+            await toggleFavorite(property.id);
             const icon = favoriteBtn.querySelector('i');
-            if (icon) {
-                if (favoriteBtn.classList.contains('active')) {
+
+            if (isFavorite(property.id)) {
+                favoriteBtn.classList.add('active');
+                if (icon) {
                     icon.classList.remove('far');
                     icon.classList.add('fas');
-                } else {
+                }
+            } else {
+                favoriteBtn.classList.remove('active');
+                if (icon) {
                     icon.classList.remove('fas');
                     icon.classList.add('far');
                 }
@@ -384,24 +354,6 @@ function createPropertyCard(property) {
     });
     
     return card;
-}
-
-// ============= Favorite System =============
-function isFavorite(propertyId) {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    return favorites.includes(propertyId);
-}
-
-function toggleFavorite(propertyId) {
-    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    
-    if (favorites.includes(propertyId)) {
-        favorites = favorites.filter(id => id !== propertyId);
-    } else {
-        favorites.push(propertyId);
-    }
-    
-    localStorage.setItem('favorites', JSON.stringify(favorites));
 }
 
 // ============= Filter Controls =============
@@ -655,65 +607,38 @@ function getSelectorForInput(input) {
     return null;
 }
 
-// ============= Mock Data Generation =============
-function generateMockProperties(targetCount = 20) {
-    const base = allPropertiesData.slice();
-    let nextId = allPropertiesData.length ? Math.max(...allPropertiesData.map(p => p.id)) + 1 : 1;
+async function loadAllPropertiesFromApi() {
+    if (typeof apiGetProperties !== 'function') {
+        return;
+    }
 
-    while (allPropertiesData.length < targetCount) {
-        const src = base[Math.floor(Math.random() * base.length)];
-        const clone = JSON.parse(JSON.stringify(src));
-        clone.id = nextId++;
-        // Slight variations
-        clone.price = Math.max(50000, Math.round((clone.price || 100000) * (0.8 + Math.random() * 0.8)));
-        clone.title = `${clone.title.split(' — ')[0]} — Unidade ${clone.id}`;
-        clone.neighborhood = clone.neighborhood || (clone.location || '').split(',')[0] || 'Bairro';
-        clone.createdAt = new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000);
-        clone.badge = Math.random() > 0.85 ? 'destaque' : (Math.random() > 0.9 ? 'novo' : null);
-        allPropertiesData.push(clone);
+    try {
+        const response = await apiGetProperties();
+        if (response?.data?.length) {
+            allPropertiesData = response.data.map(normalizeProperty);
+        }
+    } catch (error) {
+        console.warn('Não foi possível carregar propriedades da API:', error);
     }
 }
 
 // ============= Initialization =============
 function clearLocalData() {
-    ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
+    ['currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
         localStorage.removeItem(key);
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadAllPropertiesFromApi();
+    await loadFavoritesMap();
     clearLocalData();
-    // Initial render with skeleton loading
+
     setupFilterControls();
     setupSortControl();
     setupApplyClearButtons();
     setupMobileFilters();
     setupAccordions();
 
-    // Ensure there are 20 properties for realistic preview
-    generateMockProperties(20);
-    // Merge generated mocks into the global `properties` array (if present)
-    try {
-        if (typeof properties !== 'undefined' && Array.isArray(properties)) {
-            const existingIds = new Set(properties.map(p => p.id));
-            allPropertiesData.forEach(p => {
-                if (!existingIds.has(p.id)) properties.push(p);
-            });
-            // update appState filteredProperties if available
-            if (typeof appState !== 'undefined' && appState.filteredProperties) {
-                appState.filteredProperties = [...properties];
-            }
-        } else {
-            // expose as window.properties as fallback
-            window.properties = allPropertiesData.slice();
-        }
-    } catch (e) {
-        // silently ignore merge errors
-        console.warn('Merge properties failed', e);
-    }
-
-    // Load initial data
-    setTimeout(() => {
-        applyFilters();
-    }, 300);
+    applyFilters();
 });

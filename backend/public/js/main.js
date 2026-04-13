@@ -1,164 +1,15 @@
-// Dados dos imóveis (simulação de banco de dados)
-let properties = [
-    {
-        id: 1,
-        title: "Casa Alto Padrão — Condomínio Fechado",
-        price: "R$ 1.250.000",
-        description: "Mansão moderna com 5 suítes, piscina, área gourmet, 980 m². Acabamento de alto padrão e automação residencial. Localizada em condomínio fechado com segurança 24h, área de lazer completa e proximidade com escolas e comércio.",
-        location: "Jardins, São Paulo - SP",
-        type: "casa",
-        transaction: "aluguel",
-        features: ["5 suítes", "Piscina", "Área gourmet", "5 vagas", "980 m²", "Condomínio fechado"],
-        images: [
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1560448071-7fae0bad0f1b?w=800&q=80&auto=format&fit=crop"
-        ],
-        seller: {
-            id: 1,
-            name: "Carlos Mendes",
-            type: "Corretor",
-            avatar: "https://randomuser.me/api/portraits/men/46.jpg",
-            rating: 4.9,
-            phone: "+5511999999999",
-            email: "carlos.mendes@imobiliaria.com"
-        },
-        date: "2023-10-15"
-    },
-    {
-        id: 2,
-        title: "Sobrado Moderno — Bairro Tranquilo",
-        price: "R$ 790.000",
-        description: "Sobrado reformado com 3 dormitórios, suíte, cozinha planejada e quintal. Localização próxima ao comércio e áreas de lazer. Excelente oportunidade para famílias que buscam conforto e praticidade.",
-        location: "Vila Mariana, São Paulo - SP",
-        type: "casa",
-        transaction: "aluguel",
-        features: ["3 dormitórios", "2 banheiros", "2 vagas", "180 m²", "Quintal", "Reformado"],
-        images: [
-            "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1560448071-7fae0bad0f1b?w=800&q=80&auto=format&fit=crop"
-        ],
-        seller: {
-            id: 2,
-            name: "Ana Silva",
-            type: "Proprietário",
-            avatar: "https://randomuser.me/api/portraits/women/32.jpg",
-            rating: 4.7,
-            phone: "+5511988888888",
-            email: "ana.silva@email.com"
-        },
-        date: "2023-10-12"
-    },
-    {
-        id: 3,
-        title: "Apartamento de 2 Quartos no Centro",
-        price: "R$ 420.000",
-        description: "Apartamento bem localizado no centro da cidade, próximo a tudo. Prédio com portaria 24h e área de lazer. Excelente opção para quem busca praticidade e localização.",
-        location: "Centro, São Paulo - SP",
-        type: "apartamento",
-        transaction: "aluguel",
-        features: ["2 quartos", "2 banheiros", "1 vaga", "75 m²", "Centro", "Portaria 24h"],
-        images: [
-            "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1560448071-7fae0bad0f1b?w=800&q=80&auto=format&fit=crop"
-        ],
-        seller: {
-            id: 3,
-            name: "Fernando Lima",
-            type: "Corretor",
-            avatar: "https://randomuser.me/api/portraits/men/67.jpg",
-            rating: 4.9,
-            phone: "+5511977777777",
-            email: "fernando.lima@imobiliaria.com"
-        },
-        date: "2023-10-10"
-    },
-    {
-        id: 4,
-        title: "Casa com Piscina e Churrasqueira",
-        price: "R$ 3.500/mês",
-        description: "Casa espaçosa com piscina, churrasqueira e área de lazer completa. Ideal para quem busca conforto e entretenimento. Localizada em condomínio fechado com segurança.",
-        location: "Morumbi, São Paulo - SP",
-        type: "casa",
-        transaction: "aluguel",
-        features: ["4 quartos", "3 banheiros", "Piscina", "Churrasqueira", "220 m²", "Condomínio"],
-        images: [
-            "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1560448071-7fae0bad0f1b?w=800&q=80&auto=format&fit=crop"
-        ],
-        seller: {
-            id: 4,
-            name: "Patrícia Santos",
-            type: "Proprietário",
-            avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-            rating: 4.8,
-            phone: "+5511966666666",
-            email: "patricia.santos@email.com"
-        },
-        date: "2023-10-08"
-    },
-    {
-        id: 5,
-        title: "Loja Comercial em Localização Privilegiada",
-        price: "R$ 850.000",
-        description: "Loja comercial em ponto estratégico, com alto fluxo de pessoas. Ideal para diversos tipos de negócio. Reformada recentemente com ótimo acabamento.",
-        location: "Moema, São Paulo - SP",
-        type: "comercial",
-        transaction: "aluguel",
-        features: ["120 m²", "2 banheiros", "Reformada", "Ponto comercial", "Alto fluxo"],
-        images: [
-            "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1560448071-7fae0bad0f1b?w=800&q=80&auto=format&fit=crop"
-        ],
-        seller: {
-            id: 5,
-            name: "Roberto Almeida",
-            type: "Corretor",
-            avatar: "https://randomuser.me/api/portraits/men/22.jpg",
-            rating: 4.6,
-            phone: "+5511955555555",
-            email: "roberto.almeida@imobiliaria.com"
-        },
-        date: "2023-10-05"
-    },
-    {
-        id: 6,
-        title: "Terreno para Construção — 500 m²",
-        price: "R$ 350.000",
-        description: "Terreno plano e regular, ideal para construção residencial ou comercial. Localizado em bairro em desenvolvimento com boa infraestrutura e facilidade de acesso.",
-        location: "Interlagos, São Paulo - SP",
-        type: "terreno",
-        transaction: "aluguel",
-        features: ["500 m²", "Plano", "Regular", "Boa localização", "Infraestrutura"],
-        images: [
-            "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1560448071-7fae0bad0f1b?w=800&q=80&auto=format&fit=crop"
-        ],
-        seller: {
-            id: 6,
-            name: "Mariana Costa",
-            type: "Proprietário",
-            avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-            rating: 4.5,
-            phone: "+5511944444444",
-            email: "mariana.costa@email.com"
-        },
-        date: "2023-10-01"
-    }
-];
+let properties = []
 
 // Estado da aplicação
 let appState = {
     currentUser: null,
-    filteredProperties: [...properties],
+    filteredProperties: [],
     currentFilter: 'all',
-    visibleProperties: 6
+    visibleProperties: 6,
+    favoriteIds: new Set(),
+    favorites: []
 };
+let apiPropertiesLoaded = false;
 
 function getAuthToken() {
     return localStorage.getItem('authToken');
@@ -254,69 +105,154 @@ async function initCsrf() {
     }
 }
 
+function normalizeProperty(property) {
+    const nightly = Number(property.nightly_price || 0);
+    const imageUrl = property.image_url || (Array.isArray(property.images) && property.images[0]) || 'https://via.placeholder.com/1200x800?text=Imóvel';
+    const images = Array.isArray(property.images) && property.images.length > 0 ? property.images : [imageUrl];
+    const locationParts = [];
+
+    if (property.neighborhood) locationParts.push(property.neighborhood);
+    if (property.city) locationParts.push(property.city);
+    if (property.state) locationParts.push(property.state);
+
+    return {
+        id: property.id,
+        title: property.title || 'Imóvel',
+        description: property.description || 'Descrição não disponível.',
+        location: locationParts.length > 0 ? locationParts.join(', ') : property.location || 'Localização não informada',
+        type: property.property_type || 'casa',
+        transaction: property.status === 'active' ? 'aluguel' : (property.status || 'aluguel'),
+        price: formatCurrency(nightly),
+        nightlyPrice: nightly,
+        features: Array.isArray(property.amenities) ? property.amenities : [],
+        images,
+        seller: {
+            name: property.host?.user?.name || 'Anfitrião',
+            type: property.host?.is_cohost ? 'Coanfitrião' : 'Anfitrião',
+            avatar: property.host?.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(property.host?.user?.name || 'Anfitrião')}`,
+            rating: Number(property.host?.rating || 4.8),
+            phone: property.host?.user?.phone || '',
+            email: property.host?.user?.email || ''
+        },
+        date: property.listed_at ? new Date(property.listed_at).toLocaleDateString('pt-BR') : ''
+    };
+}
+
+async function loadPropertiesFromApi() {
+    try {
+        const response = await apiGetProperties();
+        const items = Array.isArray(response) ? response : response?.data || [];
+        if (!Array.isArray(items)) {
+            return;
+        }
+
+        const normalized = items.map(normalizeProperty);
+        properties = normalized;
+        appState.filteredProperties = [...properties];
+        apiPropertiesLoaded = true;
+    } catch (error) {
+        console.warn('Não foi possível carregar propriedades da API', error);
+    }
+}
+
+async function loadFavoritesFromApi() {
+    if (!appState.currentUser) {
+        appState.favoriteIds = new Set();
+        appState.favorites = [];
+        return;
+    }
+
+    try {
+        const response = await apiGetFavorites();
+        const favorites = Array.isArray(response) ? response : response?.data || [];
+        appState.favorites = favorites;
+        appState.favoriteIds = new Set(
+            favorites.map(fav => Number(fav.property_id || fav.property?.id)).filter(Boolean)
+        );
+    } catch (error) {
+        console.warn('Não foi possível carregar favoritos da API', error);
+        appState.favoriteIds = new Set();
+        appState.favorites = [];
+    }
+}
+
 // verifica se há usuário autenticado (token guardado) e ajusta interface
 async function checkAuth() {
     clearLocalData();
 
     try {
         await initCsrf();
-
         const token = getAuthToken();
 
-        const headers = {
-            'Accept': 'application/json',
-            ...(getCsrfToken() ? { 'X-CSRF-TOKEN': getCsrfToken() } : {}),
-        };
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+        if (!token) {
+            return;
         }
 
-        const resp = await fetch('/api/user', {
-            headers,
-        });
-
-        if (resp.ok) {
-            const data = await resp.json();
-            appState.currentUser = data.user;
-            updateUIForLoggedUser();
-        } else {
-            clearAuthToken();
-        }
+        const data = await apiGetCurrentUser();
+        appState.currentUser = data;
+        updateUIForLoggedUser();
+        await loadFavoritesFromApi();
     } catch (e) {
+        clearAuthToken();
         console.error('checkAuth error', e);
     }
 }
 
-// dispara ao carregar o script
-checkAuth();
-
 // ============= Favorites API (global) =============
-function saveFavorite(propertyId) {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    if (!favorites.includes(propertyId)) {
-        favorites.push(propertyId);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
+async function saveFavorite(propertyId) {
+    if (!appState.currentUser) {
+        alert('Faça login para favoritar imóveis.');
+        return false;
     }
+
+    try {
+        const response = await apiAddFavorite(propertyId);
+        const favorite = response?.data || response || null;
+        if (favorite) {
+            appState.favorites = appState.favorites || [];
+            appState.favorites.push(favorite);
+            appState.favoriteIds.add(Number(propertyId));
+            return true;
+        }
+    } catch (error) {
+        console.error('saveFavorite error', error);
+        alert(error?.data?.message || error.message || 'Não foi possível adicionar aos favoritos.');
+    }
+
+    return false;
 }
 
-function removeFavorite(propertyId) {
-    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    favorites = favorites.filter(id => id !== propertyId);
-    localStorage.setItem('favorites', JSON.stringify(favorites));
+async function removeFavorite(propertyId) {
+    if (!appState.currentUser) {
+        return false;
+    }
+
+    const favorite = (appState.favorites || []).find(fav => Number(fav.property_id || fav.property?.id) === Number(propertyId));
+    if (!favorite || !favorite.id) {
+        return false;
+    }
+
+    try {
+        await apiRemoveFavorite(favorite.id);
+        appState.favorites = (appState.favorites || []).filter(fav => Number(fav.id) !== Number(favorite.id));
+        appState.favoriteIds.delete(Number(propertyId));
+        return true;
+    } catch (error) {
+        console.error('removeFavorite error', error);
+        alert(error?.data?.message || error.message || 'Não foi possível remover dos favoritos.');
+        return false;
+    }
 }
 
 function isFavorited(propertyId) {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    return favorites.includes(propertyId);
+    return appState.favoriteIds.has(Number(propertyId));
 }
 
-function toggleFavorite(propertyId) {
+async function toggleFavorite(propertyId) {
     if (isFavorited(propertyId)) {
-        removeFavorite(propertyId);
-    } else {
-        saveFavorite(propertyId);
+        return removeFavorite(propertyId);
     }
+    return saveFavorite(propertyId);
 }
 
 // Backwards compatibility aliases used by other scripts
@@ -377,7 +313,7 @@ const switchToLogin = document.getElementById('switchToLogin');
 const sellPropertyBtn = document.getElementById('sellPropertyBtn');
 
 // Abrir modal de login
-if (loginBtn) {
+if (loginBtn && loginModal) {
     loginBtn.addEventListener('click', (e) => {
         e.preventDefault();
         loginModal.style.display = 'flex';
@@ -386,7 +322,7 @@ if (loginBtn) {
 }
 
 // Abrir modal de registro
-if (registerBtn) {
+if (registerBtn && registerModal) {
     registerBtn.addEventListener('click', (e) => {
         e.preventDefault();
         registerModal.style.display = 'flex';
@@ -417,7 +353,7 @@ if (closePropertyModal) {
 }
 
 // Alternar entre login e registro
-if (switchToRegister) {
+if (switchToRegister && loginModal && registerModal) {
     switchToRegister.addEventListener('click', (e) => {
         e.preventDefault();
         loginModal.style.display = 'none';
@@ -425,7 +361,7 @@ if (switchToRegister) {
     });
 }
 
-if (switchToLogin) {
+if (switchToLogin && loginModal && registerModal) {
     switchToLogin.addEventListener('click', (e) => {
         e.preventDefault();
         registerModal.style.display = 'none';
@@ -503,37 +439,19 @@ if (loginForm) {
         btnLoader.style.display = 'flex';
 
         try {
-            const headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            };
-
-            const csrf = getCsrfToken();
-            if (csrf) {
-                headers['X-CSRF-TOKEN'] = csrf;
-            }
-
-            const resp = await fetch('/api/login', {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ email, password, _token: csrf })
-            });
-            const data = await resp.json();
-            if (!resp.ok) {
-                const msg = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Falha no login');
-                showLoginError('loginEmail', msg);
-            } else {
-                setAuthToken(data.token);
-                appState.currentUser = data.user;
-                loginModal.style.display = 'none';
-                document.body.style.overflow = '';
-                loginForm.reset();
-                updateUIForLoggedUser();
-                showNotification('✓ Login realizado com sucesso!', 'success');
-            }
+            const data = await apiLogin(email, password);
+            setAuthToken(data.token);
+            appState.currentUser = data.user;
+            loginModal.style.display = 'none';
+            document.body.style.overflow = '';
+            loginForm.reset();
+            updateUIForLoggedUser();
+            showNotification('✓ Login realizado com sucesso!', 'success');
         } catch (err) {
             console.error(err);
-            showLoginError('loginEmail', 'Erro de rede. Tente novamente.');
+            const responseData = err.data || {};
+            const message = responseData.message || 'Erro de rede. Tente novamente.';
+            showLoginError('loginEmail', message);
         } finally {
             submitBtn.disabled = false;
             btnText.style.display = 'flex';
@@ -764,57 +682,36 @@ if (registerForm) {
         btnLoader.style.display = 'inline-block';
         
         try {
-            const headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            };
-
-            const csrf = getCsrfToken();
-            if (csrf) {
-                headers['X-CSRF-TOKEN'] = csrf;
-            }
-
-            const resp = await fetch('/api/register', {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    name,
-                    email,
-                    password,
-                    password_confirmation: confirmPassword,
-                    phone,
-                    _token: csrf
-                })
+            const data = await apiRegister({
+                name,
+                email,
+                password,
+                password_confirmation: confirmPassword,
+                phone,
             });
 
-            const data = await resp.json();
-
-                if (!resp.ok) {
-                    // mostrar mensagens de validação retornadas
-                    if (data.errors) {
-                        Object.entries(data.errors).forEach(([field, msgs]) => {
-                            showRegisterError(`register${field.charAt(0).toUpperCase() + field.slice(1)}`, msgs[0]);
-                        });
-                    } else {
-                        showNotification(data.message || 'Falha no registro', 'error');
-                    }
-                } else {
-                    setAuthToken(data.token);
-                    appState.currentUser = data.user;
-                    showNotification('✓ Conta criada com sucesso!', 'success');
-                    registerModal.style.display = 'none';
-                    document.body.style.overflow = '';
-                    registerForm.reset();
-                    updateUIForLoggedUser();
-                }
-            } catch (err) {
-                console.error(err);
-                showNotification('Erro de rede. Tente novamente.', 'error');
-            } finally {
-                submitBtn.disabled = false;
-                btnText.style.display = 'inline-block';
-                btnLoader.style.display = 'none';
+            setAuthToken(data.token);
+            appState.currentUser = data.user;
+            showNotification('✓ Conta criada com sucesso!', 'success');
+            registerModal.style.display = 'none';
+            document.body.style.overflow = '';
+            registerForm.reset();
+            updateUIForLoggedUser();
+        } catch (err) {
+            console.error(err);
+            const responseData = err.data || {};
+            if (responseData.errors) {
+                Object.entries(responseData.errors).forEach(([field, msgs]) => {
+                    showRegisterError(`register${field.charAt(0).toUpperCase() + field.slice(1)}`, msgs[0]);
+                });
+            } else {
+                showNotification(responseData.message || 'Falha no registro', 'error');
             }
+        } finally {
+            submitBtn.disabled = false;
+            btnText.style.display = 'inline-block';
+            btnLoader.style.display = 'none';
+        }
     });
     
     // Validação em tempo real para registro
@@ -963,23 +860,7 @@ function updateUIForLoggedUser() {
             logoutBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 try {
-                    const token = getAuthToken();
-                    const headers = {
-                        'Accept': 'application/json',
-                    };
-                    if (token) {
-                        headers['Authorization'] = `Bearer ${token}`;
-                    }
-                    const csrf = getCsrfToken();
-                    if (csrf) {
-                        headers['X-CSRF-TOKEN'] = csrf;
-                    }
-
-                    await fetch('/api/logout', {
-                        method: 'POST',
-                        headers,
-                        body: JSON.stringify({ _token: csrf })
-                    });
+                    await apiLogout();
                 } catch (err) {
                     console.error('logout error', err);
                 }
@@ -1120,23 +1001,27 @@ function loadProperties() {
                 }
             }
             
-            favBtn.addEventListener('click', (e) => {
+            favBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                if (typeof isFavorited === 'function' && isFavorited(property.id)) {
-                    if (typeof removeFavorite === 'function') removeFavorite(property.id);
-                    favBtn.classList.remove('active');
-                    const icon = favBtn.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
+                if (isFavorited(property.id)) {
+                    const removed = await removeFavorite(property.id);
+                    if (removed) {
+                        favBtn.classList.remove('active');
+                        const icon = favBtn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
                     }
                 } else {
-                    if (typeof saveFavorite === 'function') saveFavorite(property.id);
-                    favBtn.classList.add('active');
-                    const icon = favBtn.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
+                    const saved = await saveFavorite(property.id);
+                    if (saved) {
+                        favBtn.classList.add('active');
+                        const icon = favBtn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                        }
                     }
                 }
             });
@@ -1470,20 +1355,15 @@ function setupFAQ() {
 }
 
 // Inicialização da aplicação
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkAuth();
+    await loadPropertiesFromApi();
     loadProperties();
     setupFilters();
     setupLoadMore();
     setupSearch();
     setupSmoothScrolling();
     setupFAQ();
-    
-    // Verificar se há usuário logado no localStorage (simulação)
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        appState.currentUser = JSON.parse(savedUser);
-        updateUIForLoggedUser();
-    }
 
     
     

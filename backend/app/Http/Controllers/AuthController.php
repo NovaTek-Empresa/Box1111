@@ -84,6 +84,34 @@ class AuthController extends Controller
         return response()->json(['user' => $user]);
     }
 
+    public function update(Request $request)
+    {
+        $user = $this->userFromToken($request);
+
+        if (! $user) {
+            return response()->json(['message' => 'Não autenticado'], 401);
+        }
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'password' => ['nullable', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->phone = $data['phone'] ?? $user->phone;
+
+        if (! empty($data['password'])) {
+            $user->password = Hash::make($data['password']);
+        }
+
+        $user->save();
+
+        return response()->json(['user' => $user]);
+    }
+
     private function userFromToken(Request $request)
     {
         $header = $request->bearerToken();

@@ -439,6 +439,7 @@
         </div>
     </main>
 
+    <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
         // Carregar dados do perfil
@@ -525,10 +526,9 @@
         }
 
         // Submit form
-        document.getElementById('profileForm').addEventListener('submit', (e) => {
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Validar campos
             const fullName = document.getElementById('fullName').value.trim();
             const phone = document.getElementById('phone').value.trim();
 
@@ -537,12 +537,25 @@
                 return;
             }
 
-            // Simular salvar (em produção, seria uma requisição ao servidor)
-            appState.currentUser.name = fullName;
-            appState.currentUser.phone = phone;
-            
-            // Dados persistidos no backend: não armazenamos localmente mais.
-            showSuccess();
+            try {
+                const payload = {
+                    name: fullName,
+                    email: document.getElementById('email').value,
+                    phone: phone
+                };
+
+                const response = await apiUpdateCurrentUser(payload);
+                if (response && response.user) {
+                    appState.currentUser = response.user;
+                    showSuccess();
+                    updateUIForLoggedUser();
+                } else {
+                    showError('Não foi possível atualizar o perfil. Tente novamente.');
+                }
+            } catch (error) {
+                const message = error?.data?.message || error.message || 'Falha ao atualizar o perfil.';
+                showError(message);
+            }
         });
 
         document.addEventListener('DOMContentLoaded', async () => {

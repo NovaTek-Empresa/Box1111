@@ -348,25 +348,14 @@
         </div>
     </footer>
 
+    <script src="js/api.js"></script>
     <script>
         async function fillHostSignupFromCurrentUser() {
-            const token = localStorage.getItem('authToken');
-            if (!token) return;
-
             try {
-                const response = await fetch('/api/user', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) return;
-
-                const data = await response.json();
-                const user = data?.user;
-                if (!user) return;
+                const user = await apiGetCurrentUser();
+                if (!user) {
+                    return;
+                }
 
                 const fullName = document.getElementById('fullName');
                 const email = document.getElementById('email');
@@ -376,7 +365,7 @@
                 if (email && !email.value) email.value = user.email || '';
                 if (phone && !phone.value) phone.value = user.phone || '';
             } catch (error) {
-                console.error('fillHostSignupFromCurrentUser:', error);
+                console.warn('fillHostSignupFromCurrentUser:', error);
             }
         }
 

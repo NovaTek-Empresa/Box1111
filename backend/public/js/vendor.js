@@ -249,22 +249,9 @@ function createInitialsAvatar(name, size = 64) {
 }
 
 async function fetchCurrentUser() {
-    const token = getAuthToken();
-    if (!token) return null;
-
     try {
-        const resp = await fetch('/api/user', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        if (resp.ok) {
-            const data = await resp.json();
-            return data?.user || null;
-        }
-        return null;
+        const data = await apiGetCurrentUser();
+        return data?.user || data?.data || null;
     } catch (error) {
         console.error('fetchCurrentUser error', error);
         return null;
@@ -288,18 +275,7 @@ function applyVendorProfileUI(user) {
 
 async function logoutVendor() {
     try {
-        const token = getAuthToken();
-        if (token) {
-            await fetch('/api/logout', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({})
-            });
-        }
+        await apiLogout();
     } catch (err) {
         console.error('logoutVendor error', err);
     }

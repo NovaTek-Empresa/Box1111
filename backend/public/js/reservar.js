@@ -21,11 +21,51 @@ function clearLocalData() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     clearLocalData();
     const propertyId = qs('propertyId') || '';
-    const propertyTitle = qs('title') ? decodeURIComponent(qs('title')) : 'Imóvel';
-    const nightlyParam = Number(qs('nightly')) || 0;
+    let propertyTitle = qs('title') ? decodeURIComponent(qs('title')) : 'Imóvel';
+    let nightlyParam = Number(qs('nightly')) || 0;
+
+    if (propertyId && typeof apiGetProperty === 'function') {
+        try {
+            const propertyData = await apiGetProperty(propertyId);
+            if (propertyData && propertyData.id) {
+                const property = normalizeProperty(propertyData);
+                propertyTitle = property.title;
+                nightlyParam = Number(property.nightlyPrice) || nightlyParam;
+
+                const galleryMain = document.getElementById('galleryMainImage');
+                const galleryThumbs = document.getElementById('galleryThumbs');
+                if (galleryMain && galleryThumbs) {
+                    galleryThumbs.innerHTML = '';
+                    if (property.images.length > 0) {
+                        galleryMain.src = property.images[0];
+                        property.images.slice(0, 3).forEach((image, index) => {
+                            const button = document.createElement('button');
+                            button.type = 'button';
+                            button.className = 'thumb-btn';
+                            button.innerHTML = `<img src="${image}" alt="Foto ${index + 1}">`;
+                            button.addEventListener('click', () => { galleryMain.src = image; });
+                            galleryThumbs.appendChild(button);
+                        });
+                    }
+                }
+
+                const sellerAvatarParam = property.seller.avatar || '';
+                const sellerPhoneParam = property.seller.phone || '';
+                if (sellerAvatarParam) {
+                    const sellerImg = document.getElementById('sellerAvatarImg');
+                    if (sellerImg) sellerImg.src = sellerAvatarParam;
+                }
+                if (sellerPhoneParam) {
+                    window._sellerPhoneForReservation = sellerPhoneParam;
+                }
+            }
+        } catch (error) {
+            console.warn('Erro ao carregar imóvel da API:', error);
+        }
+    }
 
     // elementos
     const elTitle = document.getElementById('summaryTitle');
@@ -87,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendCashMessageBtn = document.getElementById('sendCashMessage');
     if (sendCashMessageBtn) {
         sendCashMessageBtn.addEventListener('click', () => {
-            const phone = sellerPhoneParam ? decodeURIComponent(sellerPhoneParam) : '';
+            const phone = sellerPhoneParam ? decodeURIComponent(sellerPhoneParam) : window._sellerPhoneForReservation || '';
             const textarea = document.getElementById('cashMessage');
             const userMessage = textarea ? textarea.value.trim() : '';
             const defaultMsg = `Olá, sou ${document.title} — vou escolher pagar em dinheiro no local para a reserva do ${propertyTitle}. Por favor, confirmar horário e instruções.`;
@@ -171,8 +211,15 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectedPayment(initial);
     }
 
-    bookingForm.addEventListener('submit', (e) => {
+    bookingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        if (!getAuthToken()) {
+            alert('Faça login para reservar este imóvel.');
+            window.location.href = 'index.html';
+            return;
+        }
+
         const ci = checkin.value ? new Date(checkin.value) : null;
         const co = checkout.value ? new Date(checkout.value) : null;
         if (!ci || !co) {
@@ -192,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // coletar forma de pagamento (simulação) — validar conforme método
+        // coletar forma de pagamento — validar conforme método
         const method = document.querySelector('input[name="paymentMethod"]:checked').value;
         let payment = { method };
         if (method === 'pix') {
@@ -221,33 +268,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const summary = updateSummary();
 
-        // montar objeto de reserva
-        const reservation = {
-            id: 'res_' + Date.now(),
-            propertyId: hiddenId.value,
-            propertyTitle: hiddenTitle.value,
-            checkin: checkin.value,
-            checkout: checkout.value,
-            nights: summary.nights,
-            guests: Number(guests.value) || 1,
-            babies: Number(babies.value) || 0,
-            pets: Number(pets.value) || 0,
-            total: summary.total,
-            payment: payment,
-            createdAt: new Date().toISOString()
+        const reservationPayload = {
+            property_id: Number(hiddenId.value),
+            check_in: checkin.value,
+            check_out: checkout.value,
+            guests_count: Number(guests.value) || 1,
+            guest_notes: `Reserva feita via web: ${payment.method}`
         };
 
-        // salvar em localStorage (simulação de backend)
         try {
-            const existing = JSON.parse(localStorage.getItem('reservas') || '[]');
-            existing.push(reservation);
-            localStorage.setItem('reservas', JSON.stringify(existing));
-        } catch (err) {
-            console.error('Erro salvando reserva', err);
-        }
+            const createdReservation = await apiCreateReservation(reservationPayload);
+            const paymentPayload = {
+                reservation_id: createdReservation.id,
+                payment_method: method === 'card' ? 'credit' : method === 'boleto' ? 'bank' : method === 'cash' ? 'bank' : method
+            };
 
-        alert('Reserva confirmada! Obrigado.');
-        window.location.href = 'index.html';
+            await apiCreatePayment(paymentPayload);
+            alert('Reserva confirmada e pagamento registrado!');
+            window.location.href = 'index.html';
+        } catch (err) {
+            console.error('Erro ao criar reserva/pagamento', err);
+            const message = err?.data?.message || err.message || 'Erro ao processar reserva';
+            alert(message);
+        }
     });
 
     // atualizar inicialmente

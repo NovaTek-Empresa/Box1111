@@ -647,8 +647,28 @@
         </div>
     </main>
 
+    <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
+        async function fillCohostFromCurrentUser() {
+            try {
+                const user = await apiGetCurrentUser();
+                if (!user) return;
+
+                const fullName = document.getElementById('fullName');
+                const email = document.getElementById('email');
+                const phone = document.getElementById('phone');
+
+                if (fullName && !fullName.value) fullName.value = user.name || '';
+                if (email && !email.value) email.value = user.email || '';
+                if (phone && !phone.value) phone.value = user.phone || '';
+            } catch (error) {
+                console.warn('fillCohostFromCurrentUser:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fillCohostFromCurrentUser);
+
         let currentStep = 1;
 
         document.getElementById('nextBtn').addEventListener('click', (e) => {
@@ -775,6 +795,11 @@
             e.preventDefault();
 
             // Validar step 2
+            const fullName = document.getElementById('fullName').value.trim();
+            const cpf = document.getElementById('cpf').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const experience = document.getElementById('experience').value;
             const street = document.getElementById('street').value.trim();
             const number = document.getElementById('number').value.trim();
             const neighborhood = document.getElementById('neighborhood').value.trim();
@@ -782,20 +807,44 @@
             const state = document.getElementById('state').value;
             const region = document.getElementById('region').value.trim();
 
-            if (!street || !number || !neighborhood || !city || !state || !region) {
+            if (!fullName || !cpf || !email || !phone || !experience || !street || !number || !neighborhood || !city || !state || !region) {
                 showError('Por favor, preencha todos os campos obrigatórios.');
                 return;
             }
 
-            // Simular envio
+            // Enviar dados para o backend quando o usuário estiver autenticado
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
-            setTimeout(() => {
-                // Simular sucesso
+            const services = Array.from(document.querySelectorAll('input[name="services"]:checked')).map((el) => el.value);
+            const availability = Array.from(document.querySelectorAll('input[name="availability"]:checked')).map((el) => el.value).join(', ');
+
+            try {
+                await apiCreateHostProfile({
+                    name: fullName,
+                    email: email,
+                    phone: phone,
+                    cpf: cpf,
+                    experience: experience,
+                    availability: availability,
+                    services: services,
+                    street: street,
+                    number: number,
+                    neighborhood: neighborhood,
+                    city: city,
+                    state: state,
+                    region: region
+                });
+
                 showSuccess();
-            }, 1500);
+            } catch (error) {
+                console.error('be-cohost form error', error);
+                showError(error?.data?.message || error?.message || 'Erro ao enviar o cadastro.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Enviar Cadastro';
+            }
         });
     </script>
 </body>

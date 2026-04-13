@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\CoHostController;
+use App\Http\Controllers\Api\HostProfileController;
 
 // Authentication endpoints (no CSRF protection)
 Route::post('/register', [AuthController::class, 'register']);
@@ -18,13 +19,18 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('authenticate-bearer');
 
+Route::put('/user', [AuthController::class, 'update'])->middleware('authenticate-bearer');
+
 // Public routes
 Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/properties/{property}', [PropertyController::class, 'show']);
+Route::get('/host-profiles', [HostProfileController::class, 'index']);
+Route::get('/host-profiles/{host_profile}', [HostProfileController::class, 'show']);
 Route::get('/reviews', [ReviewController::class, 'index']);
 
 // Protected routes (require authentication)
 Route::middleware('authenticate-bearer')->group(function () {
+    Route::post('/host-profiles', [HostProfileController::class, 'store']);
     Route::post('/logout', [AuthController::class, 'logout']);
     
     // Properties

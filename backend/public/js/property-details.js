@@ -54,26 +54,41 @@ function clearLocalData() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     clearLocalData();
-    loadProperty();
-    setupEventListeners();
+    await loadProperty();
+    await setupEventListeners();
 });
 
 // Load property data from URL or main.js
-function loadProperty() {
+async function loadProperty() {
     const propertyId = parseInt(getQueryParam('id')) || 1;
-    
+    let property = null;
+
+    if (typeof apiGetProperty === 'function') {
+        try {
+            const data = await apiGetProperty(propertyId);
+            if (data && data.id) {
+                property = normalizeProperty(data);
+                currentProperty = property;
+                renderProperty(property);
+                return;
+            }
+        } catch (error) {
+            console.warn('Erro ao carregar imóvel da API:', error);
+        }
+    }
+
     // Get property from main.js properties array
     if (typeof properties !== 'undefined' && properties.length > 0) {
-        const property = properties.find(p => p.id === propertyId);
+        property = properties.find(p => p.id === propertyId);
         if (property) {
             currentProperty = property;
             renderProperty(property);
             return;
         }
     }
-    
+
     // Fallback
     showSkeletonLoading();
 }
@@ -265,7 +280,7 @@ function renderSeller(seller) {
 }
 
 // Setup event listeners
-function setupEventListeners() {
+async function setupEventListeners() {
     // Carousel navigation
     prevBtn.addEventListener('click', () => {
         currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
@@ -323,30 +338,46 @@ function setupEventListeners() {
     });
     
     // Favorite
-    favoriteBtn.addEventListener('click', () => {
-        favoriteBtn.classList.toggle('active');
+    favoriteBtn.addEventListener('click', async () => {
         const icon = favoriteBtn.querySelector('i');
-        
+        const propertyId = currentProperty?.id;
+
+        if (!propertyId) {
+            return;
+        }
+
         if (favoriteBtn.classList.contains('active')) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            showNotification('Adicionado aos favoritos!');
-            // Save to localStorage
-            saveFavorite(currentProperty.id);
+            const removed = await removeFavorite(propertyId);
+            if (removed) {
+                favoriteBtn.classList.remove('active');
+                if (icon) {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
+                showNotification('Removido dos favoritos');
+            }
         } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            showNotification('Removido dos favoritos');
-            removeFavorite(currentProperty.id);
+            const added = await addFavorite(propertyId);
+            if (added) {
+                favoriteBtn.classList.add('active');
+                if (icon) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                }
+                showNotification('Adicionado aos favoritos!');
+            }
         }
     });
     
     // Check if already favorited
-    if (isFavorited(currentProperty?.id)) {
+    const initialFavorite = await loadPropertyFavoriteState(currentProperty?.id);
+    if (initialFavorite) {
         favoriteBtn.classList.add('active');
         const icon = favoriteBtn.querySelector('i');
-        icon.classList.remove('far');
-        icon.classList.add('fas');
+        if (icon) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+        }
     }
     
     // Share
@@ -453,27 +484,72 @@ function setupEventListeners() {
     });
 }
 
-// Favorites management (localStorage)
-function saveFavorite(propertyId) {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    if (!favorites.includes(propertyId)) {
-        favorites.push(propertyId);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
+let currentPropertyFavoriteId = null;
+
+async function loadPropertyFavoriteState(propertyId) {
+    if (!getAuthToken()) {
+        currentPropertyFavoriteId = null;
+        return false;
+    }
+
+    if (typeof apiGetFavorites !== 'function') {
+        currentPropertyFavoriteId = null;
+        return false;
+    }
+
+    try {
+        const response = await apiGetFavorites();
+        const favorites = Array.isArray(response) ? response : response?.data || [];
+        const favorite = favorites.find(item => Number(item.property?.id) === Number(propertyId));
+        currentPropertyFavoriteId = favorite?.id || null;
+        return Boolean(currentPropertyFavoriteId);
+    } catch (error) {
+        console.warn('Erro ao carregar estado de favorito:', error);
+        currentPropertyFavoriteId = null;
+        return false;
     }
 }
 
-function removeFavorite(propertyId) {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    const index = favorites.indexOf(propertyId);
-    if (index > -1) {
-        favorites.splice(index, 1);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
+async function addFavorite(propertyId) {
+    if (!getAuthToken()) {
+        alert('Faça login para favoritar este imóvel.');
+        return false;
+    }
+
+    try {
+        const response = await apiAddFavorite(propertyId);
+        const favorite = response?.data || response;
+        currentPropertyFavoriteId = favorite?.id || currentPropertyFavoriteId;
+        return true;
+    } catch (error) {
+        console.error('Erro ao adicionar favorito:', error);
+        alert('Não foi possível adicionar aos favoritos.');
+        return false;
     }
 }
 
-function isFavorited(propertyId) {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    return favorites.includes(propertyId);
+async function removeFavorite(propertyId) {
+    if (!getAuthToken()) {
+        alert('Faça login para remover favoritos.');
+        return false;
+    }
+
+    if (!currentPropertyFavoriteId) {
+        const favorited = await loadPropertyFavoriteState(propertyId);
+        if (!favorited) {
+            return false;
+        }
+    }
+
+    try {
+        await apiRemoveFavorite(currentPropertyFavoriteId);
+        currentPropertyFavoriteId = null;
+        return true;
+    } catch (error) {
+        console.error('Erro ao remover favorito:', error);
+        alert('Não foi possível remover dos favoritos.');
+        return false;
+    }
 }
 
 // Notification system
@@ -542,7 +618,7 @@ function handleSwipe() {
 // DOM Elements para Reviews
 const reviewForm = document.getElementById('reviewForm');
 const starsInput = document.getElementById('starsInput');
-const starButtons = starsInput.querySelectorAll('.star-btn');
+const starButtons = starsInput?.querySelectorAll('.star-btn') || [];
 const ratingValue = document.getElementById('ratingValue');
 const starsCount = document.getElementById('starsCount');
 const reviewText = document.getElementById('reviewText');
@@ -550,15 +626,17 @@ const charCount = document.getElementById('charCount');
 const reviewsList = document.getElementById('reviewsList');
 let currentRating = 0;
 
-// Setup Review Form
 function setupReviewForm() {
-    // Selecionar Estrelas
+    if (!reviewForm) {
+        return;
+    }
+
     starButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             const rating = parseInt(btn.dataset.rating);
             currentRating = rating;
-            ratingValue.value = rating;
+            if (ratingValue) ratingValue.value = rating;
             updateStarUI();
         });
 
@@ -574,133 +652,101 @@ function setupReviewForm() {
         });
     });
 
-    starsInput.addEventListener('mouseleave', updateStarUI);
+    starsInput?.addEventListener('mouseleave', updateStarUI);
 
-    // Contar Caracteres
-    reviewText.addEventListener('input', (e) => {
+    reviewText?.addEventListener('input', (e) => {
         const length = e.target.value.length;
-        charCount.textContent = Math.min(length, 500);
+        if (charCount) charCount.textContent = Math.min(length, 500);
         if (length >= 500) {
             e.target.value = e.target.value.substring(0, 500);
         }
     });
 
-    // Enviar Formulário
     reviewForm.addEventListener('submit', handleReviewSubmit);
 
-    // Carregar reviews existentes
     loadReviews();
 }
 
 function updateStarUI() {
     starButtons.forEach((btn, idx) => {
+        const icon = btn.querySelector('i');
         if (idx < currentRating) {
             btn.classList.add('active');
-            btn.querySelector('i').classList.remove('far');
-            btn.querySelector('i').classList.add('fas');
+            icon?.classList.remove('far');
+            icon?.classList.add('fas');
         } else {
             btn.classList.remove('active');
-            btn.querySelector('i').classList.remove('fas');
-            btn.querySelector('i').classList.add('far');
+            icon?.classList.remove('fas');
+            icon?.classList.add('far');
         }
     });
 
-    if (currentRating === 0) {
-        starsCount.textContent = 'Nenhuma classificação';
-    } else {
-        starsCount.textContent = `${currentRating} ${currentRating === 1 ? 'estrela' : 'estrelas'}`;
+    if (starsCount) {
+        starsCount.textContent = currentRating === 0 ? 'Nenhuma classificação' : `${currentRating} ${currentRating === 1 ? 'estrela' : 'estrelas'}`;
     }
 }
 
 function handleReviewSubmit(e) {
     e.preventDefault();
 
-    // Validação
-    if (currentRating === 0) {
-        showNotification('Por favor, selecione uma classificação', 'warning');
+    if (!getAuthToken()) {
+        alert('Faça login para enviar avaliações.');
         return;
     }
 
-    const name = document.getElementById('reviewName').value.trim();
-    const email = document.getElementById('reviewEmail').value.trim();
-    const text = reviewText.value.trim();
-
-    if (!name || !email || !text) {
-        showNotification('Preencha todos os campos obrigatórios', 'warning');
-        return;
-    }
-
-    if (text.length < 10) {
-        showNotification('A avaliação deve ter pelo menos 10 caracteres', 'warning');
-        return;
-    }
-
-    // Criar objeto de avaliação
-    const review = {
-        id: Date.now(),
-        propertyId: getQueryParam('id'),
-        name,
-        email,
-        rating: currentRating,
-        text,
-        date: new Date().toLocaleDateString('pt-BR')
-    };
-
-    // Salvar no localStorage
-    saveReview(review);
-
-    // Limpar formulário
-    reviewForm.reset();
-    currentRating = 0;
-    ratingValue.value = 0;
-    charCount.textContent = '0';
-    updateStarUI();
-
-    // Mostrar feedback
-    showNotification('✓ Avaliação enviada com sucesso! Obrigado pela sua opinião.', 'success');
-
-    // Atualizar lista
-    loadReviews();
+    alert('Avaliações de imóveis são registradas pelo backend após reservas concluídas. Consulte uma reserva para enviar sua avaliação.');
 }
 
-function saveReview(review) {
-    const propertyId = getQueryParam('id');
-    const key = `reviews_${propertyId}`;
-    let reviews = JSON.parse(localStorage.getItem(key)) || [];
-    reviews.unshift(review);
-    localStorage.setItem(key, JSON.stringify(reviews));
-}
+async function loadReviews() {
+    if (!reviewsList) return;
 
-function loadReviews() {
     const propertyId = getQueryParam('id');
-    const key = `reviews_${propertyId}`;
-    const reviews = JSON.parse(localStorage.getItem(key)) || [];
-
-    if (reviews.length === 0) {
+    if (!propertyId) {
         reviewsList.innerHTML = `
             <div class="reviews-placeholder">
-                <p>Nenhuma avaliação ainda. Seja o primeiro a avaliar este imóvel!</p>
+                <p>Não foi possível carregar as avaliações deste imóvel.</p>
             </div>
         `;
         return;
     }
 
-    reviewsList.innerHTML = reviews.map(review => `
-        <div class="review-item">
-            <div class="review-header">
-                <div class="review-author">
-                    <span class="review-name">${escapeHtml(review.name)}</span>
-                    <span class="review-date">${review.date}</span>
+    try {
+        const response = await apiFetch(`/reviews?property_id=${encodeURIComponent(propertyId)}`);
+        const reviews = Array.isArray(response) ? response : response?.data || [];
+
+        if (!reviews.length) {
+            reviewsList.innerHTML = `
+                <div class="reviews-placeholder">
+                    <p>Nenhuma avaliação ainda. Faça login e reserve para deixar a primeira avaliação.</p>
                 </div>
-                <div class="review-rating">
-                    ${Array(5).fill(0).map((_, i) => `
-                        <i class="fa${i < review.rating ? 's' : 'r'} fa-star"></i>
-                    `).join('')}
+            `;
+            return;
+        }
+
+        reviewsList.innerHTML = reviews.map(review => `
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="review-author">
+                        <span class="review-name">${escapeHtml(review.reviewer?.name || review.name || 'Usuário')}</span>
+                        <span class="review-date">${new Date(review.published_at || review.created_at || Date.now()).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    <div class="review-rating">
+                        ${Array.from({ length: 5 }, (_, i) => `
+                            <i class="fa${i < review.rating ? 's' : 'r'} fa-star"></i>
+                        `).join('')}
+                    </div>
                 </div>
+                <p class="review-text">${escapeHtml(review.comment || review.text || '')}</p>
             </div>
-            <p class="review-text">${escapeHtml(review.text)}</p>
-        </div>
-    `).join('');
+        `).join('');
+    } catch (error) {
+        console.error('Erro ao carregar avaliações:', error);
+        reviewsList.innerHTML = `
+            <div class="reviews-placeholder">
+                <p>Erro ao carregar avaliações do backend.</p>
+            </div>
+        `;
+    }
 }
 
 function escapeHtml(text) {

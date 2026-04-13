@@ -434,19 +434,39 @@ class HostSignupForm {
     return isValid;
   }
 
-  submitForm() {
-    // Save all data
+  async submitForm() {
+    const payload = {
+      name: this.formData.fullName,
+      email: this.formData.email,
+      phone: this.formData.phone,
+      cpf: this.formData.cpf,
+      experience: this.formData.experience,
+      availability: this.formData.availability,
+      services: this.formData.services,
+    };
 
+    try {
+      if (typeof apiGetAuthToken === 'function' && apiGetAuthToken()) {
+        await apiUpdateCurrentUser({
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone
+        });
 
-    // Simulate submission to backend
-    console.log('Dados do formulário:', this.formData);
+        await apiCreateHostProfile(payload);
+        console.log('Cadastro enviado para o backend com sucesso.');
+      } else {
+        alert('Faça login para prosseguir com o cadastro de anfitrião.');
+        return;
+      }
+    } catch (error) {
+      console.error('submitForm error', error);
+      showNotification(error?.data?.message || error?.message || 'Erro no envio do cadastro.', 'error');
+      return;
+    }
 
-    // Show success message and move to status page
     this.showStep(5);
     this.updateButtons(5);
-
-    // Clear localStorage after successful submission
-    // localStorage.removeItem('hostSignupFormData');
   }
 
   handleFileUpload(e, type) {
