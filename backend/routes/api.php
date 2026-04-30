@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\CoHostController;
 use App\Http\Controllers\Api\HostProfileController;
+use App\Http\Controllers\Api\WebhookController;
 
 // Authentication endpoints (no CSRF protection)
 Route::post('/register', [AuthController::class, 'register']);
@@ -27,6 +28,10 @@ Route::get('/properties/{property}', [PropertyController::class, 'show']);
 Route::get('/host-profiles', [HostProfileController::class, 'index']);
 Route::get('/host-profiles/{host_profile}', [HostProfileController::class, 'show']);
 Route::get('/reviews', [ReviewController::class, 'index']);
+
+// Webhooks (public routes - no authentication needed)
+Route::post('/webhooks/mercadopago', [WebhookController::class, 'mercadoPago']);
+Route::get('/webhooks/mercadopago/health', [WebhookController::class, 'health']);
 
 // Protected routes (require authentication)
 Route::middleware('authenticate-bearer')->group(function () {
