@@ -50,44 +50,53 @@ class ConversationController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'user_2' => 'required|exists:users,id|different:' . auth()->id(),
-            'property_id' => 'nullable|exists:properties,id',
-            'initial_message' => 'required|string|max:1000'
-        ]);
+        // Try to get JSON data from file_get_contents as fallback
+        $jsonInput = file_get_contents('php://input');
+        if ($jsonInput) {
+            $data = json_decode($jsonInput, true);
+            if (json_last_error() === JSON_ERROR_NONE && $data) {
+                $validated = validator($data, [
+                    'user_2' => 'required|exists:users,id|different:' . auth()->id(),
+                    'property_id' => 'nullable|exists:properties,id',
+                    'initial_message' => 'required|string|max:1000'
+                ])->validate();
 
-        // Check if conversation already exists
-        $existingConversation = Conversation::where(function ($query) use ($validated) {
-            $query->where('user_1', auth()->id())
-                  ->where('user_2', $validated['user_2']);
-        })->orWhere(function ($query) use ($validated) {
-            $query->where('user_1', $validated['user_2'])
-                  ->where('user_2', auth()->id());
-        })->first();
+                // Check if conversation already exists
+                $existingConversation = Conversation::where(function ($query) use ($validated) {
+                    $query->where('user_1', auth()->id())
+                          ->where('user_2', $validated['user_2']);
+                })->orWhere(function ($query) use ($validated) {
+                    $query->where('user_1', $validated['user_2'])
+                          ->where('user_2', auth()->id());
+                })->first();
 
-        if ($existingConversation) {
-            return response()->json([
-                'error' => 'Conversation already exists',
-                'conversation_id' => $existingConversation->id
-            ], 400);
+                if ($existingConversation) {
+                    return response()->json([
+                        'error' => 'Conversation already exists',
+                        'conversation_id' => $existingConversation->id
+                    ], 400);
+                }
+
+                $conversation = Conversation::create([
+                    'user_1' => auth()->id(),
+                    'user_2' => $validated['user_2'],
+                    'property_id' => $validated['property_id'] ?? null
+                ]);
+
+                // Create initial message
+                $message = $conversation->messages()->create([
+                    'sender_id' => auth()->id(),
+                    'content' => $validated['initial_message'],
+                    'type' => 'text'
+                ]);
+
+                $conversation->update(['last_message_id' => $message->id]);
+
+                return $this->jsonResponse($conversation->load('lastMessage'), 201);
+            }
         }
-
-        $conversation = Conversation::create([
-            'user_1' => auth()->id(),
-            'user_2' => $validated['user_2'],
-            'property_id' => $validated['property_id'] ?? null
-        ]);
-
-        // Create initial message
-        $message = $conversation->messages()->create([
-            'sender_id' => auth()->id(),
-            'content' => $validated['initial_message'],
-            'type' => 'text'
-        ]);
-
-        $conversation->update(['last_message_id' => $message->id]);
-
-        return $this->jsonResponse($conversation->load('lastMessage'), 201);
+        
+        return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     public function update(Request $request, Conversation $conversation): JsonResponse

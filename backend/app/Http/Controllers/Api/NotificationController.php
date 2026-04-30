@@ -35,19 +35,28 @@ class NotificationController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
-            'message' => 'required|string|max:1000',
-            'type' => 'required|in:info,warning,success,error',
-            'action_url' => 'nullable|url',
-            'action_text' => 'nullable|string|max:50',
-            'expires_at' => 'nullable|date|after:now'
-        ]);
+        // Try to get JSON data from file_get_contents as fallback
+        $jsonInput = file_get_contents('php://input');
+        if ($jsonInput) {
+            $data = json_decode($jsonInput, true);
+            if (json_last_error() === JSON_ERROR_NONE && $data) {
+                $validated = validator($data, [
+                    'user_id' => 'required|exists:users,id',
+                    'title' => 'required|string|max:255',
+                    'message' => 'required|string|max:1000',
+                    'type' => 'required|in:info,warning,success,error',
+                    'action_url' => 'nullable|url',
+                    'action_text' => 'nullable|string|max:50',
+                    'expires_at' => 'nullable|date|after:now'
+                ])->validate();
 
-        $notification = Notification::create($validated);
+                $notification = Notification::create($validated);
 
-        return $this->jsonResponse($notification, 201);
+                return $this->jsonResponse($notification, 201);
+            }
+        }
+        
+        return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     public function markAsRead(Request $request, Notification $notification): JsonResponse

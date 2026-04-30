@@ -25,27 +25,36 @@ class BankAccountController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'bank_name' => 'required|string|max:100',
-            'bank_code' => 'required|string|max:10',
-            'agency_number' => 'required|string|max:20',
-            'account_number' => 'required|string|max:30',
-            'account_type' => 'required|in:checking,savings',
-            'account_holder_name' => 'required|string|max:255',
-            'account_holder_document' => 'required|string|max:20',
-            'is_default' => 'boolean',
-            'pix_key_type' => 'nullable|in:cpf,cnpj,email,phone,random',
-            'pix_key' => 'nullable|string|max:255|required_with:pix_key_type'
-        ]);
+        // Try to get JSON data from file_get_contents as fallback
+        $jsonInput = file_get_contents('php://input');
+        if ($jsonInput) {
+            $data = json_decode($jsonInput, true);
+            if (json_last_error() === JSON_ERROR_NONE && $data) {
+                $validated = validator($data, [
+                    'bank_name' => 'required|string|max:100',
+                    'bank_code' => 'required|string|max:10',
+                    'agency_number' => 'required|string|max:20',
+                    'account_number' => 'required|string|max:30',
+                    'account_type' => 'required|in:checking,savings',
+                    'account_holder_name' => 'required|string|max:255',
+                    'account_holder_document' => 'required|string|max:20',
+                    'is_default' => 'boolean',
+                    'pix_key_type' => 'nullable|in:cpf,cnpj,email,phone,random',
+                    'pix_key' => 'nullable|string|max:255|required_with:pix_key_type'
+                ])->validate();
 
-        // If setting as default, unset other defaults
-        if ($validated['is_default'] ?? false) {
-            auth()->user()->bankAccounts()->update(['is_default' => false]);
+                // If setting as default, unset other defaults
+                if ($validated['is_default'] ?? false) {
+                    auth()->user()->bankAccounts()->update(['is_default' => false]);
+                }
+
+                $bankAccount = auth()->user()->bankAccounts()->create($validated);
+
+                return $this->jsonResponse($bankAccount, 201);
+            }
         }
-
-        $bankAccount = auth()->user()->bankAccounts()->create($validated);
-
-        return $this->jsonResponse($bankAccount, 201);
+        
+        return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     public function update(Request $request, BankAccount $bankAccount): JsonResponse

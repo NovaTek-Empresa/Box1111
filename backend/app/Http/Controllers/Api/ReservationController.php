@@ -36,65 +36,74 @@ class ReservationController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'property_id' => 'required|exists:properties,id',
-            'check_in' => 'required|date|after:today',
-            'check_out' => 'required|date|after:check_in',
-            'guests_count' => 'required|integer|min:1',
-            'guest_notes' => 'string|nullable'
-        ]);
+        // Try to get JSON data from file_get_contents as fallback
+        $jsonInput = file_get_contents('php://input');
+        if ($jsonInput) {
+            $data = json_decode($jsonInput, true);
+            if (json_last_error() === JSON_ERROR_NONE && $data) {
+                $validated = validator($data, [
+                    'property_id' => 'required|exists:properties,id',
+                    'check_in' => 'required|date',
+                    'check_out' => 'required|date|after:check_in',
+                    'guests_count' => 'required|integer|min:1',
+                    'guest_notes' => 'string|nullable'
+                ])->validate();
 
-        $property = \App\Models\Property::find($validated['property_id']);
+                $property = \App\Models\Property::find($validated['property_id']);
 
-        // Check availability
-        $conflicting = false;
+                // Check availability
+                $conflicting = false;
 
-        if (Schema::hasTable('calendar_availabilities')) {
-            $conflicting = CalendarAvailability::where('property_id', $property->id)
-                ->whereBetween('date_specific', [$validated['check_in'], now()->parse($validated['check_out'])->subDay()])
-                ->where('status', '!=', 'available')
-                ->exists();
-        }
+                if (Schema::hasTable('calendar_availabilities')) {
+                    $conflicting = CalendarAvailability::where('property_id', $property->id)
+                        ->whereBetween('date_specific', [$validated['check_in'], now()->parse($validated['check_out'])->subDay()])
+                        ->where('status', '!=', 'available')
+                        ->exists();
+                }
 
-        if ($conflicting) {
-            return response()->json(['error' => 'Property not available for selected dates'], 400);
-        }
+                if ($conflicting) {
+                    return response()->json(['error' => 'Property not available for selected dates'], 400);
+                }
 
-        $nights = now()->parse($validated['check_out'])->diffInDays($validated['check_in']);
-        $nightly_price = $property->nightly_price;
-        $cleaning_fee = $property->cleaning_fee;
-        $platform_fee = (($nightly_price * $nights) + $cleaning_fee) * 0.10;
-        $total = ($nightly_price * $nights) + $cleaning_fee + $platform_fee;
+                $nights = now()->parse($validated['check_in'])->diffInDays($validated['check_out']);
+                $nightly_price = $property->nightly_price;
+                $cleaning_fee = $property->cleaning_fee;
+                $platform_fee = (($nightly_price * $nights) + $cleaning_fee) * 0.10;
+                $total = ($nightly_price * $nights) + $cleaning_fee + $platform_fee;
 
-        $reservation = auth()->user()->guestReservations()->create([
-            'property_id' => $property->id,
-            'host_id' => $property->host_id,
-            'check_in' => $validated['check_in'],
-            'check_out' => $validated['check_out'],
-            'guests_count' => $validated['guests_count'],
-            'nights' => $nights,
-            'nightly_price' => $nightly_price,
-            'cleaning_fee' => $cleaning_fee,
-            'platform_fee' => $platform_fee,
-            'total_price' => $total,
-            'status' => 'pending',
-            'guest_notes' => $validated['guest_notes'] ?? null
-        ]);
-
-        // Block calendar
-        if (Schema::hasTable('calendar_availabilities')) {
-            for ($i = 0; $i < $nights; $i++) {
-                $date = now()->parse($validated['check_in'])->addDays($i);
-                CalendarAvailability::create([
+                $reservation = auth()->user()->guestReservations()->create([
                     'property_id' => $property->id,
-                    'date_specific' => $date,
-                    'status' => 'reserved',
-                    'reservation_id' => $reservation->id
+                    'host_id' => $property->host_id,
+                    'check_in' => $validated['check_in'],
+                    'check_out' => $validated['check_out'],
+                    'guests_count' => $validated['guests_count'],
+                    'nights' => $nights,
+                    'nightly_price' => $nightly_price,
+                    'cleaning_fee' => $cleaning_fee,
+                    'platform_fee' => $platform_fee,
+                    'total_price' => $total,
+                    'status' => 'pending',
+                    'guest_notes' => $validated['guest_notes'] ?? null
                 ]);
+
+                // Block calendar
+                if (Schema::hasTable('calendar_availabilities')) {
+                    for ($i = 0; $i < $nights; $i++) {
+                        $date = now()->parse($validated['check_in'])->addDays($i);
+                        CalendarAvailability::create([
+                            'property_id' => $property->id,
+                            'date_specific' => $date,
+                            'status' => 'reserved',
+                            'reservation_id' => $reservation->id
+                        ]);
+                    }
+                }
+
+                return $this->jsonResponse($reservation, 201);
             }
         }
-
-        return $this->jsonResponse($reservation, 201);
+        
+        return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     public function confirm(Reservation $reservation): JsonResponse

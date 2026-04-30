@@ -96,90 +96,99 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'reservation_id' => 'required|exists:reservations,id',
-                'payment_method' => 'required|in:qr_code,redirect'
-            ]);
+        // Try to get JSON data from file_get_contents as fallback
+        $jsonInput = file_get_contents('php://input');
+        if ($jsonInput) {
+            $data = json_decode($jsonInput, true);
+            if (json_last_error() === JSON_ERROR_NONE && $data) {
+                try {
+                    $validated = validator($data, [
+                        'reservation_id' => 'required|exists:reservations,id',
+                        'payment_method' => 'required|in:qr_code,redirect'
+                    ])->validate();
 
-            $user = $request->user();
-            $reservation = Reservation::with('property', 'host')->find($request->reservation_id);
+                    $user = $request->user();
+                    $reservation = Reservation::with('property', 'host')->find($validated['reservation_id']);
 
-            // Verificar se o usuário é o guest da reserva
-            if ($reservation->guest_id != $user->id) {
-                return response()->json([
-                    'message' => 'Você não pode pagar uma reserva que não é sua'
-                ], 403);
-            }
+                    // Verificar se o usuário é o guest da reserva
+                    if ($reservation->guest_id != $user->id) {
+                        return response()->json([
+                            'message' => 'Você não pode pagar uma reserva que não é sua'
+                        ], 403);
+                    }
 
-            // Verificar se a reserva já está paga
-            if ($reservation->payment_id) {
-                $existingPayment = Payment::find($reservation->payment_id);
-                if ($existingPayment && in_array($existingPayment->status, ['completed', 'pending'])) {
+                    // Verificar se a reserva já está paga
+                    if ($reservation->payment_id) {
+                        $existingPayment = Payment::find($reservation->payment_id);
+                        if ($existingPayment && in_array($existingPayment->status, ['completed', 'pending'])) {
+                            return response()->json([
+                                'message' => 'Esta reserva já foi paga',
+                                'payment' => $existingPayment
+                            ], 400);
+                        }
+                    }
+
+                    // Gerar QR code / Preferência de pagamento
+                    if ($validated['payment_method'] == 'qr_code') {
+                        $qrData = $this->mercadoPago->generateQRCode($reservation, $user);
+
+                        if (!$qrData) {
+                            return response()->json([
+                                'message' => 'Erro ao gerar QR code'
+                            ], 500);
+                        }
+
+                        return response()->json([
+                            'message' => 'QR Code gerado com sucesso',
+                            'payment_method' => 'qr_code',
+                            'data' => $qrData,
+                            'reservation_id' => $reservation->id,
+                            'amount' => $reservation->total_price,
+                            'currency' => 'BRL'
+                        ]);
+                    } else {
+                        // Método de redirecionamento
+                        $preference = $this->mercadoPago->createPaymentPreference($reservation, $user);
+
+                        if (!$preference) {
+                            return response()->json([
+                                'message' => 'Erro ao criar preferência de pagamento'
+                            ], 500);
+                        }
+
+                        return response()->json([
+                            'message' => 'Preferência de pagamento criada com sucesso',
+                            'payment_method' => 'redirect',
+                            'data' => [
+                                'preference_id' => $preference['id'],
+                                'init_point' => $preference['init_point'],
+                                'checkout_url' => $preference['init_point']
+                            ],
+                            'reservation_id' => $reservation->id,
+                            'amount' => $reservation->total_price,
+                            'currency' => 'BRL'
+                        ]);
+                    }
+                } catch (\Illuminate\Validation\ValidationException $e) {
                     return response()->json([
-                        'message' => 'Esta reserva já foi paga',
-                        'payment' => $existingPayment
-                    ], 400);
-                }
-            }
+                        'message' => 'Dados inválidos',
+                        'errors' => $e->errors()
+                    ], 422);
+                } catch (\Exception $e) {
+                    Log::error('Erro ao criar pagamento', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
 
-            // Gerar QR code / Preferência de pagamento
-            if ($request->payment_method == 'qr_code') {
-                $qrData = $this->mercadoPago->generateQRCode($reservation, $user);
-
-                if (!$qrData) {
                     return response()->json([
-                        'message' => 'Erro ao gerar QR code'
+                        'message' => 'Erro ao criar pagamento',
+                        'error' => $e->getMessage()
                     ], 500);
                 }
-
-                return response()->json([
-                    'message' => 'QR Code gerado com sucesso',
-                    'payment_method' => 'qr_code',
-                    'data' => $qrData,
-                    'reservation_id' => $reservation->id,
-                    'amount' => $reservation->total_price,
-                    'currency' => 'BRL'
-                ]);
-            } else {
-                // Método de redirecionamento
-                $preference = $this->mercadoPago->createPaymentPreference($reservation, $user);
-
-                if (!$preference) {
-                    return response()->json([
-                        'message' => 'Erro ao criar preferência de pagamento'
-                    ], 500);
-                }
-
-                return response()->json([
-                    'message' => 'Preferência de pagamento criada com sucesso',
-                    'payment_method' => 'redirect',
-                    'data' => [
-                        'preference_id' => $preference['id'],
-                        'init_point' => $preference['init_point'],
-                        'checkout_url' => $preference['init_point']
-                    ],
-                    'reservation_id' => $reservation->id,
-                    'amount' => $reservation->total_price,
-                    'currency' => 'BRL'
-                ]);
             }
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'message' => 'Dados inválidos',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error('Erro ao criar pagamento', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'message' => 'Erro ao criar pagamento',
-                'error' => $e->getMessage()
-            ], 500);
         }
+        
+        return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     /**

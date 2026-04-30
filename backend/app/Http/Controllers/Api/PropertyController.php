@@ -53,22 +53,42 @@ class PropertyController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'property_type' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
-            'bedrooms' => 'required|integer|min:1',
-            'bathrooms' => 'required|integer|min:1',
-            'guests_capacity' => 'required|integer|min:1',
-            'nightly_price' => 'required|numeric|min:0',
-            'cleaning_fee' => 'numeric|min:0',
-        ]);
+        // Try to get JSON data from file_get_contents as fallback
+        $jsonInput = file_get_contents('php://input');
+        if ($jsonInput) {
+            $data = json_decode($jsonInput, true);
+            if (json_last_error() === JSON_ERROR_NONE && $data) {
+                // Validate the data
+                $rules = [
+                    'title' => 'required|string|max:255',
+                    'description' => 'required|string',
+                    'property_type' => 'required|string',
+                    'city' => 'required|string',
+                    'state' => 'required|string',
+                    'bedrooms' => 'required|integer|min:1',
+                    'bathrooms' => 'required|integer|min:1',
+                    'guests_capacity' => 'required|integer|min:1',
+                    'nightly_price' => 'required|numeric|min:0',
+                    'cleaning_fee' => 'numeric|min:0',
+                ];
+                
+                $validator = validator($data, $rules);
+                if ($validator->fails()) {
+                    return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+                }
+                
+                $validated = $validator->validated();
 
-        $property = auth()->user()->hostProfile->properties()->create($validated);
+                // Add host_id automatically
+                $validated['host_id'] = auth()->user()->hostProfile->id;
+                
+                $property = Property::create($validated);
 
-        return $this->jsonResponse($property, 201);
+                return $this->jsonResponse($property, 201);
+            }
+        }
+        
+        return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     public function update(Request $request, Property $property): JsonResponse
@@ -98,22 +118,9 @@ class PropertyController extends Controller
     {
         // TODO: Implement authorization policy
         // $this->authorize('delete', $property);
+
         $property->delete();
 
-        return $this->jsonResponse(['message' => 'Property deleted']);
-    }
-
-    public function availability(Request $request, Property $property): JsonResponse
-    {
-        $validated = $request->validate([
-            'date_from' => 'required|date',
-            'date_to' => 'required|date|after:date_from'
-        ]);
-
-        $availability = CalendarAvailability::where('property_id', $property->id)
-            ->whereBetween('date_specific', [$validated['date_from'], $validated['date_to']])
-            ->get();
-
-        return $this->jsonResponse($availability);
+        return $this->jsonResponse(['message' => 'Property deleted successfully']);
     }
 }
