@@ -1,50 +1,12 @@
-// Dados do painel do anfitrião (simulação)
-const vendorData = {
+// Dados do painel do anfitrião (carregados da API)
+let vendorData = {
     stats: {
-        properties: 12,
-        views: 1254,
-        messages: 24,
-        revenue: 2500000
+        properties: 0,
+        views: 0,
+        messages: 0,
+        revenue: 0
     },
-    // Dados das propriedades recentes
-    recentProperties: [
-        {
-            id: 1,
-            title: "Casa Alto Padrão",
-            location: "Jardins, SP",
-            price: "R$ 1.250.000",
-            status: "active",
-            views: 245,
-            requests: 18,
-            rentals: 6,
-            date: "15/10/2023",
-            image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100&q=80&auto=format&fit=crop"
-        },
-        {
-            id: 2,
-            title: "Sobrado Moderno",
-            location: "Vila Mariana, SP",
-            price: "R$ 790.000",
-            status: "active",
-            views: 189,
-            requests: 12,
-            rentals: 4,
-            date: "12/10/2023",
-            image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=100&q=80&auto=format&fit=crop"
-        },
-        {
-            id: 3,
-            title: "Apartamento Centro",
-            location: "Centro, SP",
-            price: "R$ 420.000",
-            status: "inactive",
-            views: 76,
-            requests: 6,
-            rentals: 1,
-            date: "10/10/2023",
-            image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=100&q=80&auto=format&fit=crop"
-        }
-    ],
+    recentProperties: [],
     // Estatísticas detalhadas para a tela de statistics
     statistics: {
         revenueMonth: 35840,
@@ -154,62 +116,9 @@ const vendorData = {
     ]
 };
 
-// Dados de chat (simulação)
-const chatData = {
-    conversations: [
-        {
-            id: 1,
-            name: 'Joana Pereira',
-            avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
-            last: 'Olá, tenho interesse no imóvel.',
-            messages: [
-                { from: 'client', text: 'Olá, tenho interesse no imóvel.', time: '10:02' },
-                { from: 'vendor', text: 'Olá Joana! Pode me dizer qual imóvel?', time: '10:05' }
-            ]
-        },
-        {
-            id: 2,
-            name: 'Rafael Souza',
-            avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
-            last: 'Quando posso visitar?',
-            messages: [
-                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
-                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' },
-                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
-                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:21' }
-            ]
-        },
-                {
-            id: 3,
-            name: 'Rafael Souza',
-            avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
-            last: 'Quando posso visitar?',
-            messages: [
-                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
-                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' }
-            ]
-        },
-              {
-            id: 4,
-            name: 'Rafael Souza',
-            avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
-            last: 'Quando posso visitar?',
-            messages: [
-                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
-                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:15' }
-            ]
-        },
-              {
-            id: 5,
-            name: 'Rafael Souza',
-            avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
-            last: 'Quando posso visitar?',
-            messages: [
-                { from: 'client', text: 'Quando posso visitar?', time: '09:15' },
-                { from: 'vendor', text: 'Sábado às 10h funciona?', time: '09:17' }
-            ]
-        }
-    ]
+// Dados de chat (carregados da API)
+let chatData = {
+    conversations: []
 };
 
 // Chart instances
@@ -311,12 +220,27 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-function countNotification(chatData){
-    return chatData.conversations.length;
+// Carregar conversas do chat da API
+async function loadChatData() {
+    try {
+        const response = await apiGetConversations();
+        chatData.conversations = response?.data || [];
+        
+        // Atualizar badge
+        updateChatBadge();
+    } catch (error) {
+        console.error('Error loading chat data:', error);
+        chatData.conversations = [];
+    }
 }
 
-// preencher o badge
-document.querySelector(".badge-on").textContent = countNotification(chatData);
+// Atualizar badge de notificações
+function updateChatBadge() {
+    const badge = document.querySelector(".badge-on");
+    if (badge) {
+        badge.textContent = chatData.conversations.length;
+    }
+}
 
 
 // Variável temporária de anexo na conversa atual
@@ -406,17 +330,113 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configurar notificações
     setupNotifications();
     
+    // Carregar dados do chat
+    loadChatData();
+    
     // Carregar dashboard por padrão na primeira carga
     loadSectionContent('dashboard');
 });
 
-// Carregar dados do dashboard
-function loadDashboardData() {
-    // Atualizar estatísticas
-    updateStats();
-    
-    // Carregar imóveis recentes
-    loadRecentProperties();
+// Carregar dados do dashboard da API
+async function loadDashboardData() {
+    try {
+        await Promise.all([
+            loadVendorStats(),
+            loadVendorProperties(),
+            loadVendorNotifications()
+        ]);
+        
+        // Atualizar estatísticas
+        updateStats();
+        
+        // Carregar imóveis recentes
+        loadRecentProperties();
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // Fallback para dados mockados em caso de erro
+        loadDashboardData();
+    }
+}
+
+// Carregar estatísticas do vendor
+async function loadVendorStats() {
+    try {
+        const user = await apiGetCurrentUser();
+        if (!user?.hostProfile?.id) return;
+        
+        // Carregar propriedades do host
+        const propertiesResponse = await apiFetch(`/properties?host_id=${user.hostProfile.id}`);
+        const properties = propertiesResponse?.data || [];
+        
+        // Calcular estatísticas
+        const stats = {
+            properties: properties.length,
+            views: properties.reduce((sum, p) => sum + (p.views || 0), 0),
+            messages: await getUnreadMessagesCount(),
+            revenue: await calculateTotalRevenue(properties)
+        };
+        
+        vendorData.stats = stats;
+    } catch (error) {
+        console.error('Error loading vendor stats:', error);
+    }
+}
+
+// Carregar propriedades do vendor
+async function loadVendorProperties() {
+    try {
+        const user = await apiGetCurrentUser();
+        if (!user?.hostProfile?.id) return;
+        
+        const response = await apiFetch(`/properties?host_id=${user.hostProfile.id}`);
+        const properties = response?.data || [];
+        
+        vendorData.recentProperties = properties.map(p => ({
+            id: p.id,
+            title: p.title,
+            location: `${p.neighborhood || ''}, ${p.city || ''}`.trim(),
+            price: formatCurrency(p.nightly_price || 0),
+            status: p.status || 'inactive',
+            views: p.views || 0,
+            requests: p.requests || 0,
+            rentals: p.rentals || 0,
+            date: new Date(p.created_at).toLocaleDateString('pt-BR'),
+            image: p.image_url || 'https://via.placeholder.com/100x100?text=Imóvel'
+        }));
+    } catch (error) {
+        console.error('Error loading vendor properties:', error);
+    }
+}
+
+// Carregar notificações
+async function loadVendorNotifications() {
+    try {
+        const response = await apiFetch('/notifications?per_page=10');
+        vendorData.notifications = response?.data || [];
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+        vendorData.notifications = [];
+    }
+}
+
+// Obter contagem de mensagens não lidas
+async function getUnreadMessagesCount() {
+    try {
+        const response = await apiFetch('/conversations/unread-count');
+        return response?.unread_conversations || 0;
+    } catch (error) {
+        return 0;
+    }
+}
+
+// Calcular receita total
+async function calculateTotalRevenue(properties) {
+    try {
+        const total = properties.reduce((sum, p) => sum + (p.nightly_price || 0), 0);
+        return total;
+    } catch (error) {
+        return 0;
+    }
 }
 
 // Atualizar estatísticas
@@ -443,13 +463,25 @@ function updateStats() {
     }
 }
 
-// Carregar imóveis recentes
+// Carregar imóveis recentes da API
 function loadRecentProperties() {
     const propertiesTable = document.querySelector('.properties-table tbody');
     // Se não houver tabela de propriedades (página dashboard), apenas retornar
     if (!propertiesTable) return;
     
     propertiesTable.innerHTML = '';
+    
+    if (vendorData.recentProperties.length === 0) {
+        propertiesTable.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                    <p>Nenhuma propriedade encontrada</p>
+                    <button class="btn" onclick="window.location.href='#add-property'">Adicionar Propriedade</button>
+                </td>
+            </tr>
+        `;
+        return;
+    }
     
     vendorData.recentProperties.forEach(property => {
         const row = document.createElement('tr');

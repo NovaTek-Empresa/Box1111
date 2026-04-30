@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Integração API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .auth-section {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-pending { background: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Integração API Box11</h1>
+        
+        <div class="auth-section">
+            <h2>🔐 Autenticação</h2>
+            <div>
+                <input type="email" id="testEmail" placeholder="Email para teste" value="test@example.com">
+                <input type="password" id="testPassword" placeholder="Senha" value="password123">
+                <button onclick="testRegister()">Registrar</button>
+                <button onclick="testLogin()">Login</button>
+                <button onclick="testLogout()">Logout</button>
+                <button onclick="testGetCurrentUser()">Usuário Atual</button>
+            </div>
+            <div id="authResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🏠 Propriedades</h2>
+            <button onclick="testGetProperties()">Listar Propriedades</button>
+            <button onclick="testCreateProperty()">Criar Propriedade</button>
+            <button onclick="testGetProperty()">Obter Propriedade</button>
+            <button onclick="testUpdateProperty()">Atualizar Propriedade</button>
+            <div id="propertiesResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📅 Reservas</h2>
+            <button onclick="testGetReservations()">Listar Reservas</button>
+            <button onclick="testCreateReservation()">Criar Reserva</button>
+            <button onclick="testUpdateReservation()">Atualizar Reserva</button>
+            <div id="reservationsResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>💳 Pagamentos</h2>
+            <button onclick="testGetPayments()">Listar Pagamentos</button>
+            <button onclick="testCreatePayment()">Criar Pagamento</button>
+            <button onclick="testPaymentStatus()">Status Pagamento</button>
+            <div id="paymentsResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>❤️ Favoritos</h2>
+            <button onclick="testGetFavorites()">Listar Favoritos</button>
+            <button onclick="testAddFavorite()">Adicionar Favorito</button>
+            <button onclick="testRemoveFavorite()">Remover Favorito</button>
+            <div id="favoritesResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>👤 Usuários</h2>
+            <button onclick="testGetUsers()">Listar Usuários</button>
+            <button onclick="testUpdateUser()">Atualizar Usuário</button>
+            <div id="usersResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔔 Notificações</h2>
+            <button onclick="testGetNotifications()">Listar Notificações</button>
+            <button onclick="testCreateNotification()">Criar Notificação</button>
+            <button onclick="testMarkAsRead()">Marcar como Lida</button>
+            <div id="notificationsResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>💬 Conversas</h2>
+            <button onclick="testGetConversations()">Listar Conversas</button>
+            <button onclick="testCreateConversation()">Criar Conversa</button>
+            <button onclick="testGetMessages()">Listar Mensagens</button>
+            <div id="conversationsResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🏦 Contas Bancárias</h2>
+            <button onclick="testGetBankAccounts()">Listar Contas</button>
+            <button onclick="testCreateBankAccount()">Criar Conta</button>
+            <div id="bankAccountsResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>💰 Saques (Payouts)</h2>
+            <button onclick="testGetPayouts()">Listar Saques</button>
+            <button onclick="testCreatePayout()">Criar Saque</button>
+            <button onclick="testPayoutSummary()">Resumo Saques</button>
+            <div id="payoutsResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 Promoções</h2>
+            <button onclick="testGetPromotions()">Listar Promoções</button>
+            <button onclick="testValidatePromotion()">Validar Promoção</button>
+            <div id="promotionsResult" class="result info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🚨 Relatórios</h2>
+            <button onclick="testGetReports()">Listar Relatórios</button>
+            <button onclick="testCreateReport()">Criar Relatório</button>
+            <div id="reportsResult" class="result info"></div>
+        </div>
+    </div>
+
+    <!-- Incluir API functions -->
+    <script src="js/api.js"></script>
+    
+    <script>
+        let testToken = null;
+        let testPropertyId = null;
+        let testReservationId = null;
+        let testPaymentId = null;
+        let testFavoriteId = null;
+        let testConversationId = null;
+        let testBankAccountId = null;
+        let testPayoutId = null;
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        function showLoading(elementId) {
+            showResult(elementId, 'Carregando...', 'loading');
+        }
+
+        async function testRegister() {
+            showLoading('authResult');
+            try {
+                const email = document.getElementById('testEmail').value;
+                const password = document.getElementById('testPassword').value;
+                
+                const response = await apiRegister({
+                    name: 'Usuário Teste',
+                    email: email,
+                    password: password,
+                    password_confirmation: password,
+                    phone: '+5511999999999'
+                });
+                
+                testToken = response.token;
+                apiSetAuthToken(testToken);
+                
+                showResult('authResult', `✅ Registro bem-sucedido!\nToken: ${testToken?.substring(0, 20)}...\nUser ID: ${response.user?.id}`, 'success');
+            } catch (error) {
+                showResult('authResult', `❌ Erro no registro: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            showLoading('authResult');
+            try {
+                const email = document.getElementById('testEmail').value;
+                const password = document.getElementById('testPassword').value;
+                
+                const response = await apiLogin(email, password);
+                testToken = response.token;
+                apiSetAuthToken(testToken);
+                
+                showResult('authResult', `✅ Login bem-sucedido!\nToken: ${testToken?.substring(0, 20)}...\nUser ID: ${response.user?.id}`, 'success');
+            } catch (error) {
+                showResult('authResult', `❌ Erro no login: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testLogout() {
+            showLoading('authResult');
+            try {
+                await apiLogout();
+                testToken = null;
+                apiClearAuthToken();
+                
+                showResult('authResult', '✅ Logout realizado com sucesso!', 'success');
+            } catch (error) {
+                showResult('authResult', `❌ Erro no logout: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetCurrentUser() {
+            showLoading('authResult');
+            try {
+                const user = await apiGetCurrentUser();
+                showResult('authResult', `✅ Usuário atual:\n${JSON.stringify(user, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('authResult', `❌ Erro ao obter usuário: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetProperties() {
+            showLoading('propertiesResult');
+            try {
+                const response = await apiGetProperties();
+                const properties = response.data || response;
+                
+                if (properties.length > 0) {
+                    testPropertyId = properties[0].id;
+                }
+                
+                showResult('propertiesResult', `✅ ${properties.length} propriedades encontradas\nPrimeiro ID: ${testPropertyId}\n${JSON.stringify(properties.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('propertiesResult', `❌ Erro ao listar propriedades: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateProperty() {
+            showLoading('propertiesResult');
+            try {
+                const property = await apiCreateProperty({
+                    title: 'Propriedade de Teste',
+                    description: 'Descrição da propriedade de teste',
+                    property_type: 'apartment',
+                    city: 'São Paulo',
+                    state: 'SP',
+                    bedrooms: 2,
+                    bathrooms: 1,
+                    guests_capacity: 4,
+                    nightly_price: 150.00,
+                    cleaning_fee: 50.00
+                });
+                
+                testPropertyId = property.id;
+                showResult('propertiesResult', `✅ Propriedade criada!\nID: ${property.id}\n${JSON.stringify(property, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('propertiesResult', `❌ Erro ao criar propriedade: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testGetProperty() {
+            if (!testPropertyId) {
+                showResult('propertiesResult', '⚠️ Nenhuma propriedade ID disponível. Crie uma propriedade primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('propertiesResult');
+            try {
+                const property = await apiGetProperty(testPropertyId);
+                showResult('propertiesResult', `✅ Propriedade obtida:\n${JSON.stringify(property, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('propertiesResult', `❌ Erro ao obter propriedade: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateProperty() {
+            if (!testPropertyId) {
+                showResult('propertiesResult', '⚠️ Nenhuma propriedade ID disponível. Crie uma propriedade primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('propertiesResult');
+            try {
+                const property = await apiUpdateProperty(testPropertyId, {
+                    title: 'Propriedade de Teste Atualizada',
+                    nightly_price: 200.00
+                });
+                showResult('propertiesResult', `✅ Propriedade atualizada:\n${JSON.stringify(property, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('propertiesResult', `❌ Erro ao atualizar propriedade: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetReservations() {
+            showLoading('reservationsResult');
+            try {
+                const response = await apiFetch('/reservations');
+                const reservations = response.data || response;
+                
+                if (reservations.length > 0) {
+                    testReservationId = reservations[0].id;
+                }
+                
+                showResult('reservationsResult', `✅ ${reservations.length} reservas encontradas\n${JSON.stringify(reservations.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('reservationsResult', `❌ Erro ao listar reservas: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateReservation() {
+            if (!testPropertyId) {
+                showResult('reservationsResult', '⚠️ Nenhuma propriedade ID disponível. Crie uma propriedade primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('reservationsResult');
+            try {
+                const reservation = await apiCreateReservation({
+                    property_id: testPropertyId,
+                    check_in: '2026-06-01',
+                    check_out: '2026-06-03',
+                    guests_count: 2,
+                    guest_notes: 'Reserva de teste'
+                });
+                
+                testReservationId = reservation.id;
+                showResult('reservationsResult', `✅ Reserva criada!\nID: ${reservation.id}\n${JSON.stringify(reservation, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('reservationsResult', `❌ Erro ao criar reserva: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testUpdateReservation() {
+            if (!testReservationId) {
+                showResult('reservationsResult', '⚠️ Nenhuma reserva ID disponível. Crie uma reserva primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('reservationsResult');
+            try {
+                // Testar confirmação de reserva
+                const response = await apiFetch(`/reservations/${testReservationId}/confirm`, {
+                    method: 'POST'
+                });
+                showResult('reservationsResult', `✅ Reserva atualizada:\n${JSON.stringify(response, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('reservationsResult', `❌ Erro ao atualizar reserva: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetPayments() {
+            showLoading('paymentsResult');
+            try {
+                const response = await apiGetPayments();
+                const payments = response.data || response;
+                
+                if (payments.length > 0) {
+                    testPaymentId = payments[0].id;
+                }
+                
+                showResult('paymentsResult', `✅ ${payments.length} pagamentos encontrados\n${JSON.stringify(payments.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('paymentsResult', `❌ Erro ao listar pagamentos: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreatePayment() {
+            if (!testReservationId) {
+                showResult('paymentsResult', '⚠️ Nenhuma reserva ID disponível. Crie uma reserva primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('paymentsResult');
+            try {
+                const payment = await apiCreatePayment({
+                    reservation_id: testReservationId,
+                    payment_method: 'credit'
+                });
+                
+                testPaymentId = payment.id;
+                showResult('paymentsResult', `✅ Pagamento criado!\nID: ${payment.id}\n${JSON.stringify(payment, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('paymentsResult', `❌ Erro ao criar pagamento: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testPaymentStatus() {
+            if (!testPaymentId) {
+                showResult('paymentsResult', '⚠️ Nenhum pagamento ID disponível. Crie um pagamento primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('paymentsResult');
+            try {
+                const status = await apiFetch(`/payments/${testPaymentId}/status`);
+                showResult('paymentsResult', `✅ Status do pagamento:\n${JSON.stringify(status, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('paymentsResult', `❌ Erro ao obter status: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetFavorites() {
+            showLoading('favoritesResult');
+            try {
+                const response = await apiGetFavorites();
+                const favorites = response.data || response;
+                
+                if (favorites.length > 0) {
+                    testFavoriteId = favorites[0].id;
+                }
+                
+                showResult('favoritesResult', `✅ ${favorites.length} favoritos encontrados\n${JSON.stringify(favorites.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('favoritesResult', `❌ Erro ao listar favoritos: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAddFavorite() {
+            if (!testPropertyId) {
+                showResult('favoritesResult', '⚠️ Nenhuma propriedade ID disponível. Crie uma propriedade primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('favoritesResult');
+            try {
+                const favorite = await apiAddFavorite(testPropertyId);
+                testFavoriteId = favorite.id;
+                showResult('favoritesResult', `✅ Favorito adicionado!\nID: ${favorite.id}\n${JSON.stringify(favorite, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('favoritesResult', `❌ Erro ao adicionar favorito: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRemoveFavorite() {
+            if (!testFavoriteId) {
+                showResult('favoritesResult', '⚠️ Nenhum favorito ID disponível. Adicione um favorito primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('favoritesResult');
+            try {
+                await apiRemoveFavorite(testFavoriteId);
+                showResult('favoritesResult', '✅ Favorito removido com sucesso!', 'success');
+            } catch (error) {
+                showResult('favoritesResult', `❌ Erro ao remover favorito: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetUsers() {
+            showLoading('usersResult');
+            try {
+                const response = await apiGetUsers();
+                const users = response.data || response;
+                showResult('usersResult', `✅ ${users.length} usuários encontrados\n${JSON.stringify(users.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('usersResult', `❌ Erro ao listar usuários: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateUser() {
+            showLoading('usersResult');
+            try {
+                const user = await apiGetCurrentUser();
+                const updated = await apiUpdateUser(user.id, {
+                    name: 'Usuário Teste Atualizado'
+                });
+                showResult('usersResult', `✅ Usuário atualizado:\n${JSON.stringify(updated, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('usersResult', `❌ Erro ao atualizar usuário: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetNotifications() {
+            showLoading('notificationsResult');
+            try {
+                const response = await apiGetNotifications();
+                const notifications = response.data || response;
+                showResult('notificationsResult', `✅ ${notifications.length} notificações encontradas\n${JSON.stringify(notifications.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('notificationsResult', `❌ Erro ao listar notificações: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateNotification() {
+            showLoading('notificationsResult');
+            try {
+                const user = await apiGetCurrentUser();
+                const notification = await apiCreateNotification({
+                    user_id: user.id,
+                    title: 'Notificação de Teste',
+                    message: 'Esta é uma notificação de teste',
+                    type: 'info'
+                });
+                showResult('notificationsResult', `✅ Notificação criada!\n${JSON.stringify(notification, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('notificationsResult', `❌ Erro ao criar notificação: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMarkAsRead() {
+            showLoading('notificationsResult');
+            try {
+                const response = await apiGetNotifications();
+                const notifications = response.data || response;
+                
+                if (notifications.length > 0) {
+                    await apiMarkNotificationAsRead(notifications[0].id);
+                    showResult('notificationsResult', '✅ Notificação marcada como lida!', 'success');
+                } else {
+                    showResult('notificationsResult', '⚠️ Nenhuma notificação para marcar como lida', 'info');
+                }
+            } catch (error) {
+                showResult('notificationsResult', `❌ Erro ao marcar notificação: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetConversations() {
+            showLoading('conversationsResult');
+            try {
+                const response = await apiGetConversations();
+                const conversations = response.data || response;
+                
+                if (conversations.length > 0) {
+                    testConversationId = conversations[0].id;
+                }
+                
+                showResult('conversationsResult', `✅ ${conversations.length} conversas encontradas\n${JSON.stringify(conversations.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('conversationsResult', `❌ Erro ao listar conversas: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateConversation() {
+            showLoading('conversationsResult');
+            try {
+                const user = await apiGetCurrentUser();
+                const conversation = await apiCreateConversation({
+                    user_2: 1, // Supondo que exista um usuário com ID 1
+                    initial_message: 'Olá, esta é uma mensagem de teste'
+                });
+                
+                testConversationId = conversation.id;
+                showResult('conversationsResult', `✅ Conversa criada!\nID: ${conversation.id}\n${JSON.stringify(conversation, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('conversationsResult', `❌ Erro ao criar conversa: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testGetMessages() {
+            if (!testConversationId) {
+                showResult('conversationsResult', '⚠️ Nenhuma conversa ID disponível. Crie uma conversa primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('conversationsResult');
+            try {
+                const response = await apiGetMessages({ conversation_id: testConversationId });
+                const messages = response.data || response;
+                showResult('conversationsResult', `✅ ${messages.length} mensagens encontradas\n${JSON.stringify(messages.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('conversationsResult', `❌ Erro ao listar mensagens: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetBankAccounts() {
+            showLoading('bankAccountsResult');
+            try {
+                const response = await apiGetBankAccounts();
+                const accounts = response.data || response;
+                
+                if (accounts.length > 0) {
+                    testBankAccountId = accounts[0].id;
+                }
+                
+                showResult('bankAccountsResult', `✅ ${accounts.length} contas bancárias encontradas\n${JSON.stringify(accounts.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('bankAccountsResult', `❌ Erro ao listar contas: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateBankAccount() {
+            showLoading('bankAccountsResult');
+            try {
+                const account = await apiCreateBankAccount({
+                    bank_name: 'Banco de Teste',
+                    bank_code: '001',
+                    agency_number: '1234',
+                    account_number: '56789-0',
+                    account_type: 'checking',
+                    account_holder_name: 'Teste Usuario',
+                    account_holder_document: '12345678900',
+                    is_default: true,
+                    pix_key_type: 'cpf',
+                    pix_key: '12345678900'
+                });
+                
+                testBankAccountId = account.id;
+                showResult('bankAccountsResult', `✅ Conta bancária criada!\nID: ${account.id}\n${JSON.stringify(account, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('bankAccountsResult', `❌ Erro ao criar conta: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testGetPayouts() {
+            showLoading('payoutsResult');
+            try {
+                const response = await apiGetPayouts();
+                const payouts = response.data || response;
+                
+                if (payouts.length > 0) {
+                    testPayoutId = payouts[0].id;
+                }
+                
+                showResult('payoutsResult', `✅ ${payouts.length} saques encontrados\n${JSON.stringify(payouts.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('payoutsResult', `❌ Erro ao listar saques: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreatePayout() {
+            if (!testBankAccountId) {
+                showResult('payoutsResult', '⚠️ Nenhuma conta bancária ID disponível. Crie uma conta primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('payoutsResult');
+            try {
+                const payout = await apiCreatePayout({
+                    bank_account_id: testBankAccountId,
+                    amount: 100.00,
+                    description: 'Saque de teste'
+                });
+                
+                testPayoutId = payout.id;
+                showResult('payoutsResult', `✅ Saque criado!\nID: ${payout.id}\n${JSON.stringify(payout, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('payoutsResult', `❌ Erro ao criar saque: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        async function testPayoutSummary() {
+            showLoading('payoutsResult');
+            try {
+                const summary = await apiGetPayoutSummary();
+                showResult('payoutsResult', `✅ Resumo de saques:\n${JSON.stringify(summary, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('payoutsResult', `❌ Erro ao obter resumo: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetPromotions() {
+            showLoading('promotionsResult');
+            try {
+                const response = await apiGetPromotions();
+                const promotions = response.data || response;
+                showResult('promotionsResult', `✅ ${promotions.length} promoções encontradas\n${JSON.stringify(promotions.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('promotionsResult', `❌ Erro ao listar promoções: ${error.message}`, 'error');
+            }
+        }
+
+        async function testValidatePromotion() {
+            showLoading('promotionsResult');
+            try {
+                const validation = await apiValidatePromotion({
+                    code: 'TEST10',
+                    amount: 100.00
+                });
+                showResult('promotionsResult', `✅ Validação de promoção:\n${JSON.stringify(validation, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('promotionsResult', `❌ Erro ao validar promoção: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetReports() {
+            showLoading('reportsResult');
+            try {
+                const response = await apiGetReports();
+                const reports = response.data || response;
+                showResult('reportsResult', `✅ ${reports.length} relatórios encontrados\n${JSON.stringify(reports.slice(0, 2), null, 2)}`, 'success');
+            } catch (error) {
+                showResult('reportsResult', `❌ Erro ao listar relatórios: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateReport() {
+            if (!testPropertyId) {
+                showResult('reportsResult', '⚠️ Nenhuma propriedade ID disponível. Crie uma propriedade primeiro.', 'info');
+                return;
+            }
+            
+            showLoading('reportsResult');
+            try {
+                const report = await apiCreateReport({
+                    reported_type: 'property',
+                    reported_id: testPropertyId,
+                    report_type: 'other',
+                    reason: 'Relatório de teste',
+                    description: 'Este é um relatório de teste para validação da API'
+                });
+                showResult('reportsResult', `✅ Relatório criado!\n${JSON.stringify(report, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('reportsResult', `❌ Erro ao criar relatório: ${error.message}\n${JSON.stringify(error.data || {}, null, 2)}`, 'error');
+            }
+        }
+
+        // Teste automático ao carregar a página
+        window.addEventListener('load', () => {
+            showResult('authResult', '👋 Bem-vindo ao teste de integração! Faça login para testar os endpoints protegidos.', 'info');
+        });
+    </script>
+</body>
+</html>
