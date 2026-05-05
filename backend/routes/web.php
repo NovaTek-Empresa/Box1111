@@ -40,3 +40,42 @@ Route::get('/login', function () {
         'message' => 'Unauthenticated'
     ], 401);
 })->name('login');
+
+/*
+|--------------------------------------------------------------------------
+| Rotas para páginas estáticas
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/admin/{path?}', function ($path = 'index.html') {
+    $fullPath = public_path("admin/{$path}");
+    if (!file_exists($fullPath)) {
+        $fullPath = public_path("admin/index.html");
+    }
+    if (file_exists($fullPath)) {
+        return response()->file($fullPath);
+    }
+    abort(404);
+})->where('path', '.*');
+
+Route::get('/vendor/{path?}', function ($path = 'index.html') {
+    $fullPath = public_path("vendor/{$path}");
+    if (!file_exists($fullPath)) {
+        $fullPath = public_path("vendor/index.html");
+    }
+    if (file_exists($fullPath)) {
+        return response()->file($fullPath);
+    }
+    abort(404);
+})->where('path', '.*');
+
+Route::get('/cohost/{path?}', function ($path = 'index.html') {
+    $fullPath = public_path("cohost/{$path}");
+    if (!file_exists($fullPath)) {
+        $fullPath = public_path("cohost/index.html");
+    }
+    if (file_exists($fullPath)) {
+        return response()->file($fullPath);
+    }
+    abort(404);
+})->where('path', '.*');

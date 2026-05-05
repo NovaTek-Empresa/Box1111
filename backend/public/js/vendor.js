@@ -9,111 +9,31 @@ let vendorData = {
     recentProperties: [],
     // Estatísticas detalhadas para a tela de statistics
     statistics: {
-        revenueMonth: 35840,
-        revenueYear: 412000,
+        revenueMonth: 0,
+        revenueYear: 0,
         // séries simples para gráfico (últimos 12 meses)
-        revenueSeries: [28000, 30000, 32000, 29000, 35000, 36000, 37000, 34000, 38000, 40000, 42000, 35840],
+        revenueSeries: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         // desempenho por anúncio
-        adsPerformance: [
-            { id: 1, title: 'Casa Alto Padrão', views: 245, requests: 18, rentals: 6 },
-            { id: 2, title: 'Sobrado Moderno', views: 189, requests: 12, rentals: 4 },
-            { id: 3, title: 'Apartamento Centro', views: 76, requests: 6, rentals: 1 },
-            { id: 4, title: 'Loja Centro', views: 52, requests: 5, rentals: 2 },
-            { id: 5, title: 'Chácara Verde', views: 34, requests: 3, rentals: 1 }
-        ],
+        adsPerformance: [],
         // top produtos (top 5)
-        topProducts: [
-            { id: 1, title: 'Casa Alto Padrão', rentals: 6, revenue: 1250000 },
-            { id: 2, title: 'Sobrado Moderno', rentals: 4, revenue: 790000 },
-            { id: 4, title: 'Loja Centro', rentals: 2, revenue: 32000 },
-            { id: 3, title: 'Apartamento Centro', rentals: 1, revenue: 420000 },
-            { id: 5, title: 'Chácara Verde', rentals: 1, revenue: 5000 }
-        ],
+        topProducts: [],
         // ocupação
-        occupancy: [
-            { id: 1, title: 'Casa Alto Padrão', bookings: [5,6,7,15,16,17] },
-            { id: 2, title: 'Sobrado Moderno', bookings: [1,2,3,20,21] },
-            { id: 3, title: 'Apartamento Centro', bookings: [10,11,12] }
-        ],
+        occupancy: [],
         // avaliações
         reviews: {
-            average: 4.7,
-            count: 128,
-            recent: [
-                { user: 'Ana', comment: 'Ótima hospedagem, recomendo!', rating: 5 },
-                { user: 'Pedro', comment: 'Local limpo e bem localizado.', rating: 4 }
-            ]
+            average: 0,
+            count: 0,
+            recent: []
         },
         // pendências
         pending: {
-            requests: [ { id: 101, name: 'João', property: 'Sobrado Moderno', date: '04/12/2025' } ],
-            upcomingReturns: [ { id: 1, property: 'Casa Alto Padrão', due: '06/12/2025' } ],
-            overdue: [ { id: 2, property: 'Sobrado Moderno', due: '28/11/2025', daysLate: 5 } ]
+            requests: [],
+            upcomingReturns: [],
+            overdue: []
         },
-        insights: [
-            'Alta demanda às sextas-feiras entre 18h e 21h',
-            'Considere aumentar preço em 10% para Casa Alto Padrão em feriados',
-            'Itens com baixa taxa de conversão: revisar fotos/descrição'
-        ]
+        insights: []
     },
-    notifications: [
-        {
-            id: 1,
-            title: "Nova solicitação de reserva",
-            message: "João Silva solicitou reserva para Casa Alto Padrão",
-            time: "Há 5 minutos",
-            icon: "fas fa-home",
-            read: false
-        },
-        {
-            id: 2,
-            title: "Pagamento recebido",
-            message: "Pagamento de R$ 2.500 da reserva ID: 456 foi confirmado",
-            time: "Há 1 hora",
-            icon: "fas fa-dollar-sign",
-            read: false
-        },
-        {
-            id: 3,
-            title: "Avaliação recebida",
-            message: "Ana Costa deixou uma avaliação 5 estrelas em Sobrado Moderno",
-            time: "Há 2 horas",
-            icon: "fas fa-star",
-            read: false
-        },
-        {
-            id: 4,
-            title: "Sugestão de melhoria",
-            message: "Sistema detectou fotos de baixa qualidade no seu imóvel",
-            time: "Há 1 dia",
-            icon: "fas fa-lightbulb",
-            read: true
-        },
-        {
-            id: 5,
-            title: "Nova mensagem de hóspede",
-            message: "Pedro Oliveira enviou uma mensagem sobre disponibilidade",
-            time: "Há 2 dias",
-            icon: "fas fa-envelope",
-            read: true
-        },
-        {
-            id: 6,
-            title: "Cancelamento de reserva",
-            message: "Reserva ID: 123 foi cancelada pelo cliente",
-            time: "Há 3 dias",
-            icon: "fas fa-times-circle",
-            read: true
-        },
-        {
-            id: 7,
-            title: "Proprietário solicitou atualização",
-            message: "Atualize as fotos do Apartamento Centro para aumentar visualizações",
-            time: "Há 4 dias",
-            icon: "fas fa-camera",
-            read: false
-        }
-    ]
+    notifications: []
 };
 
 // Dados de chat (carregados da API)
@@ -1643,44 +1563,62 @@ function submitAddPropertyForm() {
         return;
     }
 
-    // Mock submit - in production, send to server
-    console.log('Imóvel para publicar:', propertyData);
-    
-    // Show success message
-    const successMsg = document.createElement('div');
-    successMsg.className = 'success-message';
-    successMsg.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #22c55e;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-        ">
-            <i class="fas fa-check-circle"></i> Imóvel publicado com sucesso!
-        </div>
-    `;
-    document.body.appendChild(successMsg);
-    
-    // Clear form
-    form.reset();
-    selectedPropertyTags = [];
-    const tagsDisplay = document.getElementById('tagsDisplay');
-    if (tagsDisplay) tagsDisplay.innerHTML = '';
-    document.getElementById('imagePreview').innerHTML = '';
-    document.getElementById('charCount').textContent = '0 / 2000 caracteres';
-    
-    // Uncheck all checkboxes
-    document.querySelectorAll('.tag-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
-    document.querySelectorAll('.feature-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
-    
-    // Remove success message after 4 seconds
-    setTimeout(() => successMsg.remove(), 4000);
+    // Enviar para a API
+    apiCreateProperty({
+        title: propertyData.title,
+        property_type: propertyData.type,
+        street_address: propertyData.address.street,
+        neighborhood: propertyData.address.neighborhood,
+        city: propertyData.address.city,
+        state: propertyData.address.state,
+        postal_code: propertyData.address.cep,
+        bedrooms: parseInt(propertyData.bedrooms) || 1,
+        bathrooms: parseInt(propertyData.bathrooms) || 1,
+        guests_capacity: parseInt(propertyData.bedrooms) || 1,
+        nightly_price: parseFloat(propertyData.price.replace(/[R$\s.]/g, '').replace(',', '.')) || 0,
+        description: propertyData.description
+    }).then(response => {
+        // Show success message
+        const successMsg = document.createElement('div');
+        successMsg.className = 'success-message';
+        successMsg.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #22c55e;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            ">
+                <i class="fas fa-check-circle"></i> Imóvel publicado com sucesso!
+            </div>
+        `;
+        document.body.appendChild(successMsg);
+        
+        // Reset form
+        form.reset();
+        
+        // Clear image preview
+        const imagePreview = document.getElementById('imagePreview');
+        if (imagePreview) imagePreview.innerHTML = '';
+        
+        // Uncheck all checkboxes
+        document.querySelectorAll('.tag-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.feature-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
+        
+        // Remove success message after 4 seconds
+        setTimeout(() => successMsg.remove(), 4000);
+        
+        // Go to properties section
+        loadSectionContent('properties');
+    }).catch(error => {
+        console.error('Erro ao criar propriedade:', error);
+        alert('Erro ao publicar imóvel. Tente novamente.');
+    });
 }
 
 // Renderers para tela de estatísticas

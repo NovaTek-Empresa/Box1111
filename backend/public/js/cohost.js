@@ -317,55 +317,67 @@ function selectMessage(messageItem) {
     const mensagemCorpo = document.querySelector('.mensagem-corpo');
     mensagemCorpo.innerHTML = '';
     
-    // Simula mensagens diferentes por contato
-    const conversations = {
-        'Carlos Silva': [
-            { type: 'received', text: 'Oi Maria, tudo bem?', time: 'Hoje 09:30' },
-            { type: 'sent', text: 'Oi Carlos! Tudo bem sim. Em que posso ajudar?', time: 'Hoje 09:45' },
-            { type: 'received', text: 'Pode confirmar se a limpeza foi feita corretamente?', time: 'Hoje 14:15' },
-            { type: 'sent', text: 'Sim, a limpeza foi feita perfeitamente. Todos os itens do checklist foram verificados.', time: 'Hoje 14:30' }
-        ],
-        'João Silva': [
-            { type: 'received', text: 'Qual é o código da porta? Cheguei antes do previsto.', time: 'Há 2 horas' },
-            { type: 'sent', text: 'Oi João! O código é 1234. Bem-vindo!', time: 'Há 1 hora 50 minutos' },
-            { type: 'received', text: 'Perfeito, muito obrigado!', time: 'Há 1 hora 40 minutos' }
-        ],
-        'Marina Costa': [
-            { type: 'received', text: 'Tudo bem, saio às 11:00 da manhã. Obrigada pela hospedagem!', time: 'Ontem' },
-            { type: 'sent', text: 'Obrigada Marina! Foi um prazer. Aproveite!', time: 'Ontem' }
-        ],
-        'Pedro Oliveira': [
-            { type: 'received', text: 'O Wi-Fi da sala não está funcionando. Podem resolver?', time: '2 dias atrás' },
-            { type: 'sent', text: 'Oi Pedro! Vou verificar. Qual é o seu quarto?', time: '2 dias atrás' },
-            { type: 'received', text: 'Quarto 301', time: '2 dias atrás' },
-            { type: 'sent', text: 'Já estou aqui. Deixa eu reiniciar o roteador.', time: '2 dias atrás' }
-        ],
-        'Ana Martins': [
-            { type: 'received', text: 'Gostaria de confirmar a reserva para 25 de fevereiro', time: '3 dias atrás' },
-            { type: 'sent', text: 'Oi Ana! Sua reserva está confirmada para 25 de fevereiro. Esperamos por você!', time: '3 dias atrás' }
-        ]
-    };
+    // Carregar conversas da API
+    loadConversationsForContact(selectedName);
     
-    const selectedName = contactName.split('(')[0].trim();
-    const messages = conversations[selectedName] || conversations['Carlos Silva'];
+    }
+
+// Carregar conversas da API para um contato específico
+async function loadConversationsForContact(contactName) {
+    try {
+        const conversations = await apiGetConversations();
+        const mensagemCorpo = document.querySelector('.mensagem-corpo');
+        
+        if (!mensagemCorpo) return;
+        
+        // Encontrar conversa com o contato específico
+        const conversation = conversations.data?.find(conv => 
+            conv.participants?.some(p => p.name === contactName)
+        );
+        
+        if (conversation && conversation.messages) {
+            conversation.messages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `msg msg-${msg.sender_type === 'current_user' ? 'sent' : 'received'}`;
+                msgDiv.innerHTML = `
+                    <p>${escapeHtml(msg.content)}</p>
+                    <span class="msg-time">${formatMessageTime(msg.created_at)}</span>
+                `;
+                mensagemCorpo.appendChild(msgDiv);
+            });
+        } else {
+            // Mensagem padrão se não houver conversas
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg msg-system';
+            msgDiv.innerHTML = `<p>Nenhuma mensagem encontrada com ${contactName}</p>`;
+            mensagemCorpo.appendChild(msgDiv);
+        }
+        
+        // Scroll para o final
+        mensagemCorpo.scrollTop = mensagemCorpo.scrollHeight;
+    } catch (error) {
+        console.error('Erro ao carregar conversas:', error);
+    }
+}
+
+function formatMessageTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     
-    messages.forEach(msg => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `msg msg-${msg.type}`;
-        msgDiv.innerHTML = `
-            <p>${escapeHtml(msg.text)}</p>
-            <span class="msg-time">${msg.time}</span>
-        `;
-        mensagemCorpo.appendChild(msgDiv);
-    });
-    
-    // Scroll para o final
-    mensagemCorpo.scrollTop = mensagemCorpo.scrollHeight;
-    
-    // Limpa input
-    const input = document.querySelector('.mensagem-input input');
-    input.value = '';
-    input.focus();
+    if (diffHours < 1) {
+        return 'Agora há pouco';
+    } else if (diffHours < 24) {
+        return `Há ${diffHours} horas`;
+    } else if (diffDays === 1) {
+        return 'Ontem';
+    } else if (diffDays < 7) {
+        return `Há ${diffDays} dias`;
+    } else {
+        return date.toLocaleDateString('pt-BR');
+    }
 }
 
 // Enviar mensagem
