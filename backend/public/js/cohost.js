@@ -509,34 +509,9 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Cache de dados (simulado)
+// Cache de dados (carregado da API)
 const cacheData = {
-    reservas: [
-        {
-            id: 1,
-            property: 'Casa com Piscina',
-            guest: 'João Silva',
-            checkIn: '15/02/2026',
-            checkOut: '20/02/2026',
-            status: 'confirmada'
-        },
-        {
-            id: 2,
-            property: 'Apartamento Centro',
-            guest: 'Pedro Oliveira',
-            checkIn: '10/02/2026',
-            checkOut: '12/02/2026',
-            status: 'ativa'
-        },
-        {
-            id: 3,
-            property: 'Sobrado Moderno',
-            guest: 'Marina Costa',
-            checkIn: '08/02/2026',
-            checkOut: '10/02/2026',
-            status: 'concluida'
-        }
-    ]
+    reservas: []
 };
 
 // Função auxiliar para formatar datas

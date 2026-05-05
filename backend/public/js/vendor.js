@@ -770,7 +770,7 @@ function loadSectionContent(section) {
                                                 <button type="button" class="btn btn-outline">Alterar Foto</button>
                                             </label>
                                         </div>
-                                        <h3 id="profileName">Carlos Silva</h3>
+                                        <h3 id="profileName">Carregando...</h3>
                                         <p class="muted">Anfitrião • Conta verificada</p>
                                         <div class="profile-actions">
                                             <button id="btnEditProfile" class="btn">Editar Perfil</button>
@@ -817,22 +817,22 @@ function loadSectionContent(section) {
                                             <div class="form-row">
                                                 <div class="form-group">
                                                     <label for="profileFullName">Nome completo</label>
-                                                    <input id="profileFullName" type="text" value="Carlos Silva">
+                                                    <input id="profileFullName" type="text" value="">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="profileEmail">E-mail</label>
-                                                    <input id="profileEmail" type="email" value="carlos@example.com">
+                                                    <input id="profileEmail" type="email" value="">
                                                 </div>
                                             </div>
 
                                             <div class="form-row">
                                                 <div class="form-group">
                                                     <label for="profilePhone">Telefone</label>
-                                                    <input id="profilePhone" type="text" value="(11) 99999-9999">
+                                                    <input id="profilePhone" type="text" value="">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="profileCompany">Empresa / CPF</label>
-                                                    <input id="profileCompany" type="text" value="Autônomo">
+                                                    <input id="profileCompany" type="text" value="">
                                                 </div>
                                             </div>
 
@@ -843,7 +843,7 @@ function loadSectionContent(section) {
                                                 </div>
                                                 <div class="form-group" style="flex:2">
                                                     <label for="profileStreet">Rua / Logradouro *</label>
-                                                    <input id="profileStreet" name="street" type="text" required placeholder="Rua exemplo">
+                                                    <input id="profileStreet" name="street" type="text" required placeholder="">
                                                 </div>
                                                 <div class="form-group" style="max-width:120px">
                                                     <label for="profileNumber">Número *</label>
