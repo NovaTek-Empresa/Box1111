@@ -121,22 +121,4 @@ class AuthController extends Controller
         $user->phone = $data['phone'] ?? $user->phone;
 
         if (!empty($data['password'])) {
-            $user->password = Hash::make($data['password']);
-        }
-
-        $user->save();
-
-        return response()->json(['user' => $this->userWithRelations($user)]);
-    }
-
-    private function userFromToken(Request $request): ?User
-    {
-        $header = $request->bearerToken();
-
-        if (!$header) {
-            return null;
-        }
-
-        return User::where('api_token', $header)->first();
-    }
-}
+            $user->password = Hash::make($data['password']

@@ -102,34 +102,3 @@ class HostProfileController extends Controller
                 );
 
                 // Update user role
-                $user->update(['role' => 'host']);
-
-                return $this->jsonResponse(['profile' => $profile->load('user')], 201);
-            }
-        }
-
-        return response()->json(['message' => 'Invalid JSON data'], 400);
-    }
-
-    /**
-     * PUT /api/host-profiles/{host_profile}
-     * Used by admin to approve/reject a host profile.
-     */
-    public function update(Request $request, HostProfile $hostProfile): JsonResponse
-    {
-        $validated = $request->validate([
-            'status' => 'sometimes|in:pending,approved,rejected,suspended',
-            'creci'  => 'sometimes|nullable|string|max:50',
-            'bio'    => 'sometimes|nullable|string',
-        ]);
-
-        $hostProfile->update($validated);
-
-        // Sync user role when host is approved
-        if (isset($validated['status']) && $validated['status'] === 'approved') {
-            $hostProfile->user->update(['role' => 'host']);
-        }
-
-        return $this->jsonResponse($hostProfile->load('user'));
-    }
-}

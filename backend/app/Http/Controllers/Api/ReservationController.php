@@ -17,7 +17,7 @@ class ReservationController extends Controller
         $perPage = min((int) $request->query('per_page', 15), 200);
 
         // Admins can see all reservations; regular users see only their own
-        if ($user->role === 'admin') {
+        if ($user->role === 'master') {
             $query = Reservation::with(['property', 'guest', 'host']);
 
             if ($request->has('status')) {
@@ -150,36 +150,4 @@ class ReservationController extends Controller
         ]);
 
         // Unblock calendar
-        if (Schema::hasTable('calendar_availabilities')) {
-            CalendarAvailability::where('reservation_id', $reservation->id)->delete();
-        }
-
-        return $this->jsonResponse($reservation);
-    }
-
-    public function checkin(Reservation $reservation): JsonResponse
-    {
-        // TODO: Implement authorization policy
-        // $this->authorize('update', $reservation);
-
-        $reservation->update([
-            'status' => 'checked_in',
-            'checked_in_at' => now()
-        ]);
-
-        return $this->jsonResponse($reservation);
-    }
-
-    public function checkout(Reservation $reservation): JsonResponse
-    {
-        // TODO: Implement authorization policy
-        // $this->authorize('update', $reservation);
-
-        $reservation->update([
-            'status' => 'completed',
-            'completed_at' => now()
-        ]);
-
-        return response()->json($reservation);
-    }
-}
+        if (S

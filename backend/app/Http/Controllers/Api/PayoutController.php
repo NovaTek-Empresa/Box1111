@@ -153,42 +153,4 @@ class PayoutController extends Controller
             ]);
         }
 
-        $pendingPayouts   = $hostProfile->payouts()->where('status', 'pending')->sum('amount');
-        $completedPayouts = $hostProfile->payouts()->where('status', 'completed')->sum('net_amount');
-        $availableBalance = $this->calculateBalance($hostProfile);
-
-        return $this->jsonResponse([
-            'available_balance' => $availableBalance,
-            'pending_payouts'   => $pendingPayouts,
-            'completed_payouts' => $completedPayouts,
-            'total_earnings'    => $availableBalance + $pendingPayouts + $completedPayouts,
-        ]);
-    }
-
-    // -------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------
-
-    private function calculateBalance($hostProfile): float
-    {
-        // Sum of completed reservations for all properties of this host
-        $totalEarnings = $hostProfile->properties()
-            ->with(['reservations' => function ($q) {
-                $q->where('status', 'completed');
-            }])
-            ->get()
-            ->sum(fn($p) => $p->reservations->sum('total_price'));
-
-        $totalPaidOut = $hostProfile->payouts()
-            ->where('status', 'completed')
-            ->sum('amount');
-
-        return max(0, $totalEarnings - $totalPaidOut);
-    }
-
-    private function calculateFee(float $amount): float
-    {
-        // 2% + R$ 2.00 fixo
-        return round(($amount * 0.02) + 2.00, 2);
-    }
-}
+        $

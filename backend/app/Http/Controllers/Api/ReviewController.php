@@ -24,7 +24,7 @@ class ReviewController extends Controller
 
         // Only filter by published_at for public routes; admins can see all
         $user = auth()->user();
-        if (!$user || $user->role !== 'admin') {
+        if (!$user || $user->role !== 'master') {
             $query->whereNotNull('published_at');
         }
 
@@ -74,14 +74,4 @@ class ReviewController extends Controller
         $property->update(['rating' => $reviews, 'total_reviews' => Review::where('property_id', $property->id)->count()]);
 
         return $this->jsonResponse($review, 201);
-    }
-
-    public function destroy(Review $review): JsonResponse
-    {
-        // TODO: Implement authorization policy
-        // $this->authorize('delete', $review);
-        $review->delete();
-
-        return $this->jsonResponse(['message' => 'Review deleted']);
-    }
-}
+    }

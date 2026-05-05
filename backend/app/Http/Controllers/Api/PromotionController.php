@@ -66,7 +66,7 @@ class PromotionController extends Controller
 
     public function update(Request $request, Promotion $promotion): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -91,7 +91,7 @@ class PromotionController extends Controller
 
     public function destroy(Promotion $promotion): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -199,7 +199,7 @@ class PromotionController extends Controller
 
     public function usage(Request $request, Promotion $promotion): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -214,14 +214,4 @@ class PromotionController extends Controller
     private function calculateDiscount(Promotion $promotion, float $amount): float
     {
         $discount = $promotion->type === 'percentage' 
-            ? $amount * ($promotion->value / 100)
-            : $promotion->value;
-
-        // Apply max discount limit
-        if ($promotion->max_discount) {
-            $discount = min($discount, $promotion->max_discount);
-        }
-
-        return round($discount, 2);
-    }
-}
+            ? $amount

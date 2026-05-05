@@ -151,38 +151,4 @@ class ConversationController extends Controller
         return $this->jsonResponse(['message' => 'Mensagens marcadas como lidas']);
     }
 
-    public function unreadCount(Request $request): JsonResponse
-    {
-        $count = Conversation::where(function ($q) {
-            $q->where('user_1', auth()->id())
-              ->orWhere('user_2', auth()->id());
-        })->whereHas('messages', function ($q) {
-            $q->where('sender_id', '!=', auth()->id())
-              ->whereNull('read_at');
-        })->count();
-
-        return $this->jsonResponse(['unread_conversations' => $count]);
-    }
-
-    public function archive(Conversation $conversation): JsonResponse
-    {
-        if ($conversation->user_1 !== auth()->id() && $conversation->user_2 !== auth()->id()) {
-            return response()->json(['message' => 'Não autorizado'], 403);
-        }
-
-        $conversation->update(['status' => 'archived', 'archived_at' => now()]);
-
-        return $this->jsonResponse($conversation);
-    }
-
-    public function unarchive(Conversation $conversation): JsonResponse
-    {
-        if ($conversation->user_1 !== auth()->id() && $conversation->user_2 !== auth()->id()) {
-            return response()->json(['message' => 'Não autorizado'], 403);
-        }
-
-        $conversation->update(['status' => 'active', 'archived_at' => null]);
-
-        return $this->jsonResponse($conversation);
-    }
-}
+    public function unrea

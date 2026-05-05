@@ -87,7 +87,7 @@ class UserController extends Controller
     {
         $authUser = auth()->user();
         // Only admin or the user themselves can update
-        if ($authUser->role !== 'admin' && $authUser->id !== $user->id) {
+        if ($authUser->role !== 'master' && $authUser->id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -116,7 +116,7 @@ class UserController extends Controller
 
     public function destroy(User $user): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -132,7 +132,7 @@ class UserController extends Controller
     public function documents(Request $request, User $user): JsonResponse
     {
         $authUser = auth()->user();
-        if ($authUser->role !== 'admin' && $authUser->id !== $user->id) {
+        if ($authUser->role !== 'master' && $authUser->id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -144,7 +144,7 @@ class UserController extends Controller
     public function uploadDocument(Request $request, User $user): JsonResponse
     {
         $authUser = auth()->user();
-        if ($authUser->role !== 'admin' && $authUser->id !== $user->id) {
+        if ($authUser->role !== 'master' && $authUser->id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -169,27 +169,4 @@ class UserController extends Controller
             'status' => 'pending'
         ]);
 
-        return $this->jsonResponse($document, 201);
-    }
-
-    public function verifyDocument(Request $request, User $user, UserDocument $document): JsonResponse
-    {
-        if (auth()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $validated = $request->validate([
-            'status' => 'required|in:approved,rejected',
-            'rejection_reason' => 'required_if:status,rejected|string|max:255'
-        ]);
-
-        $document->update([
-            'status' => $validated['status'],
-            'rejection_reason' => $validated['rejection_reason'] ?? null,
-            'verified_at' => now(),
-            'verified_by' => auth()->id()
-        ]);
-
-        return $this->jsonResponse($document);
-    }
-}
+        return $this->jsonRespo

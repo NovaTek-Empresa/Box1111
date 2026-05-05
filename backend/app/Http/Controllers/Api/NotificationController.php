@@ -81,35 +81,4 @@ class NotificationController extends Controller
 
         $notification->update(['read_at' => now()]);
 
-        return $this->jsonResponse($notification);
-    }
-
-    public function markAllAsRead(Request $request): JsonResponse
-    {
-        auth()->user()->notifications()
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
-
-        return $this->jsonResponse(['message' => 'Todas as notificações marcadas como lidas']);
-    }
-
-    public function destroy(Notification $notification): JsonResponse
-    {
-        if ($notification->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Não autorizado'], 403);
-        }
-
-        $notification->delete();
-
-        return $this->jsonResponse(['message' => 'Notificação removida']);
-    }
-
-    public function unreadCount(Request $request): JsonResponse
-    {
-        $count = auth()->user()->notifications()
-            ->whereNull('read_at')
-            ->count();
-
-        return $this->jsonResponse(['unread_count' => $count]);
-    }
-}
+        return $t

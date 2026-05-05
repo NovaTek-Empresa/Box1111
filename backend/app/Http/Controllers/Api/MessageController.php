@@ -139,12 +139,12 @@ class MessageController extends Controller
     public function destroy(Message $message): JsonResponse
     {
         // Only the sender or an admin may delete
-        if ($message->sender_id !== auth()->id() && auth()->user()->role !== 'admin') {
+        if ($message->sender_id !== auth()->id() && auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
         // Only allow deleting within 1 hour (admins bypass this)
-        if (auth()->user()->role !== 'admin' && $message->created_at->diffInHours(now()) > 1) {
+        if (auth()->user()->role !== 'master' && $message->created_at->diffInHours(now()) > 1) {
             return response()->json(['error' => 'Message can no longer be deleted'], 400);
         }
 
@@ -187,44 +187,4 @@ class MessageController extends Controller
         $file = Storage::get($message->file_path);
 
         return response($file, 200, [
-            'Content-Type'        => $message->file_mime_type,
-            'Content-Disposition' => 'attachment; filename="' . $message->file_name . '"',
-        ]);
-    }
-
-    public function typing(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'conversation_id' => 'required|exists:conversations,id',
-            'is_typing'       => 'required|boolean',
-        ]);
-
-        $conversation = Conversation::findOrFail($validated['conversation_id']);
-
-        if (!$this->isParticipant($conversation)) {
-            return response()->json(['message' => 'Não autorizado'], 403);
-        }
-
-        $key = "typing:{$conversation->id}:" . auth()->id();
-
-        if ($validated['is_typing']) {
-            cache()->put($key, true, 10);
-        } else {
-            cache()->forget($key);
-        }
-
-        return $this->jsonResponse(['status' => 'updated']);
-    }
-
-    private function getMessageTypeFromFile($file): string
-    {
-        $mimeType = $file->getMimeType();
-
-        if (str_starts_with($mimeType, 'image/'))  return 'image';
-        if (str_starts_with($mimeType, 'video/'))  return 'video';
-        if (str_starts_with($mimeType, 'audio/'))  return 'audio';
-        if ($mimeType === 'application/pdf')        return 'document';
-
-        return 'file';
-    }
-}
+            'Content-Type' 

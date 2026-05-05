@@ -50,7 +50,7 @@ class ReportController extends Controller
     {
         $user = auth()->user();
         // Admin can view any report; others can only view their own
-        if ($user->role !== 'admin' && $report->reporter_id !== $user->id) {
+        if ($user->role !== 'master' && $report->reporter_id !== $user->id) {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -107,7 +107,7 @@ class ReportController extends Controller
 
     public function update(Request $request, Report $report): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -125,7 +125,7 @@ class ReportController extends Controller
 
     public function destroy(Report $report): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -151,7 +151,7 @@ class ReportController extends Controller
 
     public function statistics(Request $request): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -179,7 +179,7 @@ class ReportController extends Controller
 
     public function bulkUpdate(Request $request): JsonResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'master') {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -205,22 +205,3 @@ class ReportController extends Controller
             'updated_count' => $updated
         ]);
     }
-
-    private function getReportedEntity(string $type, int $id)
-    {
-        switch ($type) {
-            case 'property':
-                return Property::find($id);
-            case 'user':
-                return User::find($id);
-            case 'reservation':
-                return \App\Models\Reservation::find($id);
-            case 'review':
-                return \App\Models\Review::find($id);
-            case 'message':
-                return \App\Models\Message::find($id);
-            default:
-                return null;
-        }
-    }
-}
