@@ -19,14 +19,13 @@ use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\PromotionController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\AdminController;
 
 // Authentication endpoints (no CSRF protection)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('authenticate-bearer');
+Route::get('/user', [AuthController::class, 'current'])->middleware('authenticate-bearer');
 
 Route::put('/user', [AuthController::class, 'update'])->middleware('authenticate-bearer');
 
@@ -44,7 +43,16 @@ Route::get('/webhooks/mercadopago/health', [WebhookController::class, 'health'])
 // Protected routes (require authentication)
 Route::middleware('authenticate-bearer')->group(function () {
     Route::post('/host-profiles', [HostProfileController::class, 'store']);
+    Route::put('/host-profiles/{host_profile}', [HostProfileController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Admin endpoints
+    Route::prefix('admin')->group(function () {
+        Route::get('/stats',              [AdminController::class, 'stats']);
+        Route::get('/recent-activities',  [AdminController::class, 'recentActivities']);
+        Route::get('/recent-properties',  [AdminController::class, 'recentProperties']);
+        Route::get('/chart-data',         [AdminController::class, 'chartData']);
+    });
     
     // Properties
     Route::post('/properties', [PropertyController::class, 'store']);

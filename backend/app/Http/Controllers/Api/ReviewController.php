@@ -22,7 +22,14 @@ class ReviewController extends Controller
             $query->where('host_id', $request->host_id);
         }
 
-        $reviews = $query->where('published_at', '!=', null)->paginate();
+        // Only filter by published_at for public routes; admins can see all
+        $user = auth()->user();
+        if (!$user || $user->role !== 'admin') {
+            $query->whereNotNull('published_at');
+        }
+
+        $perPage = min((int) $request->query('per_page', 15), 200);
+        $reviews = $query->latest()->paginate($perPage);
 
         return $this->paginatedResponse($reviews);
     }

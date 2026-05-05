@@ -13,7 +13,24 @@ class PropertyController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Property::where('status', 'active');
+        // Default: public sees only active; pass ?status= to filter by specific status
+        // Admin passes ?status=inactive / ?status=pending / ?status=all for full access
+        // When ?host_id= is provided (vendor dashboard), show all statuses for that host
+        $query = Property::with('host.user');
+
+        $hasHostIdFilter = $request->has('host_id');
+
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        } elseif (!$request->has('status') && !$hasHostIdFilter) {
+            // Default public view: only active (skip when filtering by host so vendor sees all their properties)
+            $query->where('status', 'active');
+        }
+        // if ?status=all OR ?host_id= → no default status filter
+
+        if ($hasHostIdFilter) {
+            $query->where('host_id', $request->host_id);
+        }
 
         if ($request->has('city')) {
             $query->where('city', $request->city);
@@ -35,7 +52,8 @@ class PropertyController extends Controller
             $query->where('nightly_price', '<=', $request->max_price);
         }
 
-        $properties = $query->paginate(12);
+        $perPage = min((int) $request->query('per_page', 12), 200);
+        $properties = $query->paginate($perPage);
 
         return $this->paginatedResponse($properties);
     }
@@ -90,9 +108,12 @@ class PropertyController extends Controller
 
     public function update(Request $request, Property $property): JsonResponse
     {
-        // Check if user owns this property
-        if (!auth()->user()->hostProfile || auth()->user()->hostProfile->id !== $property->host_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $user = auth()->user();
+        // Admins can update any property; hosts can only update their own
+        if ($user->role !== 'admin') {
+            if (!$user->hostProfile || $user->hostProfile->id !== $property->host_id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
         }
 
         $validated = $request->validate([
@@ -124,9 +145,11 @@ class PropertyController extends Controller
 
     public function destroy(Property $property): JsonResponse
     {
-        // Check if user owns this property
-        if (!auth()->user()->hostProfile || auth()->user()->hostProfile->id !== $property->host_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $user = auth()->user();
+        if ($user->role !== 'admin') {
+            if (!$user->hostProfile || $user->hostProfile->id !== $property->host_id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
         }
 
         $property->delete();

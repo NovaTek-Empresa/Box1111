@@ -10,9 +10,23 @@ use App\Http\Controllers\Controller;
 
 class PayoutController extends Controller
 {
+    /**
+     * Helper: get the HostProfile for the current user, or return null.
+     */
+    private function getHostProfile()
+    {
+        return auth()->user()->hostProfile;
+    }
+
     public function index(Request $request): JsonResponse
     {
-        $query = auth()->user()->payouts();
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile) {
+            return response()->json(['message' => 'Perfil de anfitrião não encontrado'], 404);
+        }
+
+        $query = $hostProfile->payouts();
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -26,45 +40,62 @@ class PayoutController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $payouts = $query->orderBy('created_at', 'desc')->paginate();
+        $payouts = $query->orderBy('created_at', 'desc')->paginate(15);
 
         return $this->paginatedResponse($payouts);
     }
 
     public function show(Payout $payout): JsonResponse
     {
-        $this->authorize('view', $payout);
+        $hostProfile = $this->getHostProfile();
 
-        return $this->jsonResponse($payout->load(['bankAccount', 'reservation.property']));
+        if (!$hostProfile || $payout->host_id !== $hostProfile->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
+
+        return $this->jsonResponse($payout->load(['bankAccount']));
     }
 
     public function store(Request $request): JsonResponse
     {
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile) {
+            return response()->json(['message' => 'Perfil de anfitrião não encontrado'], 404);
+        }
+
         $validated = $request->validate([
             'bank_account_id' => 'required|exists:bank_accounts,id',
-            'amount' => 'required|numeric|min:1',
-            'description' => 'nullable|string|max:255'
+            'amount'          => 'required|numeric|min:1',
         ]);
 
-        $bankAccount = BankAccount::findOrFail($validated['bank_account_id']);
-        $this->authorize('use', $bankAccount);
+        // Verify the bank account belongs to this host
+        $bankAccount = BankAccount::where('id', $validated['bank_account_id'])
+            ->where('host_id', $hostProfile->id)
+            ->first();
 
-        // Check if user has sufficient balance (simplified logic)
-        $userBalance = $this->calculateUserBalance();
-        if ($userBalance < $validated['amount']) {
+        if (!$bankAccount) {
+            return response()->json(['message' => 'Conta bancária não encontrada'], 404);
+        }
+
+        $availableBalance = $this->calculateBalance($hostProfile);
+
+        if ($availableBalance < $validated['amount']) {
             return response()->json([
-                'error' => 'Insufficient balance',
-                'available_balance' => $userBalance
+                'error'             => 'Saldo insuficiente',
+                'available_balance' => $availableBalance,
             ], 400);
         }
 
-        $payout = auth()->user()->payouts()->create([
+        $fee       = $this->calculateFee($validated['amount']);
+        $netAmount = $validated['amount'] - $fee;
+
+        $payout = $hostProfile->payouts()->create([
             'bank_account_id' => $validated['bank_account_id'],
-            'amount' => $validated['amount'],
-            'description' => $validated['description'] ?? 'Payout request',
-            'status' => 'pending',
-            'fee' => $this->calculatePayoutFee($validated['amount']),
-            'net_amount' => $validated['amount'] - $this->calculatePayoutFee($validated['amount'])
+            'amount'          => $validated['amount'],
+            'fees'            => $fee,
+            'net_amount'      => $netAmount,
+            'status'          => 'pending',
         ]);
 
         return $this->jsonResponse($payout, 201);
@@ -72,13 +103,17 @@ class PayoutController extends Controller
 
     public function update(Request $request, Payout $payout): JsonResponse
     {
-        $this->authorize('update', $payout);
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile || $payout->host_id !== $hostProfile->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $validated = $request->validate([
-            'status' => 'required|in:pending,processing,completed,failed,cancelled',
+            'status'                 => 'required|in:pending,processing,completed,failed,cancelled',
             'gateway_transaction_id' => 'nullable|string|max:255',
-            'failure_reason' => 'nullable|string|max:255',
-            'processed_at' => 'nullable|date'
+            'failure_reason'         => 'nullable|string|max:255',
+            'processed_at'           => 'nullable|date',
         ]);
 
         $payout->update($validated);
@@ -88,58 +123,72 @@ class PayoutController extends Controller
 
     public function destroy(Payout $payout): JsonResponse
     {
-        $this->authorize('delete', $payout);
+        $hostProfile = $this->getHostProfile();
 
-        if ($payout->status === 'processing' || $payout->status === 'completed') {
+        if (!$hostProfile || $payout->host_id !== $hostProfile->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
+
+        if (in_array($payout->status, ['processing', 'completed'])) {
             return response()->json([
-                'error' => 'Cannot delete payout that is being processed or has been completed'
+                'error' => 'Não é possível cancelar um saque em processamento ou concluído',
             ], 400);
         }
 
         $payout->update(['status' => 'cancelled']);
 
-        return $this->jsonResponse(['message' => 'Payout cancelled']);
+        return $this->jsonResponse(['message' => 'Saque cancelado']);
     }
 
     public function summary(Request $request): JsonResponse
     {
-        $user = auth()->user();
-        
-        $pendingPayouts = $user->payouts()->where('status', 'pending')->sum('amount');
-        $completedPayouts = $user->payouts()->where('status', 'completed')->sum('amount');
-        $availableBalance = $this->calculateUserBalance();
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile) {
+            return $this->jsonResponse([
+                'available_balance' => 0,
+                'pending_payouts'   => 0,
+                'completed_payouts' => 0,
+                'total_earnings'    => 0,
+            ]);
+        }
+
+        $pendingPayouts   = $hostProfile->payouts()->where('status', 'pending')->sum('amount');
+        $completedPayouts = $hostProfile->payouts()->where('status', 'completed')->sum('net_amount');
+        $availableBalance = $this->calculateBalance($hostProfile);
 
         return $this->jsonResponse([
             'available_balance' => $availableBalance,
-            'pending_payouts' => $pendingPayouts,
+            'pending_payouts'   => $pendingPayouts,
             'completed_payouts' => $completedPayouts,
-            'total_earnings' => $availableBalance + $pendingPayouts + $completedPayouts
+            'total_earnings'    => $availableBalance + $pendingPayouts + $completedPayouts,
         ]);
     }
 
-    private function calculateUserBalance(): float
+    // -------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------
+
+    private function calculateBalance($hostProfile): float
     {
-        // Simplified balance calculation
-        // In production, this would calculate from completed reservations and payments
-        $totalEarnings = auth()->user()
-            ->hostProfile
-            ->properties()
-            ->with(['reservations' => function ($query) {
-                $query->where('status', 'completed');
+        // Sum of completed reservations for all properties of this host
+        $totalEarnings = $hostProfile->properties()
+            ->with(['reservations' => function ($q) {
+                $q->where('status', 'completed');
             }])
             ->get()
-            ->sum(function ($property) {
-                return $property->reservations->sum('total_price');
-            });
+            ->sum(fn($p) => $p->reservations->sum('total_price'));
 
-        $totalPayouts = auth()->user()->payouts()->where('status', 'completed')->sum('amount');
+        $totalPaidOut = $hostProfile->payouts()
+            ->where('status', 'completed')
+            ->sum('amount');
 
-        return max(0, $totalEarnings - $totalPayouts);
+        return max(0, $totalEarnings - $totalPaidOut);
     }
 
-    private function calculatePayoutFee(float $amount): float
+    private function calculateFee(float $amount): float
     {
-        // Simple fee calculation: 2% + R$ 2.00 fixed
-        return ($amount * 0.02) + 2.00;
+        // 2% + R$ 2.00 fixo
+        return round(($amount * 0.02) + 2.00, 2);
     }
 }

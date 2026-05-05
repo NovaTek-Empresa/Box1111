@@ -273,8 +273,7 @@ async function loadDashboardData() {
         loadRecentProperties();
     } catch (error) {
         console.error('Error loading dashboard data:', error);
-        // Fallback para dados mockados em caso de erro
-        loadDashboardData();
+        // Apenas loga o erro, sem recursão
     }
 }
 
@@ -349,11 +348,13 @@ async function getUnreadMessagesCount() {
     }
 }
 
-// Calcular receita total
+// Calcular receita total a partir de reservas completadas
 async function calculateTotalRevenue(properties) {
     try {
-        const total = properties.reduce((sum, p) => sum + (p.nightly_price || 0), 0);
-        return total;
+        if (!properties || !properties.length) return 0;
+        // Busca o resumo de saques que já inclui o total de ganhos
+        const summary = await apiFetch('/payouts/summary');
+        return summary?.total_earnings || 0;
     } catch (error) {
         return 0;
     }
@@ -1136,97 +1137,102 @@ function setupProfileInteractions() {
         });
     }
 
-    // Payment methods management (localStorage)
+    // Contas bancárias – gerenciadas via API (bank-accounts)
     (function(){
-        const paymentsKey = 'vendor_profile_payments';
-        let payments = [];
+        function escHtml(s){ return String(s||'').replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
 
-        function loadPayments() {
-            try { payments = JSON.parse(localStorage.getItem(paymentsKey) || '[]'); } catch(e){ payments = []; }
-        }
-        function savePayments() { localStorage.setItem(paymentsKey, JSON.stringify(payments)); }
-
-        function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-
-        function renderPayments(){
+        async function renderBankAccounts(){
             const list = document.getElementById('paymentsList');
             if (!list) return;
-            list.innerHTML = '';
-            if (payments.length === 0) { list.innerHTML = '<div class="muted">Nenhum método cadastrado.</div>'; return; }
-        payments.forEach((p, idx) => {
-            const item = document.createElement('div');
-            item.className = 'payment-item';
-            // format value per type
-            let displayValue = '';
-            if (p.type === 'credit' || p.type === 'debit') {
-                // mask card number, show last 4
-                const digits = String(p.value).replace(/\D/g, '');
-                const last4 = digits.slice(-4);
-                displayValue = digits ? `•••• •••• •••• ${last4}` : p.value;
-            } else if (p.type === 'pix') {
-                const v = String(p.value);
-                displayValue = v.length > 12 ? v.slice(0,6) + '…' + v.slice(-4) : v;
-            } else if (p.type === 'boleto') {
-                const v = String(p.value).replace(/\s+/g,'');
-                displayValue = v.length > 8 ? '...'+v.slice(-8) : v;
-            } else if (p.type === 'cash') {
-                displayValue = 'Pago na entrada (dinheiro)';
-            } else {
-                displayValue = p.value;
+            list.innerHTML = '<div class="muted">Carregando contas bancárias...</div>';
+            try {
+                const resp = await apiGetBankAccounts();
+                const accounts = (resp && resp.data) ? resp.data : [];
+                list.innerHTML = '';
+                if (!accounts.length) {
+                    list.innerHTML = '<div class="muted">Nenhuma conta bancária cadastrada.</div>';
+                    return;
+                }
+                accounts.forEach(function(a){
+                    const item = document.createElement('div');
+                    item.className = 'payment-item';
+                    const typeLabel = a.account_type === 'checking' ? 'Corrente' : 'Poupança';
+                    const masked = '••••' + String(a.account_number || '').slice(-4);
+                    item.innerHTML =
+                        '<div class="payment-main">' +
+                            '<div class="payment-type-badge">' + escHtml(typeLabel) + '</div>' +
+                            '<div class="payment-label">' + escHtml(a.bank_name) + '</div>' +
+                            '<div class="payment-value">' + escHtml(masked) + ' – ' + escHtml(a.account_holder_name) + '</div>' +
+                        '</div>' +
+                        '<div class="payment-actions">' +
+                            '<button class="btn btn-outline btn-sm" data-id="' + a.id + '">Remover</button>' +
+                        '</div>';
+                    list.appendChild(item);
+                });
+                list.querySelectorAll('button[data-id]').forEach(function(btn){
+                    btn.addEventListener('click', async function(){
+                        if (!confirm('Remover esta conta bancária?')) return;
+                        try {
+                            await apiDeleteBankAccount(btn.getAttribute('data-id'));
+                            renderBankAccounts();
+                        } catch(e){ alert('Erro ao remover conta.'); }
+                    });
+                });
+            } catch(e){
+                list.innerHTML = '<div class="muted">Erro ao carregar contas.</div>';
             }
-
-            const typeLabel = (p.type === 'credit' && 'Crédito') || (p.type === 'debit' && 'Débito') || (p.type === 'pix' && 'PIX') || (p.type === 'boleto' && 'Boleto') || (p.type === 'cash' && 'Dinheiro') || p.type;
-
-            item.innerHTML = `
-                <div class="payment-main">
-                    <div class="payment-type-badge ${p.type}">${escapeHtml(typeLabel)}</div>
-                    <div class="payment-label">${escapeHtml(p.label)}</div>
-                    <div class="payment-value">${escapeHtml(displayValue)}</div>
-                </div>
-                <div class="payment-actions">
-                    <button class="btn btn-outline btn-sm" data-idx="${idx}">Remover</button>
-                </div>`;
-            list.appendChild(item);
-        });
-            list.querySelectorAll('button[data-idx]').forEach(btn=>btn.addEventListener('click', ()=>{
-                const i = Number(btn.getAttribute('data-idx'));
-                payments.splice(i,1); savePayments(); renderPayments();
-            }));
         }
 
-        loadPayments(); renderPayments();
+        renderBankAccounts();
 
         const addPaymentForm = document.getElementById('addPaymentForm');
         if (addPaymentForm) {
-            addPaymentForm.addEventListener('submit', (e)=>{
+            addPaymentForm.addEventListener('submit', async function(e){
                 e.preventDefault();
-                const type = document.getElementById('paymentType').value || 'card';
-                const label = document.getElementById('paymentLabel').value.trim();
-                const value = document.getElementById('paymentValue').value.trim();
-                if (!label || !value) { alert('Preencha apelido e número/chave do método.'); return; }
-                payments.push({ type, label, value }); savePayments(); renderPayments(); addPaymentForm.reset();
+                const bankName   = (document.getElementById('paymentLabel') || {}).value || '';
+                const accountNum = (document.getElementById('paymentValue') || {}).value || '';
+                const typeEl     = document.getElementById('paymentType');
+                const accType    = typeEl ? (typeEl.value === 'savings' ? 'savings' : 'checking') : 'checking';
+                if (!bankName || !accountNum) { alert('Preencha banco e número da conta.'); return; }
+                try {
+                    await apiCreateBankAccount({
+                        bank_name:           bankName.trim(),
+                        account_number:      accountNum.trim(),
+                        account_type:        accType,
+                        account_holder_name: (currentVendorUser && currentVendorUser.name) ? currentVendorUser.name : 'Titular',
+                    });
+                    addPaymentForm.reset();
+                    renderBankAccounts();
+                } catch(err){ alert((err.data && err.data.message) || 'Erro ao cadastrar conta.'); }
             });
         }
     })();
 }
 
-// Funções de ação
+// Funções de ação para propriedades
 function editProperty(id) {
-    alert(`Editando propriedade ID: ${id}`);
-    // Em uma aplicação real, isso abriria um formulário de edição
+    // Redireciona para a tela de edição de imóvel (hash routing)
+    window.location.hash = 'edit-property-' + id;
 }
 
 function promoteProperty(id) {
-    alert(`Promovendo propriedade ID: ${id}`);
-    // Em uma aplicação real, isso abriria opções de promoção
+    // Futura funcionalidade de promoção
+    alert('Funcionalidade de promoção em breve!');
 }
 
-function togglePropertyStatus(id) {
-    const property = vendorData.recentProperties.find(p => p.id === id);
-    if (property) {
-        property.status = property.status === 'active' ? 'inactive' : 'active';
+async function togglePropertyStatus(id) {
+    const property = vendorData.recentProperties.find(function(p){ return p.id === id; });
+    if (!property) return;
+    const newStatus = property.status === 'active' ? 'inactive' : 'active';
+    try {
+        await apiFetch('/properties/' + id, {
+            method: 'PUT',
+            body: JSON.stringify({ status: newStatus })
+        });
+        property.status = newStatus;
         loadRecentProperties();
-        alert(`Status da propriedade ID: ${id} alterado para ${property.status}`);
+    } catch (err) {
+        alert((err.data && err.data.message) || 'Erro ao alterar status do imóvel.');
     }
 }
 

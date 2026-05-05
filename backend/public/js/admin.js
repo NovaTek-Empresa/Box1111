@@ -1,64 +1,55 @@
-// Dados do painel administrativo (carregados da API)
+// ============================================================
+// ADMIN.JS – Painel Administrativo
+// Todos os dados são carregados da API. Zero dados mockados.
+// ============================================================
+
+// ------------------------------------------------------------------
+// Estado global
+// ------------------------------------------------------------------
 const adminData = {
-    stats: {
-        properties: 0,
-        users: 0,
-        vendors: 0,
-        revenue: 0
-    },
+    stats: { properties: 0, users: 0, vendors: 0, revenue: 0 },
     recentActivities: [],
     recentProperties: [],
     allProperties: [],
     users: [],
     vendors: [],
     notifications: [],
-    reports: {
-        financeiro: [],
-        reservas: [],
-        imoveis: [],
-        usuarios: [],
-        avaliacoes: [],
-        operacional: []
-    }
 };
 
-// Estado da aplicação
 let appState = {
     currentSection: 'dashboard',
     editingProperty: null,
     searchQuery: '',
     currentReport: 'financeiro',
-    reportFilters: {}
+    propertiesPage: 1,
+    usersPage: 1,
+    vendorsPage: 1,
 };
 
-// Autenticação
 let currentUser = null;
 
-function getAuthToken() {
-    return localStorage.getItem('authToken');
-}
-
-function clearAuthToken() {
-    localStorage.removeItem('authToken');
-}
+// ------------------------------------------------------------------
+// Auth helpers
+// ------------------------------------------------------------------
+function getAuthToken() { return localStorage.getItem('authToken'); }
+function clearAuthToken() { localStorage.removeItem('authToken'); }
 
 function getInitialsFromName(name) {
-    if (!name || typeof name !== 'string') return '';
+    if (!name) return 'AD';
     const parts = name.trim().split(/\s+/);
-    const first = parts[0] ? parts[0][0] : '';
-    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
-    return (first + last).toUpperCase();
+    return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase() || 'AD';
 }
 
-function createInitialsAvatar(name, size = 64) {
-    const initials = getInitialsFromName(name) || 'AD';
+function createInitialsAvatar(name, size) {
+    size = size || 64;
+    const initials = getInitialsFromName(name);
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = size;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#22c55e';
     ctx.fillRect(0, 0, size, size);
-    ctx.font = `${Math.floor(size * 0.45)}px Arial`;
-    ctx.fillStyle = '#ffffff';
+    ctx.font = Math.floor(size * 0.45) + 'px Arial';
+    ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(initials, size / 2, size / 2);
@@ -68,84 +59,58 @@ function createInitialsAvatar(name, size = 64) {
 async function fetchCurrentUser() {
     try {
         const data = await apiGetCurrentUser();
-        return data?.user || data?.data || null;
-    } catch (error) {
-        console.error('fetchCurrentUser error', error);
-        return null;
-    }
+        return data && data.user ? data.user : (data && data.data ? data.data : data || null);
+    } catch (e) { return null; }
 }
 
 function applyAdminProfileUI(user) {
     if (!user) return;
-    const nameEl = document.getElementById('adminUserName');
+    const nameEl   = document.getElementById('adminUserName');
     const avatarEl = document.getElementById('adminUserAvatar');
-    const welcomeHeading = document.querySelector('.admin-header .header-left h1');
-
-    if (nameEl) nameEl.textContent = user.name || 'Administrador';
+    if (nameEl)   nameEl.textContent = user.name || 'Administrador';
     if (avatarEl) avatarEl.src = user.avatar || createInitialsAvatar(user.name);
-    if (welcomeHeading) welcomeHeading.textContent = `Dashboard - ${user.name}`;
-
-    const profileLink = document.getElementById('adminOpenProfile');
-    if (profileLink) profileLink.href = '../account-settings.html';
 }
 
 async function logoutAdmin() {
-    try {
-        await apiLogout();
-    } catch (error) {
-        console.error('logoutAdmin error', error);
-    }
+    try { await apiLogout(); } catch (e) { /* ignore */ }
     clearAuthToken();
     window.location.href = '../index.html';
 }
 
 function clearLocalData() {
-    ['favorites', 'currentUser', 'hostSignupFormData', 'vendor_profile_payments', 'reservas', 'property_reviews'].forEach(key => {
-        localStorage.removeItem(key);
-    });
+    ['favorites','currentUser','hostSignupFormData','vendor_profile_payments','reservas','property_reviews'].forEach(function(k){ localStorage.removeItem(k); });
 }
 
 async function initAdminAuth() {
     clearLocalData();
     const user = await fetchCurrentUser();
-    if (user) {
-        currentUser = user;
-        applyAdminProfileUI(user);
-    }
-    const logoutBtn = document.getElementById('adminLogoutBtn');
+    if (user) { currentUser = user; applyAdminProfileUI(user); }
+    var logoutBtn = document.getElementById('adminLogoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (event) => {
-            event.preventDefault();
-            await logoutAdmin();
-        });
+        logoutBtn.addEventListener('click', async function(e) { e.preventDefault(); await logoutAdmin(); });
     }
 }
 
+// ------------------------------------------------------------------
+// DOM ready
+// ------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar toggle (mobile)
+    var sidebarToggle   = document.getElementById('sidebarToggle');
+    var adminSidebar    = document.querySelector('.admin-sidebar');
+    var sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
-// Inicialização do painel administrativo
-document.addEventListener('DOMContentLoaded', () => {
-    // Toggle da sidebar em dispositivos móveis
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const adminSidebar = document.querySelector('.admin-sidebar');
-    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
-    
     if (sidebarToggle && adminSidebar && sidebarBackdrop) {
-        // Abrir/fechar sidebar
-        sidebarToggle.addEventListener('click', () => {
+        sidebarToggle.addEventListener('click', function() {
             adminSidebar.classList.toggle('active');
             sidebarBackdrop.classList.toggle('active');
         });
-        
-        // Fechar sidebar ao clicar no backdrop
-        sidebarBackdrop.addEventListener('click', () => {
+        sidebarBackdrop.addEventListener('click', function() {
             adminSidebar.classList.remove('active');
             sidebarBackdrop.classList.remove('active');
         });
-        
-        // Fechar sidebar ao clicar em um link de navegação
-        const navLinks = adminSidebar.querySelectorAll('.nav-item a');
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
+        adminSidebar.querySelectorAll('.nav-item a').forEach(function(link) {
+            link.addEventListener('click', function() {
                 if (window.innerWidth <= 768) {
                     adminSidebar.classList.remove('active');
                     sidebarBackdrop.classList.remove('active');
@@ -154,1565 +119,1012 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Section filters: users and vendors (filter by name or email)
-    const usersSearch = document.getElementById('usersSearch');
-    if (usersSearch) {
-        usersSearch.addEventListener('input', (e) => {
-            appState.searchQuery = e.target.value.toLowerCase().trim();
-            loadUsersTable();
-        });
-        usersSearch.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                appState.searchQuery = e.target.value.toLowerCase().trim();
-                loadUsersTable();
-            }
-        });
-    }
-
-    const vendorsSearch = document.getElementById('vendorsSearch');
-    if (vendorsSearch) {
-        vendorsSearch.addEventListener('input', (e) => {
-            appState.searchQuery = e.target.value.toLowerCase().trim();
-            loadVendorsTable();
-        });
-        vendorsSearch.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                appState.searchQuery = e.target.value.toLowerCase().trim();
-                loadVendorsTable();
-            }
-        });
-    }
-    
-    // Botão para colapsar/expandir a sidebar (desktop)
-    const adminCollapseBtn = document.getElementById('adminSidebarCollapse');
-    const adminMain = document.querySelector('.admin-main');
-
+    // Sidebar collapse (desktop)
+    var adminCollapseBtn = document.getElementById('adminSidebarCollapse');
+    var adminMain        = document.querySelector('.admin-main');
     if (adminCollapseBtn && adminSidebar && adminMain) {
-        adminCollapseBtn.addEventListener('click', () => {
-            const icon = adminCollapseBtn.querySelector('i');
+        adminCollapseBtn.addEventListener('click', function() {
+            var icon = adminCollapseBtn.querySelector('i');
             adminSidebar.classList.toggle('collapsed');
             adminMain.classList.toggle('sidebar-compact');
-            // Alternar ícone
             if (adminSidebar.classList.contains('collapsed')) {
-                if (icon) {
-                    icon.classList.remove('fa-angle-left');
-                    icon.classList.add('fa-angle-right');
-                }
+                if (icon) { icon.classList.remove('fa-angle-left'); icon.classList.add('fa-angle-right'); }
             } else {
-                if (icon) {
-                    icon.classList.remove('fa-angle-right');
-                    icon.classList.add('fa-angle-left');
-                }
+                if (icon) { icon.classList.remove('fa-angle-right'); icon.classList.add('fa-angle-left'); }
             }
         });
     }
-    
-    // Iniciar autenticação e UI do usuário
-    initAdminAuth();
 
-    // Navegação entre seções
+    // Search inputs
+    var usersSearch = document.getElementById('usersSearch');
+    if (usersSearch) {
+        usersSearch.addEventListener('input', function(e) {
+            appState.searchQuery = e.target.value.toLowerCase().trim();
+            appState.usersPage = 1;
+            loadUsersTable();
+        });
+    }
+    var vendorsSearch = document.getElementById('vendorsSearch');
+    if (vendorsSearch) {
+        vendorsSearch.addEventListener('input', function(e) {
+            appState.searchQuery = e.target.value.toLowerCase().trim();
+            appState.vendorsPage = 1;
+            loadVendorsTable();
+        });
+    }
+
+    initAdminAuth();
     setupNavigation();
-    
-    // Carregar dados do dashboard
     loadDashboardData();
-    
-    // Configurar busca
     setupAdminSearch();
-    
-    // Configurar notificações
     setupNotifications();
-    
-    // Configurar modal de propriedades
     setupPropertyModal();
-    
-    // Carregar dados das tabelas
     loadPropertiesTable();
     loadUsersTable();
     loadVendorsTable();
 });
 
-// Configurar navegação
+// ------------------------------------------------------------------
+// Navigation
+// ------------------------------------------------------------------
 function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    const contentSections = document.querySelectorAll('.content-section');
-    
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const section = item.getAttribute('data-section');
-            
-            // Atualizar estado
+    var navItems        = document.querySelectorAll('.nav-item');
+    var contentSections = document.querySelectorAll('.content-section');
+
+    navItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            var section = item.getAttribute('data-section');
             appState.currentSection = section;
-            
-            // Remover classe active de todos os itens
-            navItems.forEach(i => i.classList.remove('active'));
-            // Adicionar classe active ao item clicado
+            appState.searchQuery = '';
+
+            navItems.forEach(function(i) { i.classList.remove('active'); });
             item.classList.add('active');
-            
-            // Ocultar todas as seções
-            contentSections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Mostrar seção correspondente
-            const targetSection = document.getElementById(`${section}-section`);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
-            
-            // Atualizar o título da página
-            const pageTitle = document.querySelector('.admin-header h1');
-            const linkText = item.querySelector('span').textContent;
-            if (pageTitle) {
-                pageTitle.textContent = linkText;
-            }
-            
-            // Carregar dados específicos da seção
+
+            contentSections.forEach(function(s) { s.classList.remove('active'); });
+            var target = document.getElementById(section + '-section');
+            if (target) target.classList.add('active');
+
+            var pageTitle = document.querySelector('.admin-header h1');
+            if (pageTitle) pageTitle.textContent = item.querySelector('span') ? item.querySelector('span').textContent : section;
+
             loadSectionData(section);
         });
     });
 }
 
-// Carregar dados específicos da seção
 function loadSectionData(section) {
-    switch(section) {
-        case 'dashboard':
-            loadDashboardData();
-            break;
-        case 'properties':
-            loadPropertiesTable();
-            break;
-        case 'users':
-            loadUsersTable();
-            break;
-        case 'vendors':
-            loadVendorsTable();
-            break;
-        case 'categories':
-            // Carregar dados de categorias
-            break;
-        case 'reports':
-            loadReportsSection();
-            break;
+    switch (section) {
+        case 'dashboard':  loadDashboardData();            break;
+        case 'properties': loadPropertiesTable();          break;
+        case 'users':      loadUsersTable();               break;
+        case 'vendors':    loadVendorsTable();             break;
+        case 'reports':    if (window.loadReportsSection) window.loadReportsSection(); break;
     }
 }
 
-// Carregar dados do dashboard
-function loadDashboardData() {
-    // Atualizar estatísticas
-    updateStats();
-    
-    // Carregar atividades recentes
-    loadRecentActivities();
-    
-    // Carregar imóveis recentes
-    loadRecentProperties();
+// ------------------------------------------------------------------
+// Dashboard
+// ------------------------------------------------------------------
+async function loadDashboardData() {
+    try {
+        var results = await Promise.all([
+            apiFetch('/admin/stats'),
+            apiFetch('/admin/recent-activities'),
+            apiFetch('/admin/recent-properties'),
+        ]);
+        var stats  = results[0];
+        var recent = results[1];
+        var props  = results[2];
+
+        adminData.stats = {
+            properties: stats.total_properties || 0,
+            users:      stats.total_users      || 0,
+            vendors:    stats.total_vendors    || 0,
+            revenue:    stats.total_revenue    || 0,
+        };
+        adminData.recentActivities = recent.data || [];
+        adminData.recentProperties = props.data  || [];
+
+        updateStats();
+        loadRecentActivities();
+        loadRecentProperties();
+    } catch (err) {
+        console.error('loadDashboardData error:', err);
+    }
 }
 
-// Atualizar estatísticas
 function updateStats() {
-    const stats = adminData.stats;
-    
-    // Formatar números
-    const formatNumber = (num) => {
-        if (num >= 1000000) {
-            return (num / 1000000).toFixed(1) + 'M';
-        } else if (num >= 1000) {
-            return (num / 1000).toFixed(1) + 'K';
-        }
-        return num.toString();
-    };
-    
-    // Atualizar cards de estatística
-    const statCards = document.querySelectorAll('.stat-info h3');
-    if (statCards.length >= 4) {
-        statCards[0].textContent = formatNumber(stats.properties);
-        statCards[1].textContent = formatNumber(stats.users);
-        statCards[2].textContent = formatNumber(stats.vendors);
-        statCards[3].textContent = 'R$ ' + formatNumber(stats.revenue);
+    function fmt(n) {
+        if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+        return String(n);
+    }
+    var cards = document.querySelectorAll('.stat-info h3');
+    if (cards.length >= 4) {
+        cards[0].textContent = fmt(adminData.stats.properties);
+        cards[1].textContent = fmt(adminData.stats.users);
+        cards[2].textContent = fmt(adminData.stats.vendors);
+        cards[3].textContent = 'R$ ' + fmt(adminData.stats.revenue);
     }
 }
 
-// Carregar atividades recentes
 function loadRecentActivities() {
-    const activityList = document.getElementById('activityList');
-    if (!activityList) return;
-    
-    activityList.innerHTML = '';
-    
-    adminData.recentActivities.forEach(activity => {
-        const activityItem = document.createElement('div');
-        activityItem.classList.add('activity-item');
-        
-        activityItem.innerHTML = `
-            <div class="activity-avatar">
-                <img src="${activity.avatar}" alt="${activity.user}">
-            </div>
-            <div class="activity-content">
-                <p><strong>${activity.user}</strong> ${activity.action}</p>
-                <span class="activity-time">${activity.time}</span>
-            </div>
-        `;
-        
-        activityList.appendChild(activityItem);
-    });
-}
-
-// Carregar imóveis recentes
-function loadRecentProperties() {
-    const propertyList = document.getElementById('propertyList');
-    if (!propertyList) return;
-    
-    propertyList.innerHTML = '';
-    
-    adminData.recentProperties.forEach(property => {
-        const propertyItem = document.createElement('div');
-        propertyItem.classList.add('property-item');
-        
-        propertyItem.innerHTML = `
-            <div class="property-image">
-                <img src="${property.image}" alt="${property.title}">
-            </div>
-            <div class="property-info">
-                <h4>${property.title}</h4>
-                <p class="property-price">${property.price}</p>
-                <div class="property-meta">
-                    <span class="property-location">${property.location}</span>
-                    <span class="property-date">${property.date}</span>
-                </div>
-            </div>
-            <div class="property-actions">
-                <button class="btn-icon edit" title="Editar" onclick="editProperty(${property.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-icon delete" title="Excluir" onclick="deleteProperty(${property.id})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        `;
-        
-        propertyList.appendChild(propertyItem);
-    });
-}
-
-// Configurar busca administrativa
-function setupAdminSearch() {
-    const searchInput = document.getElementById('globalSearch');
-    const searchButton = document.querySelector('.admin-search button');
-    
-    function performSearch() {
-        const query = searchInput.value.toLowerCase().trim();
-        appState.searchQuery = query;
-        
-        // Aplicar filtro baseado na seção atual
-        switch(appState.currentSection) {
-            case 'dashboard':
-                filterDashboardData(query);
-                break;
-            case 'properties':
-                filterPropertiesTable(query);
-                break;
-            case 'users':
-                filterUsersTable(query);
-                break;
-            case 'vendors':
-                filterVendorsTable(query);
-                break;
-            // Adicionar outros casos conforme necessário
-        }
-    }
-    
-    if (searchButton) {
-        searchButton.addEventListener('click', performSearch);
-    }
-    
-    if (searchInput) {
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-        
-        // Limpar busca quando o campo estiver vazio
-        searchInput.addEventListener('input', () => {
-            if (searchInput.value === '') {
-                appState.searchQuery = '';
-                loadSectionData(appState.currentSection);
-            }
-        });
-    }
-}
-
-// Filtrar dados do dashboard
-function filterDashboardData(query) {
-    // Filtrar atividades
-    const filteredActivities = adminData.recentActivities.filter(activity => 
-        activity.user.toLowerCase().includes(query) || 
-        activity.action.toLowerCase().includes(query)
-    );
-    
-    // Filtrar propriedades
-    const filteredProperties = adminData.recentProperties.filter(property => 
-        property.title.toLowerCase().includes(query) || 
-        property.location.toLowerCase().includes(query)
-    );
-    
-    // Atualizar interface com dados filtrados
-    updateFilteredDashboardData(filteredActivities, filteredProperties);
-}
-
-// Atualizar dashboard com dados filtrados
-function updateFilteredDashboardData(activities, properties) {
-    // Atualizar atividades
-    const activityList = document.getElementById('activityList');
-    if (activityList) {
-        activityList.innerHTML = '';
-        
-        if (activities.length === 0) {
-            activityList.innerHTML = '<p class="no-results">Nenhuma atividade encontrada</p>';
-        } else {
-            activities.forEach(activity => {
-                const activityItem = document.createElement('div');
-                activityItem.classList.add('activity-item');
-                
-                activityItem.innerHTML = `
-                    <div class="activity-avatar">
-                        <img src="${activity.avatar}" alt="${activity.user}">
-                    </div>
-                    <div class="activity-content">
-                        <p><strong>${activity.user}</strong> ${activity.action}</p>
-                        <span class="activity-time">${activity.time}</span>
-                    </div>
-                `;
-                
-                activityList.appendChild(activityItem);
-            });
-        }
-    }
-    
-    // Atualizar propriedades
-    const propertyList = document.getElementById('propertyList');
-    if (propertyList) {
-        propertyList.innerHTML = '';
-        
-        if (properties.length === 0) {
-            propertyList.innerHTML = '<p class="no-results">Nenhum imóvel encontrado</p>';
-        } else {
-            properties.forEach(property => {
-                const propertyItem = document.createElement('div');
-                propertyItem.classList.add('property-item');
-                
-                propertyItem.innerHTML = `
-                    <div class="property-image">
-                        <img src="${property.image}" alt="${property.title}">
-                    </div>
-                    <div class="property-info">
-                        <h4>${property.title}</h4>
-                        <p class="property-price">${property.price}</p>
-                        <div class="property-meta">
-                            <span class="property-location">${property.location}</span>
-                            <span class="property-date">${property.date}</span>
-                        </div>
-                    </div>
-                    <div class="property-actions">
-                        <button class="btn-icon edit" title="Editar" onclick="editProperty(${property.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon delete" title="Excluir" onclick="deleteProperty(${property.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                
-                propertyList.appendChild(propertyItem);
-            });
-        }
-    }
-}
-
-// Configurar notificações
-function setupNotifications() {
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationsDropdown = document.getElementById('notificationsDropdown');
-    const markAllReadBtn = document.querySelector('.mark-all-read');
-    
-    if (notificationBtn && notificationsDropdown) {
-        // Acessibilidade: atributos ARIA
-        notificationBtn.setAttribute('aria-haspopup', 'dialog');
-        notificationBtn.setAttribute('aria-controls', 'notificationsDropdown');
-        notificationBtn.setAttribute('aria-expanded', 'false');
-
-        // Toggle do dropdown de notificações (click)
-        notificationBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isOpen = notificationsDropdown.classList.toggle('show');
-            notificationBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            loadNotifications();
-
-            // se abriu, focar o primeiro item focável
-            if (isOpen) {
-                const first = notificationsDropdown.querySelector('.notification-item[tabindex]');
-                if (first) first.focus();
-            }
-        });
-
-        // Toggle via teclado (Enter / Space)
-        notificationBtn.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                notificationBtn.click();
-            }
-        });
-
-        // Fechar dropdown ao clicar fora
-        document.addEventListener('click', () => {
-            if (notificationsDropdown.classList.contains('show')) {
-                notificationsDropdown.classList.remove('show');
-                notificationBtn.setAttribute('aria-expanded', 'false');
-            }
-        });
-
-        // Prevenir fechamento ao clicar dentro do dropdown
-        notificationsDropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        // Fechar com Escape e gerenciar foco
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && notificationsDropdown.classList.contains('show')) {
-                notificationsDropdown.classList.remove('show');
-                notificationBtn.setAttribute('aria-expanded', 'false');
-                notificationBtn.focus();
-            }
-        });
-    }
-    
-    if (markAllReadBtn) {
-        markAllReadBtn.addEventListener('click', markAllNotificationsAsRead);
-    }
-}
-
-// Carregar notificações
-function loadNotifications() {
-    const notificationList = document.querySelector('.notification-list');
-    if (!notificationList) return;
-    
-    notificationList.innerHTML = '';
-    
-    const unreadCount = adminData.notifications.filter(n => !n.read).length;
-    updateNotificationBadge(unreadCount);
-    
-    if (adminData.notifications.length === 0) {
-        notificationList.innerHTML = '<div class="no-results">Nenhuma notificação</div>';
+    var list = document.getElementById('activityList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!adminData.recentActivities.length) {
+        list.innerHTML = '<p class="no-results">Nenhuma atividade recente</p>';
         return;
     }
-    
-    adminData.notifications.forEach(notification => {
-        const notificationItem = document.createElement('div');
-        notificationItem.classList.add('notification-item');
-        if (!notification.read) {
-            notificationItem.classList.add('unread');
-        }
-
-        // tornar foco acessível
-        notificationItem.setAttribute('tabindex', '0');
-        notificationItem.setAttribute('role', 'button');
-
-        notificationItem.innerHTML = `
-            <div class="notification-icon" aria-hidden="true">
-                <i class="${notification.icon}"></i>
-            </div>
-            <div class="notification-content">
-                <p><strong>${notification.title}</strong> ${notification.message}</p>
-                <span class="notification-time">${notification.time}</span>
-            </div>
-        `;
-
-        // click e teclado ativam marcação como lida
-        notificationItem.addEventListener('click', () => {
-            markNotificationAsRead(notification.id);
-        });
-        notificationItem.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                markNotificationAsRead(notification.id);
-            }
-        });
-
-        notificationList.appendChild(notificationItem);
+    adminData.recentActivities.forEach(function(a) {
+        var el = document.createElement('div');
+        el.className = 'activity-item';
+        var avatarSrc = a.avatar || createInitialsAvatar(a.user, 40);
+        el.innerHTML = '<div class="activity-avatar"><img src="' + avatarSrc + '" alt="' + escapeHtml(a.user) + '"></div>' +
+            '<div class="activity-content"><p><strong>' + escapeHtml(a.user) + '</strong> ' + escapeHtml(a.action) + '</p>' +
+            '<span class="activity-time">' + escapeHtml(a.time) + '</span></div>';
+        list.appendChild(el);
     });
 }
 
-// Atualizar badge de notificações
+function loadRecentProperties() {
+    var list = document.getElementById('propertyList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!adminData.recentProperties.length) {
+        list.innerHTML = '<p class="no-results">Nenhum imóvel encontrado</p>';
+        return;
+    }
+    adminData.recentProperties.forEach(function(p) {
+        var el = document.createElement('div');
+        el.className = 'property-item';
+        el.innerHTML =
+            '<div class="property-image"><img src="' + p.image + '" alt="' + escapeHtml(p.title) + '"></div>' +
+            '<div class="property-info">' +
+                '<h4>' + escapeHtml(p.title) + '</h4>' +
+                '<p class="property-price">' + escapeHtml(p.price) + '</p>' +
+                '<div class="property-meta">' +
+                    '<span class="property-location">' + escapeHtml(p.location) + '</span>' +
+                    '<span class="property-date">' + escapeHtml(p.date) + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="property-actions">' +
+                '<button class="btn-icon edit" title="Editar" onclick="editProperty(' + p.id + ')"><i class="fas fa-edit"></i></button>' +
+                '<button class="btn-icon delete" title="Excluir" onclick="deleteProperty(' + p.id + ')"><i class="fas fa-trash"></i></button>' +
+            '</div>';
+        list.appendChild(el);
+    });
+}
+
+// ------------------------------------------------------------------
+// Search
+// ------------------------------------------------------------------
+function setupAdminSearch() {
+    var searchInput  = document.getElementById('globalSearch');
+    var searchButton = document.querySelector('.admin-search button');
+
+    function perform() {
+        appState.searchQuery = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        switch (appState.currentSection) {
+            case 'properties': loadPropertiesTable(); break;
+            case 'users':      loadUsersTable();      break;
+            case 'vendors':    loadVendorsTable();    break;
+        }
+    }
+
+    if (searchButton) searchButton.addEventListener('click', perform);
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') perform(); });
+        searchInput.addEventListener('input', function() {
+            if (!searchInput.value) { appState.searchQuery = ''; loadSectionData(appState.currentSection); }
+        });
+    }
+}
+
+// ------------------------------------------------------------------
+// Notifications
+// ------------------------------------------------------------------
+function setupNotifications() {
+    var btn      = document.getElementById('notificationBtn');
+    var dropdown = document.getElementById('notificationsDropdown');
+    var markAll  = document.querySelector('.mark-all-read');
+
+    if (btn && dropdown) {
+        btn.setAttribute('aria-haspopup', 'dialog');
+        btn.setAttribute('aria-controls', 'notificationsDropdown');
+        btn.setAttribute('aria-expanded', 'false');
+
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var isOpen = dropdown.classList.toggle('show');
+            btn.setAttribute('aria-expanded', String(isOpen));
+            if (isOpen) fetchAndRenderNotifications();
+        });
+        btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }
+        });
+        document.addEventListener('click', function() {
+            dropdown.classList.remove('show');
+            btn.setAttribute('aria-expanded', 'false');
+        });
+        dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                btn.setAttribute('aria-expanded', 'false');
+                btn.focus();
+            }
+        });
+    }
+
+    if (markAll) {
+        markAll.addEventListener('click', async function() {
+            try {
+                await apiMarkAllNotificationsAsRead();
+                adminData.notifications.forEach(function(n) { n.read = true; });
+                renderNotifications();
+            } catch (e) { console.error(e); }
+        });
+    }
+}
+
+async function fetchAndRenderNotifications() {
+    try {
+        var resp   = await apiGetNotifications({ per_page: 15 });
+        adminData.notifications = resp && resp.data ? resp.data : [];
+        renderNotifications();
+        var unread = await apiGetUnreadNotificationsCount();
+        updateNotificationBadge(unread && unread.unread_count ? unread.unread_count : 0);
+    } catch (e) { console.error('fetchAndRenderNotifications:', e); }
+}
+
+function renderNotifications() {
+    var list = document.querySelector('.notification-list');
+    if (!list) return;
+    list.innerHTML = '';
+    updateNotificationBadge(adminData.notifications.filter(function(n){ return !n.read; }).length);
+    if (!adminData.notifications.length) {
+        list.innerHTML = '<div class="no-results">Nenhuma notificação</div>';
+        return;
+    }
+    adminData.notifications.forEach(function(n) {
+        var el = document.createElement('div');
+        el.className = 'notification-item' + (n.read ? '' : ' unread');
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('role', 'button');
+        el.innerHTML =
+            '<div class="notification-icon" aria-hidden="true"><i class="' + escapeHtml(n.icon || 'fas fa-bell') + '"></i></div>' +
+            '<div class="notification-content">' +
+                '<p><strong>' + escapeHtml(n.title) + '</strong> ' + escapeHtml(n.message) + '</p>' +
+                '<span class="notification-time">' + escapeHtml(n.time) + '</span>' +
+            '</div>';
+        var act = function() { markNotificationRead(n.id); };
+        el.addEventListener('click', act);
+        el.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
+        list.appendChild(el);
+    });
+}
+
 function updateNotificationBadge(count) {
-    const badge = document.querySelector('.notification-badge');
-    if (badge) {
-        if (count > 0) {
-            badge.textContent = count;
-            badge.style.display = 'flex';
-        } else {
-            badge.style.display = 'none';
-        }
+    var badge = document.querySelector('.notification-badge');
+    if (!badge) return;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+}
+
+async function markNotificationRead(id) {
+    var n = adminData.notifications.find(function(x){ return x.id === id; });
+    if (n && !n.read) {
+        try { await apiMarkNotificationAsRead(id); n.read = true; renderNotifications(); } catch (e) { console.error(e); }
     }
 }
 
+// ------------------------------------------------------------------
+// Properties table
+// ------------------------------------------------------------------
+async function loadPropertiesTable() {
+    var tbody = document.querySelector('#propertiesTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" class="no-results">Carregando...</td></tr>';
 
+    try {
+        var params = { per_page: 50, page: appState.propertiesPage };
+        if (appState.searchQuery) params.search = appState.searchQuery;
 
-// Marcar notificação como lida
-function markNotificationAsRead(id) {
-    const notification = adminData.notifications.find(n => n.id === id);
-    if (notification && !notification.read) {
-        notification.read = true;
-        loadNotifications();
+        // Fetch all statuses for admin view
+        var results = await Promise.all([
+            apiFetch('/properties?' + new URLSearchParams(Object.assign({}, params, { status: 'active' }))),
+            apiFetch('/properties?' + new URLSearchParams(Object.assign({}, params, { status: 'inactive' }))),
+            apiFetch('/properties?' + new URLSearchParams(Object.assign({}, params, { status: 'pending' }))),
+        ]);
+
+        var all = (results[0] && results[0].data ? results[0].data : [])
+            .concat(results[1] && results[1].data ? results[1].data : [])
+            .concat(results[2] && results[2].data ? results[2].data : []);
+
+        var filtered = appState.searchQuery
+            ? all.filter(function(p) {
+                var q = appState.searchQuery;
+                return (p.title && p.title.toLowerCase().includes(q)) ||
+                       (p.city  && p.city.toLowerCase().includes(q))  ||
+                       (p.neighborhood && p.neighborhood.toLowerCase().includes(q));
+              })
+            : all;
+
+        adminData.allProperties = filtered;
+        renderPropertiesTable(filtered);
+    } catch (err) {
+        console.error('loadPropertiesTable:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="no-results">Erro ao carregar imóveis</td></tr>';
     }
 }
 
-// Marcar todas as notificações como lidas
-function markAllNotificationsAsRead() {
-    adminData.notifications.forEach(notification => {
-        notification.read = true;
+function renderPropertiesTable(properties) {
+    var tbody = document.querySelector('#propertiesTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!properties.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="no-results">Nenhum imóvel encontrado</td></tr>';
+        return;
+    }
+
+    properties.forEach(function(p) {
+        var row      = document.createElement('tr');
+        var location = [p.neighborhood, p.city, p.state].filter(Boolean).join(', ');
+        var price    = 'R$ ' + Number(p.nightly_price || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '/noite';
+        var date     = new Date(p.created_at).toLocaleDateString('pt-BR');
+        var img      = p.image_url || 'https://via.placeholder.com/40x40?text=Im%C3%B3vel';
+
+        row.innerHTML =
+            '<td><input type="checkbox" class="property-checkbox" value="' + p.id + '"></td>' +
+            '<td><div class="property-info-table">' +
+                '<div class="property-image-table"><img src="' + img + '" alt="' + escapeHtml(p.title) + '"></div>' +
+                '<div class="property-details"><strong>' + escapeHtml(p.title) + '</strong></div>' +
+            '</div></td>' +
+            '<td>' + price + '</td>' +
+            '<td>' + escapeHtml(location) + '</td>' +
+            '<td><span class="status-badge ' + p.status + '">' + getStatusText(p.status) + '</span></td>' +
+            '<td>' + date + '</td>' +
+            '<td><div class="table-actions">' +
+                '<button class="btn-icon edit" title="Editar" onclick="editProperty(' + p.id + ')"><i class="fas fa-edit"></i></button>' +
+                '<button class="btn-icon delete" title="Excluir" onclick="deleteProperty(' + p.id + ')"><i class="fas fa-trash"></i></button>' +
+            '</div></td>';
+        tbody.appendChild(row);
     });
-    loadNotifications();
+
+    var selectAll = document.getElementById('selectAllProperties');
+    if (selectAll) {
+        var fresh = selectAll.cloneNode(true);
+        selectAll.parentNode.replaceChild(fresh, selectAll);
+        fresh.addEventListener('change', function() {
+            document.querySelectorAll('.property-checkbox').forEach(function(cb){ cb.checked = fresh.checked; });
+        });
+    }
 }
 
-// Configurar modal de propriedades
+// ------------------------------------------------------------------
+// Users table
+// ------------------------------------------------------------------
+async function loadUsersTable() {
+    var tbody = document.querySelector('#usersTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" class="no-results">Carregando...</td></tr>';
+
+    try {
+        var params = { per_page: 15, page: appState.usersPage };
+        if (appState.searchQuery) params.search = appState.searchQuery;
+        var resp = await apiGetUsers(params);
+        adminData.users = resp && resp.data ? resp.data : [];
+        renderUsersTable(adminData.users);
+    } catch (err) {
+        console.error('loadUsersTable:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="no-results">Erro ao carregar usuários</td></tr>';
+    }
+}
+
+function renderUsersTable(users) {
+    var tbody = document.querySelector('#usersTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="no-results">Nenhum usuário encontrado</td></tr>';
+        return;
+    }
+
+    users.forEach(function(u) {
+        var row    = document.createElement('tr');
+        var avatar = u.avatar || createInitialsAvatar(u.name, 40);
+        var date   = new Date(u.created_at).toLocaleDateString('pt-BR');
+        var status = u.deleted_at ? 'inactive' : 'active';
+
+        row.innerHTML =
+            '<td data-label="Selecionar"><input type="checkbox" class="user-checkbox" value="' + u.id + '"></td>' +
+            '<td data-label="Usuário"><div class="user-info-table">' +
+                '<div class="user-avatar-table"><img src="' + avatar + '" alt="' + escapeHtml(u.name) + '"></div>' +
+                '<div class="user-details"><strong>' + escapeHtml(u.name) + '</strong></div>' +
+            '</div></td>' +
+            '<td data-label="Email"><span class="td-value">' + escapeHtml(u.email || '-') + '</span></td>' +
+            '<td data-label="Telefone"><span class="td-value">' + escapeHtml(u.phone || '-') + '</span></td>' +
+            '<td data-label="Status"><span class="status-badge ' + status + '">' + getStatusText(status) + '</span></td>' +
+            '<td data-label="Registro"><span class="td-value">' + date + '</span></td>' +
+            '<td data-label="Ações"><div class="table-actions">' +
+                '<button class="btn-icon edit" title="Editar" onclick="editUser(' + u.id + ')"><i class="fas fa-edit"></i></button>' +
+                '<button class="btn-icon delete" title="Excluir" onclick="deleteUser(' + u.id + ')"><i class="fas fa-trash"></i></button>' +
+            '</div></td>';
+        tbody.appendChild(row);
+    });
+
+    var selectAll = document.getElementById('selectAllUsers');
+    if (selectAll) {
+        var fresh = selectAll.cloneNode(true);
+        selectAll.parentNode.replaceChild(fresh, selectAll);
+        fresh.addEventListener('change', function() {
+            document.querySelectorAll('.user-checkbox').forEach(function(cb){ cb.checked = fresh.checked; });
+        });
+    }
+}
+
+// ------------------------------------------------------------------
+// Vendors (Hosts) table
+// ------------------------------------------------------------------
+async function loadVendorsTable() {
+    var tbody = document.querySelector('#vendorsTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="8" class="no-results">Carregando...</td></tr>';
+
+    try {
+        var params = { per_page: 15, page: appState.vendorsPage, all: 1 };
+        if (appState.searchQuery) params.q = appState.searchQuery;
+        var resp = await apiGetHostProfiles(params);
+        adminData.vendors = resp && resp.data ? resp.data : [];
+        renderVendorsTable(adminData.vendors);
+    } catch (err) {
+        console.error('loadVendorsTable:', err);
+        tbody.innerHTML = '<tr><td colspan="8" class="no-results">Erro ao carregar anfitriões</td></tr>';
+    }
+}
+
+function renderVendorsTable(vendors) {
+    var tbody = document.querySelector('#vendorsTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!vendors.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="no-results">Nenhum anfitrião encontrado</td></tr>';
+        return;
+    }
+
+    vendors.forEach(function(v) {
+        var row    = document.createElement('tr');
+        var user   = v.user || {};
+        var avatar = user.avatar || createInitialsAvatar(user.name || 'H', 40);
+        var date   = new Date(v.created_at).toLocaleDateString('pt-BR');
+        var creci  = v.creci || '-';
+        var approveBtn = v.status === 'pending'
+            ? '<button class="btn-icon approve" title="Aprovar" onclick="approveVendor(' + v.id + ')"><i class="fas fa-check"></i></button>'
+            : '';
+
+        row.innerHTML =
+            '<td data-label="Selecionar"><input type="checkbox" class="vendor-checkbox" value="' + v.id + '"></td>' +
+            '<td data-label="Anfitrião"><div class="user-info-table">' +
+                '<div class="user-avatar-table"><img src="' + avatar + '" alt="' + escapeHtml(user.name || '') + '"></div>' +
+                '<div class="user-details"><strong>' + escapeHtml(user.name || '-') + '</strong></div>' +
+            '</div></td>' +
+            '<td data-label="Email"><span class="td-value">' + escapeHtml(user.email || '-') + '</span></td>' +
+            '<td data-label="Telefone"><span class="td-value">' + escapeHtml(user.phone || '-') + '</span></td>' +
+            '<td data-label="CRECI"><span class="td-value">' + escapeHtml(creci) + '</span></td>' +
+            '<td data-label="Status"><span class="status-badge ' + v.status + '">' + getStatusText(v.status) + '</span></td>' +
+            '<td data-label="Registro"><span class="td-value">' + date + '</span></td>' +
+            '<td data-label="Ações"><div class="table-actions">' +
+                approveBtn +
+                '<button class="btn-icon edit" title="Editar" onclick="editVendor(' + v.id + ')"><i class="fas fa-edit"></i></button>' +
+                '<button class="btn-icon delete" title="Excluir" onclick="deleteVendor(' + v.id + ')"><i class="fas fa-trash"></i></button>' +
+            '</div></td>';
+        tbody.appendChild(row);
+    });
+
+    var selectAll = document.getElementById('selectAllVendors');
+    if (selectAll) {
+        var fresh = selectAll.cloneNode(true);
+        selectAll.parentNode.replaceChild(fresh, selectAll);
+        fresh.addEventListener('change', function() {
+            document.querySelectorAll('.vendor-checkbox').forEach(function(cb){ cb.checked = fresh.checked; });
+        });
+    }
+}
+
+// ------------------------------------------------------------------
+// Filter helpers
+// ------------------------------------------------------------------
+function filterPropertiesTable() { loadPropertiesTable(); }
+function filterUsersTable()       { loadUsersTable(); }
+function filterVendorsTable()     { loadVendorsTable(); }
+
+// ------------------------------------------------------------------
+// Status text helper
+// ------------------------------------------------------------------
+function getStatusText(status) {
+    var map = { active:'Ativo', inactive:'Inativo', pending:'Pendente', approved:'Aprovado', rejected:'Rejeitado', suspended:'Suspenso', blocked:'Bloqueado' };
+    return map[status] || status || '-';
+}
+
+// ------------------------------------------------------------------
+// Property CRUD
+// ------------------------------------------------------------------
 function setupPropertyModal() {
-    const modal = document.getElementById('propertyModal');
-    const addPropertyBtn = document.getElementById('addPropertyBtn');
-    const modalClose = document.getElementById('modalClose');
-    const modalCancel = document.getElementById('modalCancel');
-    const modalSave = document.getElementById('modalSave');
-    const propertyForm = document.getElementById('propertyForm');
-    
-    if (addPropertyBtn) {
-        addPropertyBtn.addEventListener('click', () => {
-            openPropertyModal();
-        });
-    }
-    
-    if (modalClose) {
-        modalClose.addEventListener('click', closePropertyModal);
-    }
-    
-    if (modalCancel) {
-        modalCancel.addEventListener('click', closePropertyModal);
-    }
-    
-    if (modalSave) {
-        modalSave.addEventListener('click', saveProperty);
-    }
-    
-    // Fechar modal ao clicar fora
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closePropertyModal();
-            }
-        });
-    }
-    
-    // Prevenir envio do formulário
-    if (propertyForm) {
-        propertyForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            saveProperty();
-        });
-    }
+    var modal     = document.getElementById('propertyModal');
+    var addBtn    = document.getElementById('addPropertyBtn');
+    var closeBtn  = document.getElementById('modalClose');
+    var cancelBtn = document.getElementById('modalCancel');
+    var saveBtn   = document.getElementById('modalSave');
+    var form      = document.getElementById('propertyForm');
+
+    if (addBtn)    addBtn.addEventListener('click',   function(){ openPropertyModal(); });
+    if (closeBtn)  closeBtn.addEventListener('click',  closePropertyModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closePropertyModal);
+    if (saveBtn)   saveBtn.addEventListener('click',   saveProperty);
+    if (form)      form.addEventListener('submit', function(e){ e.preventDefault(); saveProperty(); });
+    if (modal)     modal.addEventListener('click', function(e){ if (e.target === modal) closePropertyModal(); });
 }
 
-// Abrir modal de propriedade
-function openPropertyModal(propertyId = null) {
-    const modal = document.getElementById('propertyModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const propertyForm = document.getElementById('propertyForm');
-    
+function openPropertyModal(propertyId) {
+    propertyId = propertyId || null;
+    var modal = document.getElementById('propertyModal');
+    var title = document.getElementById('modalTitle');
+    var form  = document.getElementById('propertyForm');
+
+    appState.editingProperty = propertyId;
+
     if (propertyId) {
-        // Modo edição
-        appState.editingProperty = propertyId;
-        modalTitle.textContent = 'Editar Imóvel';
-        
-        // Preencher formulário com dados existentes
-        const property = adminData.allProperties.find(p => p.id === propertyId);
-        if (property) {
-            document.getElementById('propertyTitle').value = property.title;
-            document.getElementById('propertyPrice').value = property.price.replace('R$ ', '');
-            document.getElementById('propertyLocation').value = property.location;
-            // Preencher outros campos conforme necessário
+        if (title) title.textContent = 'Editar Imóvel';
+        var p = adminData.allProperties.find(function(x){ return x.id === propertyId; });
+        if (p) {
+            var tf = document.getElementById('propertyTitle');    if (tf) tf.value = p.title || '';
+            var pf = document.getElementById('propertyPrice');    if (pf) pf.value = p.nightly_price || '';
+            var lf = document.getElementById('propertyLocation'); if (lf) lf.value = p.city || '';
+            var tyf = document.getElementById('propertyType');    if (tyf) tyf.value = p.property_type || '';
         }
     } else {
-        // Modo adição
-        appState.editingProperty = null;
-        modalTitle.textContent = 'Adicionar Imóvel';
-        propertyForm.reset();
+        if (title) title.textContent = 'Adicionar Imóvel';
+        if (form) form.reset();
     }
-    
-    modal.classList.add('show');
+    if (modal) modal.classList.add('show');
 }
 
-// Fechar modal de propriedade
 function closePropertyModal() {
-    const modal = document.getElementById('propertyModal');
-    modal.classList.remove('show');
+    var modal = document.getElementById('propertyModal');
+    if (modal) modal.classList.remove('show');
     appState.editingProperty = null;
 }
 
-// Salvar propriedade
-function saveProperty() {
-    const title = document.getElementById('propertyTitle').value;
-    const price = document.getElementById('propertyPrice').value;
-    const location = document.getElementById('propertyLocation').value;
-    const type = document.getElementById('propertyType').value;
-    
+async function saveProperty() {
+    var titleEl    = document.getElementById('propertyTitle');
+    var priceEl    = document.getElementById('propertyPrice');
+    var locationEl = document.getElementById('propertyLocation');
+    var typeEl     = document.getElementById('propertyType');
+
+    var title    = titleEl    ? titleEl.value.trim()    : '';
+    var price    = priceEl    ? priceEl.value            : '';
+    var location = locationEl ? locationEl.value.trim() : '';
+    var type     = typeEl     ? typeEl.value             : '';
+
     if (!title || !price || !location || !type) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
+        showToast('Preencha todos os campos obrigatórios.', 'error');
         return;
     }
-    
-    if (appState.editingProperty) {
-        // Atualizar propriedade existente
-        const propertyIndex = adminData.allProperties.findIndex(p => p.id === appState.editingProperty);
-        if (propertyIndex !== -1) {
-            adminData.allProperties[propertyIndex].title = title;
-            adminData.allProperties[propertyIndex].price = `R$ ${price}`;
-            adminData.allProperties[propertyIndex].location = location;
-            // Atualizar outros campos conforme necessário
-        }
-        
-        // Mostrar mensagem de sucesso
-        showMessage('Imóvel atualizado com sucesso!', 'success');
-    } else {
-        // Adicionar nova propriedade
-        const newId = Math.max(...adminData.allProperties.map(p => p.id)) + 1;
-        const newProperty = {
-            id: newId,
-            title: title,
-            price: `R$ ${price}`,
-            location: location,
-            date: new Date().toLocaleDateString('pt-BR'),
-            image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150&q=80&auto=format&fit=crop',
-            status: 'active'
-        };
-        
-        adminData.allProperties.unshift(newProperty);
-        
-        // Mostrar mensagem de sucesso
-        showMessage('Imóvel adicionado com sucesso!', 'success');
-    }
-    
-    // Fechar modal e atualizar dados
-    closePropertyModal();
-    loadPropertiesTable();
-    
-    // Se estiver no dashboard, atualizar também a lista de imóveis recentes
-    if (appState.currentSection === 'dashboard') {
-        loadRecentProperties();
-    }
-}
 
-// Mostrar mensagem
-function showMessage(message, type) {
-    // Remover mensagens existentes
-    const existingMessages = document.querySelectorAll('.message');
-    existingMessages.forEach(msg => msg.remove());
-    
-    // Criar nova mensagem
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message');
-    messageDiv.classList.add(`${type}-message`);
-    messageDiv.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
-        <span>${message}</span>
-    `;
-    
-    // Adicionar ao conteúdo
-    const adminContent = document.querySelector('.admin-content');
-    if (adminContent) {
-        adminContent.insertBefore(messageDiv, adminContent.firstChild);
-        
-        // Remover após 5 segundos
-        setTimeout(() => {
-            messageDiv.remove();
-        }, 5000);
-    }
-}
-
-// Carregar tabela de propriedades
-function loadPropertiesTable() {
-    const tableBody = document.querySelector('#propertiesTable tbody');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = '';
-    
-    let propertiesToShow = adminData.allProperties;
-    
-    // Aplicar filtro de busca se existir
-    if (appState.searchQuery) {
-        propertiesToShow = propertiesToShow.filter(property => 
-            property.title.toLowerCase().includes(appState.searchQuery) ||
-            property.location.toLowerCase().includes(appState.searchQuery) ||
-            property.price.toLowerCase().includes(appState.searchQuery)
-        );
-    }
-    
-    if (propertiesToShow.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="no-results">Nenhum imóvel encontrado</td>
-            </tr>
-        `;
-        return;
-    }
-    
-    propertiesToShow.forEach(property => {
-        const row = document.createElement('tr');
-        
-        row.innerHTML = `
-            <td><input type="checkbox" class="property-checkbox" value="${property.id}"></td>
-            <td>
-                <div class="property-info-table">
-                    <div class="property-image-table">
-                        <img src="${property.image}" alt="${property.title}">
-                    </div>
-                    <div class="property-details">
-                        <strong>${property.title}</strong>
-                    </div>
-                </div>
-            </td>
-            <td>${property.price}</td>
-            <td>${property.location}</td>
-            <td><span class="status-badge ${property.status}">${getStatusText(property.status)}</span></td>
-            <td>${property.date}</td>
-            <td>
-                <div class="table-actions">
-                    <button class="btn-icon edit" title="Editar" onclick="editProperty(${property.id})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-icon delete" title="Excluir" onclick="deleteProperty(${property.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-    
-    // Configurar seleção de todos
-    const selectAll = document.getElementById('selectAllProperties');
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.property-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
+    try {
+        if (appState.editingProperty) {
+            await apiFetch('/properties/' + appState.editingProperty, {
+                method: 'PUT',
+                body: JSON.stringify({ title: title, nightly_price: price, city: location, property_type: type }),
             });
-        });
-    }
-}
-
-// Carregar tabela de usuários
-function loadUsersTable() {
-    const tableBody = document.querySelector('#usersTable tbody');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = '';
-    
-    let usersToShow = adminData.users;
-    
-    // Aplicar filtro de busca se existir
-    if (appState.searchQuery) {
-        usersToShow = usersToShow.filter(user => 
-            user.name.toLowerCase().includes(appState.searchQuery) ||
-            user.email.toLowerCase().includes(appState.searchQuery) ||
-            user.type.toLowerCase().includes(appState.searchQuery)
-        );
-    }
-    
-    if (usersToShow.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="no-results">Nenhum usuário encontrado</td>
-            </tr>
-        `;
-        return;
-    }
-    
-    usersToShow.forEach(user => {
-        const row = document.createElement('tr');
-        
-        row.innerHTML = `
-            <td data-label="Selecionar"><input type="checkbox" class="user-checkbox" value="${user.id}"></td>
-            <td data-label="Usuário">
-                <div class="user-info-table">
-                    <div class="user-avatar-table">
-                        <img src="${user.avatar}" alt="${user.name}">
-                    </div>
-                    <div class="user-details">
-                        <strong>${user.name}</strong>
-                    </div>
-                </div>
-            </td>
-            <td data-label="Email"><span class="td-value">${user.email}</span></td>
-            <td data-label="Telefone"><span class="td-value">${user.phone || '-'}</span></td>
-            <td data-label="Status"><span class="status-badge ${user.status}">${getStatusText(user.status)}</span></td>
-            <td data-label="Registro"><span class="td-value">${user.registration}</span></td>
-            <td data-label="Ações">
-                <div class="table-actions">
-                    <button class="btn-icon edit" title="Editar" onclick="editUser(${user.id})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-icon delete" title="Excluir" onclick="deleteUser(${user.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-    
-    // Configurar seleção de todos
-    const selectAll = document.getElementById('selectAllUsers');
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.user-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
+            showToast('Imóvel atualizado com sucesso!', 'success');
+        } else {
+            await apiFetch('/properties', {
+                method: 'POST',
+                body: JSON.stringify({ title: title, nightly_price: price, city: location, property_type: type,
+                    description: title, state: 'SP', bedrooms: 1, bathrooms: 1, guests_capacity: 2 }),
             });
-        });
-    }
-}
-
-// Filtrar tabela de propriedades
-function filterPropertiesTable(query) {
-    loadPropertiesTable();
-}
-
-// Filtrar tabela de usuários
-function filterUsersTable(query) {
-    loadUsersTable();
-}
-
-// Filtrar tabela de anfitriões
-function filterVendorsTable(query) {
-    loadVendorsTable();
-}
-
-// Obter texto do status
-function getStatusText(status) {
-    const statusMap = {
-        'active': 'Ativo',
-        'inactive': 'Inativo',
-        'pending': 'Pendente'
-    };
-    
-    return statusMap[status] || status;
-}
-
-// Funções de ação
-function editProperty(id) {
-    openPropertyModal(id);
-}
-
-function deleteProperty(id) {
-    if (confirm('Tem certeza que deseja excluir este imóvel?')) {
-        const propertyIndex = adminData.allProperties.findIndex(p => p.id === id);
-        if (propertyIndex !== -1) {
-            adminData.allProperties.splice(propertyIndex, 1);
-            showMessage('Imóvel excluído com sucesso!', 'success');
-            loadPropertiesTable();
-            
-            // Se estiver no dashboard, atualizar também a lista de imóveis recentes
-            if (appState.currentSection === 'dashboard') {
-                loadRecentProperties();
-            }
+            showToast('Imóvel criado com sucesso!', 'success');
         }
+        closePropertyModal();
+        loadPropertiesTable();
+        if (appState.currentSection === 'dashboard') loadDashboardData();
+    } catch (err) {
+        showToast((err.data && err.data.message) || 'Erro ao salvar imóvel.', 'error');
     }
 }
 
-function editUser(id) {
-    alert(`Editando usuário ID: ${id}`);
-    // Em uma aplicação real, isso abriria um modal de edição de usuário
-}
+function editProperty(id) { openPropertyModal(id); }
 
-function deleteUser(id) {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
-        const userIndex = adminData.users.findIndex(u => u.id === id);
-        if (userIndex !== -1) {
-            adminData.users.splice(userIndex, 1);
-            showMessage('Usuário excluído com sucesso!', 'success');
-            loadUsersTable();
-        }
+async function deleteProperty(id) {
+    if (!confirm('Tem certeza que deseja excluir este imóvel?')) return;
+    try {
+        await apiFetch('/properties/' + id, { method: 'DELETE' });
+        showToast('Imóvel excluído com sucesso!', 'success');
+        loadPropertiesTable();
+        if (appState.currentSection === 'dashboard') loadDashboardData();
+    } catch (err) {
+        showToast((err.data && err.data.message) || 'Erro ao excluir imóvel.', 'error');
     }
 }
 
-// Carregar tabela de anfitriões
-function loadVendorsTable() {
-    const tableBody = document.querySelector('#vendorsTable tbody');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = '';
-    
-    let vendorsToShow = adminData.vendors;
-    
-    // Aplicar filtro de busca se existir
-    if (appState.searchQuery) {
-        vendorsToShow = vendorsToShow.filter(vendor => 
-            vendor.name.toLowerCase().includes(appState.searchQuery) ||
-            vendor.email.toLowerCase().includes(appState.searchQuery) ||
-            vendor.creci.toLowerCase().includes(appState.searchQuery)
-        );
-    }
-    
-    if (vendorsToShow.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="8" class="no-results">Nenhum anfitrião encontrado</td>
-            </tr>
-        `;
-        return;
-    }
-    
-    vendorsToShow.forEach(vendor => {
-        const row = document.createElement('tr');
-        
-        // Mostrar botão de aprovar apenas se status for pending
-        const approveButton = vendor.status === 'pending' ? `
-            <button class="btn-icon approve" title="Aprovar" onclick="approveVendor(${vendor.id})">
-                <i class="fas fa-check"></i>
-            </button>
-        ` : '';
-        
-        row.innerHTML = `
-            <td data-label="Selecionar"><input type="checkbox" class="vendor-checkbox" value="${vendor.id}"></td>
-            <td data-label="Anfitrião">
-                <div class="user-info-table">
-                    <div class="user-avatar-table">
-                        <img src="${vendor.avatar}" alt="${vendor.name}">
-                    </div>
-                    <div class="user-details">
-                        <strong>${vendor.name}</strong>
-                    </div>
-                </div>
-            </td>
-            <td data-label="Email"><span class="td-value">${vendor.email}</span></td>
-            <td data-label="Telefone"><span class="td-value">${vendor.phone}</span></td>
-            <td data-label="CRECI"><span class="td-value">${vendor.creci}</span></td>
-            <td data-label="Status"><span class="status-badge ${vendor.status}">${getStatusText(vendor.status)}</span></td>
-            <td data-label="Registro"><span class="td-value">${vendor.registration}</span></td>
-            <td data-label="Ações">
-                <div class="table-actions">
-                    ${approveButton}
-                    <button class="btn-icon edit" title="Editar" onclick="editVendor(${vendor.id})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-icon delete" title="Excluir" onclick="deleteVendor(${vendor.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-    
-    // Configurar seleção de todos
-    const selectAll = document.getElementById('selectAllVendors');
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.vendor-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-        });
-    }
-}
-
-function editVendor(id) {
-    // Abre o modal de edição de anfitrião
-    openVendorModal(id);
-}
-
-function approveVendor(id) {
-    const vendor = adminData.vendors.find(v => v.id === id);
-    if (vendor) {
-        vendor.status = 'active';
-        showMessage(`Anfitrião ${vendor.name} aprovado com sucesso!`, 'success');
+// ------------------------------------------------------------------
+// Vendor (Host) actions
+// ------------------------------------------------------------------
+async function approveVendor(id) {
+    try {
+        await apiFetch('/host-profiles/' + id, { method: 'PUT', body: JSON.stringify({ status: 'approved' }) });
+        showToast('Anfitrião aprovado com sucesso!', 'success');
         loadVendorsTable();
+        if (appState.currentSection === 'dashboard') loadDashboardData();
+    } catch (err) {
+        showToast((err.data && err.data.message) || 'Erro ao aprovar anfitrião.', 'error');
     }
 }
 
-function deleteVendor(id) {
-    if (confirm('Tem certeza que deseja excluir este anfitrião?')) {
-        const vendorIndex = adminData.vendors.findIndex(v => v.id === id);
-        if (vendorIndex !== -1) {
-            adminData.vendors.splice(vendorIndex, 1);
-            showMessage('Anfitrião excluído com sucesso!', 'success');
-            loadVendorsTable();
-        }
+async function deleteVendor(id) {
+    if (!confirm('Tem certeza que deseja excluir este anfitrião?')) return;
+    var vendor = adminData.vendors.find(function(v){ return v.id === id; });
+    if (!vendor) return;
+    try {
+        await apiDeleteUser(vendor.user_id || (vendor.user && vendor.user.id));
+        showToast('Anfitrião excluído com sucesso!', 'success');
+        loadVendorsTable();
+        if (appState.currentSection === 'dashboard') loadDashboardData();
+    } catch (err) {
+        showToast((err.data && err.data.message) || 'Erro ao excluir anfitrião.', 'error');
     }
 }
 
-// Adicionar estilos para elementos da tabela
-const style = document.createElement('style');
-style.textContent = `
-    .property-info-table,
-    .user-info-table {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+// ------------------------------------------------------------------
+// User actions
+// ------------------------------------------------------------------
+async function deleteUser(id) {
+    if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+    try {
+        await apiDeleteUser(id);
+        showToast('Usuário desativado com sucesso!', 'success');
+        loadUsersTable();
+        if (appState.currentSection === 'dashboard') loadDashboardData();
+    } catch (err) {
+        showToast((err.data && err.data.message) || 'Erro ao excluir usuário.', 'error');
     }
-    
-    .property-image-table,
-    .user-avatar-table {
-        width: 40px;
-        height: 40px;
-        border-radius: 6px;
-        overflow: hidden;
-        flex-shrink: 0;
-    }
-    
-    .property-image-table img,
-    .user-avatar-table img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .property-details,
-    .user-details {
-        flex: 1;
-    }
-    
-    .message {
-        padding: 12px 16px;
-        border-radius: var(--radius);
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        animation: slideIn 0.3s ease;
-    }
-    
-    .success-message {
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid var(--success);
-        color: var(--success);
-    }
-    
-    .error-message {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid var(--danger);
-        color: var(--danger);
-    }
-    
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
-document.head.appendChild(style);
+}
 
-// ===== MODAL DE USUÁRIOS =====
-let currentUserId = null;
-let isUserEditMode = false;
+// ------------------------------------------------------------------
+// User modal
+// ------------------------------------------------------------------
+var currentUserId  = null;
+var isUserEditMode = false;
 
-// Aguardar o DOM estar pronto
 document.addEventListener('DOMContentLoaded', function() {
     initializeUserModal();
     initializeVendorModal();
 });
 
 function initializeUserModal() {
-    const userModal = document.getElementById('userModal');
-    if (!userModal) return;
-    
-    const userModalTitle = document.getElementById('userModalTitle');
-    const userForm = document.getElementById('userForm');
-    const closeUserModalBtn = document.getElementById('closeUserModalBtn');
-    const cancelUserModalBtn = document.getElementById('cancelUserModalBtn');
-    const addUserBtn = document.getElementById('addUserBtn');
-    const userModalMessage = document.getElementById('userModalMessage');
-    
-    // Abrir modal para criar novo usuário
-    if (addUserBtn) {
-        addUserBtn.addEventListener('click', function() {
-            openUserModal();
+    var modal     = document.getElementById('userModal');
+    if (!modal) return;
+    var form      = document.getElementById('userForm');
+    var closeBtn  = document.getElementById('closeUserModalBtn');
+    var cancelBtn = document.getElementById('cancelUserModalBtn');
+    var addBtn    = document.getElementById('addUserBtn');
+
+    if (addBtn)    addBtn.addEventListener('click', function(){ openUserModal(); });
+    if (closeBtn)  closeBtn.addEventListener('click', closeUserModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeUserModal);
+    var overlay = modal.querySelector('.modal-overlay');
+    if (overlay) overlay.addEventListener('click', function(e){ if (e.target === e.currentTarget) closeUserModal(); });
+
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!validateUserForm()) { showUserMessage('Por favor, corrija os erros no formulário.', 'error'); return; }
+            var payload = {
+                name:  document.getElementById('userName').value.trim(),
+                email: document.getElementById('userEmail').value.trim(),
+                phone: document.getElementById('userPhone').value.trim(),
+            };
+            try {
+                if (isUserEditMode) {
+                    await apiUpdateUser(currentUserId, payload);
+                    showUserMessage('Usuário ' + payload.name + ' atualizado!', 'success');
+                } else {
+                    var passwordEl = document.getElementById('userPassword');
+                    var password   = passwordEl ? passwordEl.value : 'temp1234';
+                    await apiFetch('/users', { method: 'POST', body: JSON.stringify(Object.assign({}, payload, { password: password, password_confirmation: password })) });
+                    showUserMessage('Usuário ' + payload.name + ' criado!', 'success');
+                }
+                setTimeout(function(){ closeUserModal(); loadUsersTable(); }, 1200);
+            } catch (err) {
+                showUserMessage((err.data && err.data.message) || 'Erro ao salvar usuário.', 'error');
+            }
         });
     }
-    
-    // Fechar modal
-    closeUserModalBtn.addEventListener('click', closeUserModal);
-    cancelUserModalBtn.addEventListener('click', closeUserModal);
-    
-    // Fechar modal ao clicar no overlay
-    userModal.querySelector('.modal-overlay').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeUserModal();
-        }
-    });
-    
-    // Salvar usuário
-    userForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (!validateUserForm()) {
-            showUserMessage('Por favor, corrija os erros no formulário', 'error');
-            return;
-        }
-        
-        const userData = {
-            name: document.getElementById('userName').value.trim(),
-            email: document.getElementById('userEmail').value.trim(),
-            phone: document.getElementById('userPhone').value.trim(),
-            status: document.getElementById('userStatus').value,
-            registration: document.getElementById('userRegistration').value
-        };
-        
-        if (isUserEditMode) {
-            // Editar usuário existente
-            const user = adminData.users.find(u => u.id === currentUserId);
-            if (user) {
-                Object.assign(user, userData);
-                showUserMessage(`Usuário ${userData.name} atualizado com sucesso!`, 'success');
-            }
-        } else {
-            // Criar novo usuário
-            const newUser = {
-                id: Math.max(...adminData.users.map(u => u.id), 0) + 1,
-                avatar: 'https://randomuser.me/api/portraits/men/' + Math.floor(Math.random() * 70) + '.jpg',
-                type: 'Cliente',
-                ...userData
-            };
-            adminData.users.push(newUser);
-            showUserMessage(`Usuário ${userData.name} criado com sucesso!`, 'success');
-        }
-        
-        loadUsersTable();
-        
-        setTimeout(() => {
-            closeUserModal();
-        }, 1500);
-    });
 }
 
-function openUserModal(userId = null) {
-    const userModal = document.getElementById('userModal');
-    const userModalTitle = document.getElementById('userModalTitle');
-    const userForm = document.getElementById('userForm');
-    
+function openUserModal(userId) {
+    userId = userId || null;
+    var modal = document.getElementById('userModal');
+    if (!modal) return;
+    var title = document.getElementById('userModalTitle');
+    var form  = document.getElementById('userForm');
+
     isUserEditMode = !!userId;
-    currentUserId = userId;
-    
-    // Limpar formulário
-    userForm.reset();
+    currentUserId  = userId;
+    if (form) form.reset();
     clearUserErrors();
     hideUserMessage();
-    
+
     if (isUserEditMode) {
-        const user = adminData.users.find(u => u.id === userId);
-        if (!user) return;
-        
-        // Preencher formulário com dados do usuário
-        document.getElementById('userId').value = user.id;
-        document.getElementById('userName').value = user.name;
-        document.getElementById('userEmail').value = user.email;
-        document.getElementById('userPhone').value = user.phone;
-        document.getElementById('userStatus').value = user.status;
-        document.getElementById('userRegistration').value = user.registration;
-        
-        userModalTitle.textContent = `Editar Usuário - ${user.name}`;
+        var u = adminData.users.find(function(x){ return x.id === userId; });
+        if (!u) return;
+        var eid = document.getElementById('userId'); if (eid) eid.value = u.id;
+        var en  = document.getElementById('userName');  if (en)  en.value  = u.name  || '';
+        var ee  = document.getElementById('userEmail'); if (ee)  ee.value  = u.email || '';
+        var ep  = document.getElementById('userPhone'); if (ep)  ep.value  = u.phone || '';
+        if (title) title.textContent = 'Editar Usuário – ' + u.name;
     } else {
-        userModalTitle.textContent = 'Adicionar Usuário';
-        document.getElementById('userRegistration').value = new Date().toISOString().split('T')[0];
+        if (title) title.textContent = 'Adicionar Usuário';
     }
-    
-    userModal.classList.add('active');
+    modal.classList.add('active');
 }
 
 function closeUserModal() {
-    const userModal = document.getElementById('userModal');
-    const userForm = document.getElementById('userForm');
-    
-    userModal.classList.remove('active');
-    userForm.reset();
+    var modal = document.getElementById('userModal');
+    var form  = document.getElementById('userForm');
+    if (modal) modal.classList.remove('active');
+    if (form)  form.reset();
     clearUserErrors();
     hideUserMessage();
     currentUserId = null;
     isUserEditMode = false;
 }
 
-// Validar email
-function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
-// Limpar todos os erros de usuário
 function clearUserErrors() {
-    document.querySelectorAll('#userForm .error-message').forEach(el => {
-        el.textContent = '';
-        el.classList.remove('show');
-    });
-    document.querySelectorAll('#userForm input, #userForm select').forEach(el => {
-        el.classList.remove('error');
-    });
+    document.querySelectorAll('#userForm .error-message').forEach(function(el){ el.textContent = ''; el.classList.remove('show'); });
+    document.querySelectorAll('#userForm input, #userForm select').forEach(function(el){ el.classList.remove('error'); });
 }
 
-// Mostrar erro em um campo de usuário
-function showUserError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    const errorElement = document.getElementById(fieldId + 'Error');
-    
-    if (field) {
-        field.classList.add('error');
-    }
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.classList.add('show');
-    }
+function showUserError(fieldId, msg) {
+    var f = document.getElementById(fieldId); if (f) f.classList.add('error');
+    var e = document.getElementById(fieldId + 'Error'); if (e) { e.textContent = msg; e.classList.add('show'); }
 }
 
-// Validar formulário de usuário
 function validateUserForm() {
     clearUserErrors();
-    let isValid = true;
-    
-    const name = document.getElementById('userName').value.trim();
-    const email = document.getElementById('userEmail').value.trim();
-    const phone = document.getElementById('userPhone').value.trim();
-    const status = document.getElementById('userStatus').value;
-    
-    if (!name) {
-        showUserError('userName', 'Nome é obrigatório');
-        isValid = false;
-    }
-    
-    if (!email) {
-        showUserError('userEmail', 'Email é obrigatório');
-        isValid = false;
-    } else if (!isValidEmail(email)) {
-        showUserError('userEmail', 'Email inválido');
-        isValid = false;
-    }
-    
-    if (!phone) {
-        showUserError('userPhone', 'Telefone é obrigatório');
-        isValid = false;
-    }
-    
-    if (!status) {
-        showUserError('userStatus', 'Status é obrigatório');
-        isValid = false;
-    }
-    
-    return isValid;
+    var ok    = true;
+    var nameEl  = document.getElementById('userName');
+    var emailEl = document.getElementById('userEmail');
+    var phoneEl = document.getElementById('userPhone');
+    var name    = nameEl  ? nameEl.value.trim()  : '';
+    var email   = emailEl ? emailEl.value.trim() : '';
+    var phone   = phoneEl ? phoneEl.value.trim() : '';
+    if (!name)  { showUserError('userName',  'Nome é obrigatório');     ok = false; }
+    if (!email) { showUserError('userEmail', 'Email é obrigatório');    ok = false; }
+    else if (!isValidEmail(email)) { showUserError('userEmail', 'Email inválido'); ok = false; }
+    if (!phone) { showUserError('userPhone', 'Telefone é obrigatório'); ok = false; }
+    return ok;
 }
 
-// Mostrar mensagem de usuário
-function showUserMessage(message, type = 'success') {
-    const userModalMessage = document.getElementById('userModalMessage');
-    if (!userModalMessage) return;
-    
-    userModalMessage.textContent = message;
-    userModalMessage.className = `modal-message show ${type}`;
-    setTimeout(() => {
-        hideUserMessage();
-    }, 3000);
+function showUserMessage(msg, type) {
+    type = type || 'success';
+    var el = document.getElementById('userModalMessage');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'modal-message show ' + type;
+    setTimeout(function(){ hideUserMessage(); }, 3000);
 }
 
-// Esconder mensagem de usuário
 function hideUserMessage() {
-    const userModalMessage = document.getElementById('userModalMessage');
-    if (!userModalMessage) return;
-    
-    userModalMessage.className = 'modal-message';
-    userModalMessage.textContent = '';
+    var el = document.getElementById('userModalMessage');
+    if (!el) return;
+    el.className = 'modal-message';
+    el.textContent = '';
 }
 
-// Modificar função editUser para abrir o modal
-window.editUser = function(id) {
-    openUserModal(id);
-};
+window.editUser = function(id) { openUserModal(id); };
 
-// ===== MODAL DE ANFITRIÕES =====
+// ------------------------------------------------------------------
+// Vendor modal
+// ------------------------------------------------------------------
+var currentVendorId = null;
+var isEditMode      = false;
 
 function initializeVendorModal() {
-    const modal = document.getElementById('vendorModal');
-    if (!modal) return; // Se modal não existe, sair
-    
-    const modalTitle = document.getElementById('modalTitle');
-    const vendorForm = document.getElementById('vendorForm');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const cancelModalBtn = document.getElementById('cancelModalBtn');
-    const addVendorBtn = document.getElementById('addVendorBtn');
-    const approveBtn = document.getElementById('approveVendorBtn');
-    const rejectBtn = document.getElementById('rejectVendorBtn');
-    const modalMessage = document.getElementById('modalMessage');
-    
-    // Abrir modal para criar novo anfitrião
-    if (addVendorBtn) {
-        addVendorBtn.addEventListener('click', function() {
-            openVendorModal();
+    var modal = document.getElementById('vendorModal');
+    if (!modal) return;
+    var form      = document.getElementById('vendorForm');
+    var closeBtn  = document.getElementById('closeModalBtn');
+    var cancelBtn = document.getElementById('cancelModalBtn');
+    var addBtn    = document.getElementById('addVendorBtn');
+    var approveBtn = document.getElementById('approveVendorBtn');
+    var rejectBtn  = document.getElementById('rejectVendorBtn');
+
+    if (addBtn)    addBtn.addEventListener('click', function(){ openVendorModal(); });
+    if (closeBtn)  closeBtn.addEventListener('click', closeVendorModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeVendorModal);
+    var overlay = modal.querySelector('.modal-overlay');
+    if (overlay) overlay.addEventListener('click', function(e){ if (e.target === e.currentTarget) closeVendorModal(); });
+
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!validateVendorForm()) { showVendorMessage('Por favor, corrija os erros.', 'error'); return; }
+            var statusEl = document.getElementById('vendorStatus');
+            var creciEl  = document.getElementById('vendorCreci');
+            var payload  = { status: statusEl ? statusEl.value : 'pending', creci: creciEl ? creciEl.value.trim() : '' };
+            try {
+                await apiFetch('/host-profiles/' + currentVendorId, { method: 'PUT', body: JSON.stringify(payload) });
+                showVendorMessage('Anfitrião atualizado!', 'success');
+                setTimeout(function(){ closeVendorModal(); loadVendorsTable(); }, 1200);
+            } catch (err) { showVendorMessage((err.data && err.data.message) || 'Erro ao salvar.', 'error'); }
         });
     }
-    
-    // Fechar modal
-    closeModalBtn.addEventListener('click', closeVendorModal);
-    cancelModalBtn.addEventListener('click', closeVendorModal);
-    
-    // Fechar modal ao clicar no overlay
-    modal.querySelector('.modal-overlay').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeVendorModal();
-        }
-    });
-    
-    // Salvar anfitrião
-    vendorForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (!validateVendorForm()) {
-            showMessage('Por favor, corrija os erros no formulário', 'error');
-            return;
-        }
-        
-        const vendorData = {
-            name: document.getElementById('vendorName').value.trim(),
-            email: document.getElementById('vendorEmail').value.trim(),
-            phone: document.getElementById('vendorPhone').value.trim(),
-            creci: document.getElementById('vendorCreci').value.trim(),
-            status: document.getElementById('vendorStatus').value,
-            registration: document.getElementById('vendorRegistration').value
-        };
-        
-        if (isEditMode) {
-            // Editar anfitrião existente
-            const vendor = adminData.vendors.find(v => v.id === currentVendorId);
-            if (vendor) {
-                Object.assign(vendor, vendorData);
-                showMessage(`Anfitrião ${vendorData.name} atualizado com sucesso!`, 'success');
-            }
-        } else {
-            // Criar novo anfitrião
-            const newVendor = {
-                id: Math.max(...adminData.vendors.map(v => v.id), 0) + 1,
-                avatar: 'https://randomuser.me/api/portraits/men/' + Math.floor(Math.random() * 70) + '.jpg',
-                ...vendorData
-            };
-            adminData.vendors.push(newVendor);
-            showMessage(`Anfitrião ${vendorData.name} criado com sucesso!`, 'success');
-        }
-        
-        loadVendorsTable();
-        
-        setTimeout(() => {
-            closeVendorModal();
-        }, 1500);
-    });
-    
-    // Aprovar anfitrião
-    approveBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        if (!validateVendorForm()) {
-            showMessage('Por favor, corrija os erros no formulário', 'error');
-            return;
-        }
-        
-        const vendor = adminData.vendors.find(v => v.id === currentVendorId);
-        if (vendor) {
-            vendor.name = document.getElementById('vendorName').value.trim();
-            vendor.email = document.getElementById('vendorEmail').value.trim();
-            vendor.phone = document.getElementById('vendorPhone').value.trim();
-            vendor.creci = document.getElementById('vendorCreci').value.trim();
-            vendor.registration = document.getElementById('vendorRegistration').value;
-            vendor.status = 'active';
-            
-            showMessage(`Anfitrião ${vendor.name} aprovado com sucesso!`, 'success');
-            loadVendorsTable();
-            
-            setTimeout(() => {
-                closeVendorModal();
-            }, 1500);
-        }
-    });
-    
-    // Reprovar anfitrião
-    rejectBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        if (confirm('Tem certeza que deseja reprovar este anfitrião?')) {
-            const vendor = adminData.vendors.find(v => v.id === currentVendorId);
-            if (vendor) {
-                vendor.status = 'inactive';
-                showMessage(`Anfitrião ${vendor.name} reprovado!`, 'success');
-                loadVendorsTable();
-                
-                setTimeout(() => {
-                    closeVendorModal();
-                }, 1500);
-            }
-        }
-    });
+
+    if (approveBtn) {
+        approveBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            try {
+                await apiFetch('/host-profiles/' + currentVendorId, { method: 'PUT', body: JSON.stringify({ status: 'approved' }) });
+                showVendorMessage('Anfitrião aprovado!', 'success');
+                setTimeout(function(){ closeVendorModal(); loadVendorsTable(); loadDashboardData(); }, 1200);
+            } catch (err) { showVendorMessage((err.data && err.data.message) || 'Erro.', 'error'); }
+        });
+    }
+
+    if (rejectBtn) {
+        rejectBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            if (!confirm('Tem certeza que deseja reprovar este anfitrião?')) return;
+            try {
+                await apiFetch('/host-profiles/' + currentVendorId, { method: 'PUT', body: JSON.stringify({ status: 'rejected' }) });
+                showVendorMessage('Anfitrião reprovado.', 'success');
+                setTimeout(function(){ closeVendorModal(); loadVendorsTable(); }, 1200);
+            } catch (err) { showVendorMessage((err.data && err.data.message) || 'Erro.', 'error'); }
+        });
+    }
 }
 
-function openVendorModal(vendorId = null) {
-    const modal = document.getElementById('vendorModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const vendorForm = document.getElementById('vendorForm');
-    const approveBtn = document.getElementById('approveVendorBtn');
-    const rejectBtn = document.getElementById('rejectVendorBtn');
-    
-    isEditMode = !!vendorId;
+function openVendorModal(vendorId) {
+    vendorId = vendorId || null;
+    var modal = document.getElementById('vendorModal');
+    if (!modal) return;
+    var title      = document.getElementById('modalTitle');
+    var form       = document.getElementById('vendorForm');
+    var approveBtn = document.getElementById('approveVendorBtn');
+    var rejectBtn  = document.getElementById('rejectVendorBtn');
+
+    isEditMode      = !!vendorId;
     currentVendorId = vendorId;
-    
-    // Limpar formulário
-    vendorForm.reset();
+    if (form) form.reset();
     clearAllErrors();
-    hideMessage();
-    
+    hideVendorMessage();
+
     if (isEditMode) {
-        const vendor = adminData.vendors.find(v => v.id === vendorId);
-        if (!vendor) return;
-        
-        // Preencher formulário com dados do vendedor
-        document.getElementById('vendorId').value = vendor.id;
-        document.getElementById('vendorName').value = vendor.name;
-        document.getElementById('vendorEmail').value = vendor.email;
-        document.getElementById('vendorPhone').value = vendor.phone;
-        document.getElementById('vendorCreci').value = vendor.creci;
-        document.getElementById('vendorStatus').value = vendor.status;
-        document.getElementById('vendorRegistration').value = vendor.registration;
-        
-        modalTitle.textContent = `Editar Anfitrião - ${vendor.name}`;
-        
-        // Mostrar botões de aprovar/reprovar se estiver pendente
-        if (vendor.status === 'pending') {
-            approveBtn.style.display = 'flex';
-            rejectBtn.style.display = 'flex';
-        } else {
-            approveBtn.style.display = 'none';
-            rejectBtn.style.display = 'none';
-        }
+        var v = adminData.vendors.find(function(x){ return x.id === vendorId; });
+        if (!v) return;
+        var user = v.user || {};
+        var eid = document.getElementById('vendorId');     if (eid) eid.value = v.id;
+        var en  = document.getElementById('vendorName');   if (en)  en.value  = user.name  || '';
+        var ee  = document.getElementById('vendorEmail');  if (ee)  ee.value  = user.email || '';
+        var ep  = document.getElementById('vendorPhone');  if (ep)  ep.value  = user.phone || '';
+        var ec  = document.getElementById('vendorCreci');  if (ec)  ec.value  = v.creci    || '';
+        var es  = document.getElementById('vendorStatus'); if (es)  es.value  = v.status   || 'pending';
+        if (title) title.textContent = 'Editar Anfitrião – ' + (user.name || '');
+        var isPending = v.status === 'pending';
+        if (approveBtn) approveBtn.style.display = isPending ? 'flex' : 'none';
+        if (rejectBtn)  rejectBtn.style.display  = isPending ? 'flex' : 'none';
     } else {
-        modalTitle.textContent = 'Adicionar Anfitrião';
-        approveBtn.style.display = 'none';
-        rejectBtn.style.display = 'none';
-        document.getElementById('vendorRegistration').value = new Date().toISOString().split('T')[0];
+        if (title) title.textContent = 'Adicionar Anfitrião';
+        if (approveBtn) approveBtn.style.display = 'none';
+        if (rejectBtn)  rejectBtn.style.display  = 'none';
     }
-    
     modal.classList.add('active');
 }
+
 function closeVendorModal() {
-    const modal = document.getElementById('vendorModal');
-    const vendorForm = document.getElementById('vendorForm');
-    
-    modal.classList.remove('active');
-    vendorForm.reset();
+    var modal = document.getElementById('vendorModal');
+    var form  = document.getElementById('vendorForm');
+    if (modal) modal.classList.remove('active');
+    if (form)  form.reset();
     clearAllErrors();
-    hideMessage();
+    hideVendorMessage();
     currentVendorId = null;
     isEditMode = false;
 }
 
-// Validar email
-function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// Limpar todos os erros
 function clearAllErrors() {
-    document.querySelectorAll('.error-message').forEach(el => {
-        el.textContent = '';
-        el.classList.remove('show');
-    });
-    document.querySelectorAll('.form-group input, .form-group select').forEach(el => {
-        el.classList.remove('error');
-    });
+    document.querySelectorAll('.error-message').forEach(function(el){ el.textContent = ''; el.classList.remove('show'); });
+    document.querySelectorAll('.form-group input, .form-group select').forEach(function(el){ el.classList.remove('error'); });
 }
 
-// Mostrar erro em um campo
-function showError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    const errorElement = document.getElementById(fieldId + 'Error');
-    
-    if (field) {
-        field.classList.add('error');
-    }
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.classList.add('show');
-    }
+function showError(fieldId, msg) {
+    var f = document.getElementById(fieldId); if (f) f.classList.add('error');
+    var e = document.getElementById(fieldId + 'Error'); if (e) { e.textContent = msg; e.classList.add('show'); }
 }
 
-// Validar formulário
 function validateVendorForm() {
     clearAllErrors();
-    let isValid = true;
-    
-    const name = document.getElementById('vendorName').value.trim();
-    const email = document.getElementById('vendorEmail').value.trim();
-    const phone = document.getElementById('vendorPhone').value.trim();
-    const creci = document.getElementById('vendorCreci').value.trim();
-    const status = document.getElementById('vendorStatus').value;
-    
-    if (!name) {
-        showError('vendorName', 'Nome é obrigatório');
-        isValid = false;
-    }
-    
-    if (!email) {
-        showError('vendorEmail', 'Email é obrigatório');
-        isValid = false;
-    } else if (!isValidEmail(email)) {
-        showError('vendorEmail', 'Email inválido');
-        isValid = false;
-    }
-    
-    if (!phone) {
-        showError('vendorPhone', 'Telefone é obrigatório');
-        isValid = false;
-    }
-    
-    if (!creci) {
-        showError('vendorCreci', 'CRECI é obrigatório');
-        isValid = false;
-    }
-    
-    if (!status) {
-        showError('vendorStatus', 'Status é obrigatório');
-        isValid = false;
-    }
-    
-    return isValid;
+    var ok    = true;
+    var nameEl  = document.getElementById('vendorName');
+    var emailEl = document.getElementById('vendorEmail');
+    var phoneEl = document.getElementById('vendorPhone');
+    var creciEl = document.getElementById('vendorCreci');
+    var name    = nameEl  ? nameEl.value.trim()  : '';
+    var email   = emailEl ? emailEl.value.trim() : '';
+    var phone   = phoneEl ? phoneEl.value.trim() : '';
+    var creci   = creciEl ? creciEl.value.trim() : '';
+    if (!name)  { showError('vendorName',  'Nome é obrigatório');     ok = false; }
+    if (!email) { showError('vendorEmail', 'Email é obrigatório');    ok = false; }
+    else if (!isValidEmail(email)) { showError('vendorEmail', 'Email inválido'); ok = false; }
+    if (!phone) { showError('vendorPhone', 'Telefone é obrigatório'); ok = false; }
+    if (!creci) { showError('vendorCreci', 'CRECI é obrigatório');    ok = false; }
+    return ok;
 }
 
-// Mostrar mensagem
-function showMessage(message, type = 'success') {
-    const modalMessage = document.getElementById('modalMessage');
-    if (!modalMessage) return;
-    
-    modalMessage.textContent = message;
-    modalMessage.className = `modal-message show ${type}`;
-    setTimeout(() => {
-        hideMessage();
-    }, 3000);
+function showVendorMessage(msg, type) {
+    type = type || 'success';
+    var el = document.getElementById('modalMessage');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'modal-message show ' + type;
+    setTimeout(function(){ hideVendorMessage(); }, 3000);
 }
 
-// Esconder mensagem
-function hideMessage() {
-    const modalMessage = document.getElementById('modalMessage');
-    if (!modalMessage) return;
-    
-    modalMessage.className = 'modal-message';
-    modalMessage.textContent = '';
+function hideVendorMessage() {
+    var el = document.getElementById('modalMessage');
+    if (!el) return;
+    el.className = 'modal-message';
+    el.textContent = '';
 }
 
-// Modificar função editVendor para abrir o modal
-window.editVendor = function(id) {
-    openVendorModal(id);
-};
+window.editVendor = function(id) { openVendorModal(id); };
+
+// ------------------------------------------------------------------
+// Toast helper
+// ------------------------------------------------------------------
+function showToast(message, type) {
+    type = type || 'success';
+    document.querySelectorAll('.admin-toast').forEach(function(t){ t.remove(); });
+    var el = document.createElement('div');
+    el.className = 'message admin-toast ' + type + '-message';
+    el.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check' : 'exclamation') + '-circle"></i><span>' + escapeHtml(message) + '</span>';
+    var content = document.querySelector('.admin-content');
+    if (content) content.insertBefore(el, content.firstChild);
+    setTimeout(function(){ el.remove(); }, 5000);
+}
+
+window.showMessage = showToast;
+
+// ------------------------------------------------------------------
+// Utility
+// ------------------------------------------------------------------
+function escapeHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function(m){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+    });
+}
+
+// ------------------------------------------------------------------
+// Dynamic styles
+// ------------------------------------------------------------------
+var _adminStyles = document.createElement('style');
+_adminStyles.textContent = [
+    '.property-info-table,.user-info-table{display:flex;align-items:center;gap:10px}',
+    '.property-image-table,.user-avatar-table{width:40px;height:40px;border-radius:6px;overflow:hidden;flex-shrink:0}',
+    '.property-image-table img,.user-avatar-table img{width:100%;height:100%;object-fit:cover}',
+    '.property-details,.user-details{flex:1}',
+    '.admin-toast{padding:12px 16px;border-radius:var(--radius,8px);margin-bottom:20px;display:flex;align-items:center;gap:8px;animation:slideIn .3s ease}',
+    '.success-message{background:rgba(16,185,129,.1);border:1px solid var(--success,#10b981);color:var(--success,#10b981)}',
+    '.error-message{background:rgba(239,68,68,.1);border:1px solid var(--danger,#ef4444);color:var(--danger,#ef4444)}',
+    '@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}',
+    '.btn-icon.approve{color:#10b981}',
+].join('');
+document.head.appendChild(_adminStyles);

@@ -66,7 +66,9 @@ class PromotionController extends Controller
 
     public function update(Request $request, Promotion $promotion): JsonResponse
     {
-        $this->authorize('update', $promotion);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
@@ -89,7 +91,9 @@ class PromotionController extends Controller
 
     public function destroy(Promotion $promotion): JsonResponse
     {
-        $this->authorize('delete', $promotion);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $promotion->update(['active' => false]);
 
@@ -195,7 +199,9 @@ class PromotionController extends Controller
 
     public function usage(Request $request, Promotion $promotion): JsonResponse
     {
-        $this->authorize('view', $promotion);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $usages = $promotion->usages()
             ->with(['user', 'reservation'])

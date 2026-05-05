@@ -9,75 +9,84 @@ use App\Http\Controllers\Controller;
 
 class BankAccountController extends Controller
 {
+    /**
+     * Return the host profile for the authenticated user, or a 404 JSON response.
+     */
+    private function getHostProfile()
+    {
+        return auth()->user()->hostProfile;
+    }
+
     public function index(Request $request): JsonResponse
     {
-        $bankAccounts = auth()->user()->bankAccounts()->paginate();
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile) {
+            return response()->json(['message' => 'Perfil de anfitrião não encontrado'], 404);
+        }
+
+        $bankAccounts = $hostProfile->bankAccounts()->paginate(15);
 
         return $this->paginatedResponse($bankAccounts);
     }
 
     public function show(BankAccount $bankAccount): JsonResponse
     {
-        $this->authorize('view', $bankAccount);
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile || $bankAccount->host_id !== $hostProfile->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         return $this->jsonResponse($bankAccount);
     }
 
     public function store(Request $request): JsonResponse
     {
-        // Try to get JSON data from file_get_contents as fallback
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile) {
+            return response()->json(['message' => 'Perfil de anfitrião não encontrado'], 404);
+        }
+
         $jsonInput = file_get_contents('php://input');
         if ($jsonInput) {
             $data = json_decode($jsonInput, true);
             if (json_last_error() === JSON_ERROR_NONE && $data) {
                 $validated = validator($data, [
-                    'bank_name' => 'required|string|max:100',
-                    'bank_code' => 'required|string|max:10',
-                    'agency_number' => 'required|string|max:20',
-                    'account_number' => 'required|string|max:30',
-                    'account_type' => 'required|in:checking,savings',
+                    'bank_name'           => 'required|string|max:100',
+                    'bank_code'           => 'nullable|string|max:10',
+                    'account_number'      => 'required|string|max:30',
+                    'account_type'        => 'required|in:checking,savings',
                     'account_holder_name' => 'required|string|max:255',
-                    'account_holder_document' => 'required|string|max:20',
-                    'is_default' => 'boolean',
-                    'pix_key_type' => 'nullable|in:cpf,cnpj,email,phone,random',
-                    'pix_key' => 'nullable|string|max:255|required_with:pix_key_type'
+                    'account_document'    => 'nullable|string|max:20',
                 ])->validate();
 
-                // If setting as default, unset other defaults
-                if ($validated['is_default'] ?? false) {
-                    auth()->user()->bankAccounts()->update(['is_default' => false]);
-                }
-
-                $bankAccount = auth()->user()->bankAccounts()->create($validated);
+                $bankAccount = $hostProfile->bankAccounts()->create($validated);
 
                 return $this->jsonResponse($bankAccount, 201);
             }
         }
-        
+
         return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     public function update(Request $request, BankAccount $bankAccount): JsonResponse
     {
-        $this->authorize('update', $bankAccount);
+        $hostProfile = $this->getHostProfile();
+
+        if (!$hostProfile || $bankAccount->host_id !== $hostProfile->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $validated = $request->validate([
-            'bank_name' => 'sometimes|string|max:100',
-            'bank_code' => 'sometimes|string|max:10',
-            'agency_number' => 'sometimes|string|max:20',
-            'account_number' => 'sometimes|string|max:30',
-            'account_type' => 'sometimes|in:checking,savings',
+            'bank_name'           => 'sometimes|string|max:100',
+            'bank_code'           => 'nullable|string|max:10',
+            'account_number'      => 'sometimes|string|max:30',
+            'account_type'        => 'sometimes|in:checking,savings',
             'account_holder_name' => 'sometimes|string|max:255',
-            'account_holder_document' => 'sometimes|string|max:20',
-            'is_default' => 'boolean',
-            'pix_key_type' => 'nullable|in:cpf,cnpj,email,phone,random',
-            'pix_key' => 'nullable|string|max:255|required_with:pix_key_type'
+            'account_document'    => 'nullable|string|max:20',
         ]);
-
-        // If setting as default, unset other defaults
-        if (($validated['is_default'] ?? false) && !$bankAccount->is_default) {
-            auth()->user()->bankAccounts()->where('id', '!=', $bankAccount->id)->update(['is_default' => false]);
-        }
 
         $bankAccount->update($validated);
 
@@ -86,30 +95,27 @@ class BankAccountController extends Controller
 
     public function destroy(BankAccount $bankAccount): JsonResponse
     {
-        $this->authorize('delete', $bankAccount);
+        $hostProfile = $this->getHostProfile();
 
-        // Prevent deletion of default account if user has other accounts
-        if ($bankAccount->is_default && auth()->user()->bankAccounts()->count() > 1) {
-            return response()->json([
-                'error' => 'Cannot delete default bank account. Please set another account as default first.'
-            ], 400);
+        if (!$hostProfile || $bankAccount->host_id !== $hostProfile->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
         }
 
         $bankAccount->delete();
 
-        return $this->jsonResponse(['message' => 'Bank account deleted']);
+        return $this->jsonResponse(['message' => 'Conta bancária removida']);
     }
 
     public function setDefault(Request $request, BankAccount $bankAccount): JsonResponse
     {
-        $this->authorize('update', $bankAccount);
+        $hostProfile = $this->getHostProfile();
 
-        // Unset all other defaults
-        auth()->user()->bankAccounts()->where('id', '!=', $bankAccount->id)->update(['is_default' => false]);
+        if (!$hostProfile || $bankAccount->host_id !== $hostProfile->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
-        // Set this as default
-        $bankAccount->update(['is_default' => true]);
-
+        // This is informational only since the schema doesn't have is_default.
+        // The "default" account is simply the most-recently used one.
         return $this->jsonResponse($bankAccount);
     }
 }

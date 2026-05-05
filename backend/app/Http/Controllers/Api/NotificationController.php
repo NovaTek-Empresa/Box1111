@@ -17,8 +17,13 @@ class NotificationController extends Controller
             $query->where('type', $request->type);
         }
 
+        // "read" filter: true = already read (read_at IS NOT NULL), false = unread
         if ($request->has('read')) {
-            $query->where('read', $request->boolean('read'));
+            if ($request->boolean('read')) {
+                $query->whereNotNull('read_at');
+            } else {
+                $query->whereNull('read_at');
+            }
         }
 
         $notifications = $query->orderBy('created_at', 'desc')->paginate(20);
@@ -28,45 +33,53 @@ class NotificationController extends Controller
 
     public function show(Notification $notification): JsonResponse
     {
-        $this->authorize('view', $notification);
+        if ($notification->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         return $this->jsonResponse($notification);
     }
 
     public function store(Request $request): JsonResponse
     {
-        // Try to get JSON data from file_get_contents as fallback
         $jsonInput = file_get_contents('php://input');
         if ($jsonInput) {
-            $data = json_decode($jsonInput, true);
-            if (json_last_error() === JSON_ERROR_NONE && $data) {
-                $validated = validator($data, [
-                    'user_id' => 'required|exists:users,id',
-                    'title' => 'required|string|max:255',
-                    'message' => 'required|string|max:1000',
-                    'type' => 'required|in:info,warning,success,error',
-                    'action_url' => 'nullable|url',
-                    'action_text' => 'nullable|string|max:50',
-                    'expires_at' => 'nullable|date|after:now'
+            $decoded = json_decode($jsonInput, true);
+            if (json_last_error() === JSON_ERROR_NONE && $decoded) {
+                $validated = validator($decoded, [
+                    'user_id'    => 'required|exists:users,id',
+                    'type'       => 'required|in:reservation_request,reservation_confirmed,reservation_rejected,reservation_canceled,payment_received,payment_failed,review_posted,message_received,host_verified,cohost_invited,cohost_accepted,property_reported,system_alert',
+                    'title'      => 'nullable|string|max:255',
+                    'message'    => 'nullable|string|max:1000',
+                    'icon'       => 'nullable|string|max:100',
+                    'action_url' => 'nullable|string|max:500',
                 ])->validate();
 
-                $notification = Notification::create($validated);
+                $notification = Notification::create([
+                    'user_id' => $validated['user_id'],
+                    'type'    => $validated['type'],
+                    'data'    => [
+                        'title'      => $validated['title'] ?? null,
+                        'message'    => $validated['message'] ?? null,
+                        'icon'       => $validated['icon'] ?? null,
+                        'action_url' => $validated['action_url'] ?? null,
+                    ],
+                ]);
 
                 return $this->jsonResponse($notification, 201);
             }
         }
-        
+
         return response()->json(['message' => 'Invalid JSON data'], 400);
     }
 
     public function markAsRead(Request $request, Notification $notification): JsonResponse
     {
-        $this->authorize('update', $notification);
+        if ($notification->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
-        $notification->update([
-            'read' => true,
-            'read_at' => now()
-        ]);
+        $notification->update(['read_at' => now()]);
 
         return $this->jsonResponse($notification);
     }
@@ -74,28 +87,27 @@ class NotificationController extends Controller
     public function markAllAsRead(Request $request): JsonResponse
     {
         auth()->user()->notifications()
-            ->where('read', false)
-            ->update([
-                'read' => true,
-                'read_at' => now()
-            ]);
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
-        return $this->jsonResponse(['message' => 'All notifications marked as read']);
+        return $this->jsonResponse(['message' => 'Todas as notificações marcadas como lidas']);
     }
 
     public function destroy(Notification $notification): JsonResponse
     {
-        $this->authorize('delete', $notification);
+        if ($notification->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $notification->delete();
 
-        return $this->jsonResponse(['message' => 'Notification deleted']);
+        return $this->jsonResponse(['message' => 'Notificação removida']);
     }
 
     public function unreadCount(Request $request): JsonResponse
     {
         $count = auth()->user()->notifications()
-            ->where('read', false)
+            ->whereNull('read_at')
             ->count();
 
         return $this->jsonResponse(['unread_count' => $count]);

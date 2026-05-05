@@ -13,14 +13,36 @@ class ReservationController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        $user    = auth()->user();
+        $perPage = min((int) $request->query('per_page', 15), 200);
 
-        if ($request->has('as') && $request->as === 'host') {
-            $reservations = Reservation::whereHas('property', function ($q) use ($user) {
-                $q->where('host_id', $user->hostProfile->id ?? null);
-            })->paginate();
+        // Admins can see all reservations; regular users see only their own
+        if ($user->role === 'admin') {
+            $query = Reservation::with(['property', 'guest', 'host']);
+
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+            if ($request->has('start_date')) {
+                $query->where('check_in', '>=', $request->start_date);
+            }
+            if ($request->has('end_date')) {
+                $query->where('check_out', '<=', $request->end_date);
+            }
+
+            $reservations = $query->latest()->paginate($perPage);
+        } elseif ($request->has('as') && $request->as === 'host') {
+            $reservations = Reservation::with(['property', 'guest'])
+                ->whereHas('property', function ($q) use ($user) {
+                    $q->where('host_id', $user->hostProfile->id ?? null);
+                })
+                ->latest()
+                ->paginate($perPage);
         } else {
-            $reservations = $user->guestReservations()->paginate();
+            $reservations = $user->guestReservations()
+                ->with(['property', 'guest'])
+                ->latest()
+                ->paginate($perPage);
         }
 
         return $this->paginatedResponse($reservations);

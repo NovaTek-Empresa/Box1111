@@ -33,7 +33,8 @@ class UserController extends Controller
             }
         }
 
-        $users = $query->paginate(15);
+        $perPage = min((int) $request->query('per_page', 15), 200);
+        $users = $query->paginate($perPage);
 
         return $this->paginatedResponse($users);
     }
@@ -84,7 +85,11 @@ class UserController extends Controller
 
     public function update(Request $request, User $user): JsonResponse
     {
-        $this->authorize('update', $user);
+        $authUser = auth()->user();
+        // Only admin or the user themselves can update
+        if ($authUser->role !== 'admin' && $authUser->id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
@@ -111,7 +116,9 @@ class UserController extends Controller
 
     public function destroy(User $user): JsonResponse
     {
-        $this->authorize('delete', $user);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         // Soft delete by setting email to null and adding deleted_at timestamp
         $user->update([
@@ -124,7 +131,10 @@ class UserController extends Controller
 
     public function documents(Request $request, User $user): JsonResponse
     {
-        $this->authorize('view', $user);
+        $authUser = auth()->user();
+        if ($authUser->role !== 'admin' && $authUser->id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $documents = $user->documents()->paginate();
 
@@ -133,7 +143,10 @@ class UserController extends Controller
 
     public function uploadDocument(Request $request, User $user): JsonResponse
     {
-        $this->authorize('update', $user);
+        $authUser = auth()->user();
+        if ($authUser->role !== 'admin' && $authUser->id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $validated = $request->validate([
             'document_type' => 'required|in:id_card,passport,driver_license,proof_of_address',
@@ -161,7 +174,9 @@ class UserController extends Controller
 
     public function verifyDocument(Request $request, User $user, UserDocument $document): JsonResponse
     {
-        $this->authorize('verify', $document);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $validated = $request->validate([
             'status' => 'required|in:approved,rejected',

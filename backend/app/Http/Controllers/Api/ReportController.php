@@ -48,7 +48,11 @@ class ReportController extends Controller
 
     public function show(Report $report): JsonResponse
     {
-        $this->authorize('view', $report);
+        $user = auth()->user();
+        // Admin can view any report; others can only view their own
+        if ($user->role !== 'admin' && $report->reporter_id !== $user->id) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         return $this->jsonResponse($report->load(['reporter', 'reportedEntity', 'reviewer']));
     }
@@ -103,7 +107,9 @@ class ReportController extends Controller
 
     public function update(Request $request, Report $report): JsonResponse
     {
-        $this->authorize('update', $report);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $validated = $request->validate([
             'status' => 'required|in:pending,under_review,resolved,dismissed',
@@ -119,7 +125,9 @@ class ReportController extends Controller
 
     public function destroy(Report $report): JsonResponse
     {
-        $this->authorize('delete', $report);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $report->delete();
 
@@ -143,7 +151,9 @@ class ReportController extends Controller
 
     public function statistics(Request $request): JsonResponse
     {
-        $this->authorize('viewReports', Report::class);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $stats = [
             'total_reports' => Report::count(),
@@ -169,7 +179,9 @@ class ReportController extends Controller
 
     public function bulkUpdate(Request $request): JsonResponse
     {
-        $this->authorize('bulkUpdate', Report::class);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
 
         $validated = $request->validate([
             'report_ids' => 'required|array',
