@@ -53,60 +53,68 @@ class PropertyController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        // Try to get JSON data from file_get_contents as fallback
-        $jsonInput = file_get_contents('php://input');
-        if ($jsonInput) {
-            $data = json_decode($jsonInput, true);
-            if (json_last_error() === JSON_ERROR_NONE && $data) {
-                // Validate the data
-                $rules = [
-                    'title' => 'required|string|max:255',
-                    'description' => 'required|string',
-                    'property_type' => 'required|string',
-                    'city' => 'required|string',
-                    'state' => 'required|string',
-                    'bedrooms' => 'required|integer|min:1',
-                    'bathrooms' => 'required|integer|min:1',
-                    'guests_capacity' => 'required|integer|min:1',
-                    'nightly_price' => 'required|numeric|min:0',
-                    'cleaning_fee' => 'numeric|min:0',
-                ];
-                
-                $validator = validator($data, $rules);
-                if ($validator->fails()) {
-                    return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
-                }
-                
-                $validated = $validator->validated();
-
-                // Add host_id automatically
-                $validated['host_id'] = auth()->user()->hostProfile->id;
-                
-                $property = Property::create($validated);
-
-                return $this->jsonResponse($property, 201);
-            }
+        // Check if user has host profile
+        if (!auth()->user()->hostProfile) {
+            return response()->json(['message' => 'User does not have a host profile'], 403);
         }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'property_type' => 'required|string',
+            'street_address' => 'nullable|string',
+            'neighborhood' => 'nullable|string',
+            'city' => 'required|string',
+            'state' => 'required|string|max:2',
+            'postal_code' => 'nullable|string|max:10',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'bedrooms' => 'required|integer|min:1',
+            'bathrooms' => 'required|integer|min:1',
+            'guests_capacity' => 'required|integer|min:1',
+            'nightly_price' => 'required|numeric|min:0',
+            'cleaning_fee' => 'nullable|numeric|min:0',
+            'amenities' => 'nullable|array',
+            'rules' => 'nullable|string',
+            'cancellation_policy' => 'nullable|string',
+            'image_url' => 'nullable|url'
+        ]);
+
+        // Add host_id automatically
+        $validated['host_id'] = auth()->user()->hostProfile->id;
         
-        return response()->json(['message' => 'Invalid JSON data'], 400);
+        $property = Property::create($validated);
+
+        return $this->jsonResponse($property, 201);
     }
 
     public function update(Request $request, Property $property): JsonResponse
     {
-        // TODO: Implement authorization policy
-        // $this->authorize('update', $property);
+        // Check if user owns this property
+        if (!auth()->user()->hostProfile || auth()->user()->hostProfile->id !== $property->host_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $validated = $request->validate([
-            'title' => 'string|max:255',
-            'description' => 'string',
-            'property_type' => 'string',
-            'city' => 'string',
-            'state' => 'string',
-            'bedrooms' => 'integer|min:1',
-            'bathrooms' => 'integer|min:1',
-            'guests_capacity' => 'integer|min:1',
-            'nightly_price' => 'numeric|min:0',
-            'cleaning_fee' => 'numeric|min:0',
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'property_type' => 'sometimes|string',
+            'street_address' => 'sometimes|nullable|string',
+            'neighborhood' => 'sometimes|nullable|string',
+            'city' => 'sometimes|string',
+            'state' => 'sometimes|string|max:2',
+            'postal_code' => 'sometimes|nullable|string|max:10',
+            'latitude' => 'sometimes|nullable|numeric',
+            'longitude' => 'sometimes|nullable|numeric',
+            'bedrooms' => 'sometimes|integer|min:1',
+            'bathrooms' => 'sometimes|integer|min:1',
+            'guests_capacity' => 'sometimes|integer|min:1',
+            'nightly_price' => 'sometimes|numeric|min:0',
+            'cleaning_fee' => 'sometimes|numeric|min:0',
+            'amenities' => 'sometimes|nullable|array',
+            'rules' => 'sometimes|nullable|string',
+            'cancellation_policy' => 'sometimes|nullable|string',
+            'image_url' => 'sometimes|nullable|url'
         ]);
 
         $property->update($validated);
@@ -116,8 +124,10 @@ class PropertyController extends Controller
 
     public function destroy(Property $property): JsonResponse
     {
-        // TODO: Implement authorization policy
-        // $this->authorize('delete', $property);
+        // Check if user owns this property
+        if (!auth()->user()->hostProfile || auth()->user()->hostProfile->id !== $property->host_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $property->delete();
 

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CalendarAvailability extends Model
 {
+    protected $table = 'calendar_availabilities';
+    
     protected $fillable = [
         'property_id',
         'date_specific',
@@ -26,6 +28,6 @@ class CalendarAvailability extends Model
 
     public function reservation(): BelongsTo
     {
-        return $this->belongsTo(Reservation::class)->nullable();
+        return $this->belongsTo(Reservation::class);
     }
 }

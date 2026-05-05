@@ -34,6 +34,8 @@ class Property extends Model
         'image_url',
         'total_reviews',
         'average_rating',
+        'views',
+        'requests',
         'listed_at'
     ];
 

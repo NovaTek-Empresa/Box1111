@@ -14,7 +14,7 @@ class VendorPropertyForm {
     setupEventListeners() {
         // Listener para o formulário de propriedade
         document.addEventListener('submit', async (e) => {
-            if (e.target.id === 'propertyForm') {
+            if (e.target.id === 'addPropertyForm') {
                 e.preventDefault();
                 await this.handlePropertySubmit(e);
             }
@@ -88,26 +88,42 @@ class VendorPropertyForm {
     }
 
     formatPropertyData(formData) {
+        // Mapear campos do formulário para a API
         const data = {
             title: formData.get('title'),
             description: formData.get('description'),
-            property_type: formData.get('property_type'),
-            street_address: formData.get('street_address'),
+            property_type: formData.get('type'), // Campo 'type' no HTML
+            street_address: formData.get('street'),
             neighborhood: formData.get('neighborhood'),
             city: formData.get('city'),
             state: formData.get('state'),
-            postal_code: formData.get('postal_code'),
+            postal_code: formData.get('cep'),
             bedrooms: parseInt(formData.get('bedrooms')) || 1,
             bathrooms: parseInt(formData.get('bathrooms')) || 1,
-            guests_capacity: parseInt(formData.get('guests_capacity')) || 1,
-            nightly_price: parseFloat(formData.get('nightly_price')) || 0,
-            cleaning_fee: parseFloat(formData.get('cleaning_fee')) || 0,
-            amenities: JSON.parse(formData.get('amenities') || '[]'),
-            rules: JSON.parse(formData.get('rules') || '[]'),
-            cancellation_policy: formData.get('cancellation_policy') || 'moderate'
+            guests_capacity: parseInt(formData.get('bedrooms')) || 1, // Usar bedrooms como capacidade se não houver campo específico
+            nightly_price: this.parseCurrency(formData.get('price')) || 0,
+            cleaning_fee: 0, // Campo não existe no formulário atual
+            amenities: [], // Será preenchido pelos checkboxes
+            rules: formData.get('access') || '',
+            cancellation_policy: 'moderate' // Padrão
         };
 
         return data;
+    }
+
+    parseCurrency(value) {
+        if (!value) return 0;
+        // Remover R$, espaços e converter para número
+        const cleanValue = value.replace(/[R$\s.]/g, '').replace(',', '.');
+        return parseFloat(cleanValue) || 0;
+    }
+
+    formatCurrency(value) {
+        if (!value) return 'R$ 0,00';
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value);
     }
 
     async editProperty(propertyId) {
@@ -132,24 +148,22 @@ class VendorPropertyForm {
     }
 
     populateForm(property) {
-        const form = document.getElementById('propertyForm');
+        const form = document.getElementById('addPropertyForm');
         if (!form) return;
 
         // Preencher campos básicos
         form.querySelector('[name="title"]').value = property.title || '';
         form.querySelector('[name="description"]').value = property.description || '';
-        form.querySelector('[name="property_type"]').value = property.property_type || '';
-        form.querySelector('[name="street_address"]').value = property.street_address || '';
+        form.querySelector('[name="type"]').value = property.property_type || '';
+        form.querySelector('[name="street"]').value = property.street_address || '';
         form.querySelector('[name="neighborhood"]').value = property.neighborhood || '';
         form.querySelector('[name="city"]').value = property.city || '';
         form.querySelector('[name="state"]').value = property.state || '';
-        form.querySelector('[name="postal_code"]').value = property.postal_code || '';
+        form.querySelector('[name="cep"]').value = property.postal_code || '';
         form.querySelector('[name="bedrooms"]').value = property.bedrooms || 1;
         form.querySelector('[name="bathrooms"]').value = property.bathrooms || 1;
-        form.querySelector('[name="guests_capacity"]').value = property.guests_capacity || 1;
-        form.querySelector('[name="nightly_price"]').value = property.nightly_price || 0;
-        form.querySelector('[name="cleaning_fee"]').value = property.cleaning_fee || 0;
-        form.querySelector('[name="cancellation_policy"]').value = property.cancellation_policy || 'moderate';
+        form.querySelector('[name="price"]').value = this.formatCurrency(property.nightly_price || 0);
+        form.querySelector('[name="access"]').value = property.rules || '';
 
         // Preencher amenities
         const amenitiesField = form.querySelector('[name="amenities"]');
@@ -227,7 +241,7 @@ class VendorPropertyForm {
     }
 
     resetForm() {
-        const form = document.getElementById('propertyForm');
+        const form = document.getElementById('addPropertyForm');
         if (form) {
             form.reset();
             
@@ -248,7 +262,7 @@ class VendorPropertyForm {
             formTitle.textContent = 'Adicionar Nova Propriedade';
         }
 
-        const submitBtn = document.querySelector('#propertyForm button[type="submit"]');
+        const submitBtn = document.querySelector('#addPropertyForm button[type="submit"]');
         if (submitBtn) {
             submitBtn.textContent = 'Salvar Propriedade';
         }
